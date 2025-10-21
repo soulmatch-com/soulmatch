@@ -1,0 +1,225 @@
+
+> soulmatch-web@0.1.0 build
+> next build --turbopack
+
+   ▲ Next.js 15.5.4 (Turbopack)
+   - Environments: .env.local
+   - Experiments (use with caution):
+     · optimizePackageImports
+
+   Creating an optimized production build ...
+
+[2m[258.14ms][22m [@tailwindcss/postcss] src/app/globals.css
+[2m[  0.24ms][22m  [2m ↳ [22mQuick bail check
+[2m[ 75.02ms][22m  [2m ↳ [22mSetup compiler
+[2m[  1.03ms][22m    [2m ↳ [22mPostCSS AST -> Tailwind CSS AST
+[2m[ 73.87ms][22m    [2m ↳ [22mCreate compiler
+[2m[  0.34ms][22m  [2m ↳ [22mRegister full rebuild paths
+[2m[  2.66ms][22m  [2m ↳ [22mSetup scanner
+[2m[ 19.34ms][22m  [2m ↳ [22mScan for candidates
+[2m[ 16.58ms][22m  [2m ↳ [22mRegister dependency messages
+[2m[ 92.12ms][22m  [2m ↳ [22mBuild utilities
+[2m[ 44.26ms][22m  [2m ↳ [22mOptimization
+[2m[  2.71ms][22m    [2m ↳ [22mAST -> CSS
+[2m[ 15.37ms][22m    [2m ↳ [22mLightning CSS
+[2m[ 26.01ms][22m    [2m ↳ [22mCSS -> PostCSS AST
+[2m[  5.96ms][22m  [2m ↳ [22mUpdate PostCSS AST
+
+ ✓ Finished writing to disk in 67ms
+ ✓ Compiled successfully in 12.7s
+   Linting and checking validity of types ...
+
+./src/app/(dashboard)/profile/[id]/page.tsx
+334:65  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+340:65  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+346:65  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+352:65  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+
+./src/app/(dashboard)/profile/edit/page.tsx
+12:18  Warning: 'AvatarImage' is defined but never used.  @typescript-eslint/no-unused-vars
+72:6  Warning: React Hook useEffect has a missing dependency: 'loadProfile'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+485:54  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+720:53  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+730:59  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+742:53  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+752:59  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+
+./src/app/(dashboard)/search/page.tsx
+59:6  Warning: React Hook useEffect has a missing dependency: 'loadProfiles'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+
+./src/app/admin/active-profiles/page.tsx
+43:6  Warning: React Hook useEffect has a missing dependency: 'fetchActiveProfiles'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+171:29  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./src/app/admin/profiles/page.tsx
+43:6  Warning: React Hook useEffect has a missing dependency: 'fetchProfiles'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+189:29  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./src/app/admin/users/page.tsx
+48:6  Warning: React Hook useEffect has a missing dependency: 'fetchUsers'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+89:14  Warning: 'error' is defined but never used.  @typescript-eslint/no-unused-vars
+110:14  Warning: 'error' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./src/app/admin/verification-queue/page.tsx
+146:29  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./src/app/api/admin/auth/login/route.ts
+72:28  Warning: '_' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+./src/app/api/admin/profiles/verify/route.ts
+21:23  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/app/api/admin/setup/route.ts
+6:28  Warning: 'request' is defined but never used.  @typescript-eslint/no-unused-vars
+36:13  Warning: 'data' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+./src/app/api/admin/stats/route.ts
+147:50  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/app/api/admin/users/[id]/route.ts
+29:36  Warning: 'authError' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+59:20  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/app/api/admin/users/route.ts
+45:11  Warning: 'userIds' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+./src/app/api/upload/route.ts
+24:38  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/components/Header.tsx
+26:14  Warning: 'error' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./src/components/auth/ForgotPasswordForm.tsx
+75:15  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+83:17  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+109:42  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+
+./src/components/auth/LoginForm.tsx
+81:14  Warning: 'error' is defined but never used.  @typescript-eslint/no-unused-vars
+162:16  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+
+./src/components/auth/ResetPasswordForm.tsx
+95:14  Warning: 'error' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./src/components/auth/SocialLogin.tsx
+34:14  Warning: 'error' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./src/components/auth/TwoFactorSetup.tsx
+25:6  Warning: React Hook useEffect has a missing dependency: 'checkTwoFactorStatus'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+42:14  Warning: 'error' is defined but never used.  @typescript-eslint/no-unused-vars
+66:14  Warning: 'error' is defined but never used.  @typescript-eslint/no-unused-vars
+104:14  Warning: 'error' is defined but never used.  @typescript-eslint/no-unused-vars
+133:14  Warning: 'error' is defined but never used.  @typescript-eslint/no-unused-vars
+181:18  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+205:17  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+282:50  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+293:40  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+
+./src/components/auth/TwoFactorVerification.tsx
+70:14  Warning: 'error' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./src/components/profile/BasicInfoForm.tsx
+26:47  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+79:86  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+96:100  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+170:86  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+177:46  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+
+./src/components/profile/PhotoUpload.tsx
+9:8  Warning: 'Image' is defined but never used.  @typescript-eslint/no-unused-vars
+63:14  Warning: 'error' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./src/lib/supabase/middleware.ts
+18:48  Warning: 'options' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./src/modules/admin/services/auth.service.ts
+36:21  Warning: 'token' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./src/modules/admin/services/user.service.ts
+14:18  Warning: 'params' is defined but never used.  @typescript-eslint/no-unused-vars
+28:21  Warning: 'id' is defined but never used.  @typescript-eslint/no-unused-vars
+37:5  Warning: 'userId' is defined but never used.  @typescript-eslint/no-unused-vars
+38:5  Warning: 'status' is defined but never used.  @typescript-eslint/no-unused-vars
+47:20  Warning: 'userId' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./src/scripts/create-admin.ts
+51:13  Warning: 'data' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+info  - Need to disable some ESLint rules? Learn more here: https://nextjs.org/docs/app/api-reference/config/eslint#disabling-rules
+   Collecting page data ...
+⚠️  Node.js 18 and below are deprecated and will no longer be supported in future versions of @supabase/supabase-js. Please upgrade to Node.js 20 or later. For more information, visit: https://github.com/orgs/supabase/discussions/37217
+⚠️  Node.js 18 and below are deprecated and will no longer be supported in future versions of @supabase/supabase-js. Please upgrade to Node.js 20 or later. For more information, visit: https://github.com/orgs/supabase/discussions/37217
+⚠️  Node.js 18 and below are deprecated and will no longer be supported in future versions of @supabase/supabase-js. Please upgrade to Node.js 20 or later. For more information, visit: https://github.com/orgs/supabase/discussions/37217
+⚠️  Node.js 18 and below are deprecated and will no longer be supported in future versions of @supabase/supabase-js. Please upgrade to Node.js 20 or later. For more information, visit: https://github.com/orgs/supabase/discussions/37217
+⚠️  Node.js 18 and below are deprecated and will no longer be supported in future versions of @supabase/supabase-js. Please upgrade to Node.js 20 or later. For more information, visit: https://github.com/orgs/supabase/discussions/37217
+⚠️  Node.js 18 and below are deprecated and will no longer be supported in future versions of @supabase/supabase-js. Please upgrade to Node.js 20 or later. For more information, visit: https://github.com/orgs/supabase/discussions/37217
+⚠️  Node.js 18 and below are deprecated and will no longer be supported in future versions of @supabase/supabase-js. Please upgrade to Node.js 20 or later. For more information, visit: https://github.com/orgs/supabase/discussions/37217
+⚠️  Node.js 18 and below are deprecated and will no longer be supported in future versions of @supabase/supabase-js. Please upgrade to Node.js 20 or later. For more information, visit: https://github.com/orgs/supabase/discussions/37217
+⚠️  Node.js 18 and below are deprecated and will no longer be supported in future versions of @supabase/supabase-js. Please upgrade to Node.js 20 or later. For more information, visit: https://github.com/orgs/supabase/discussions/37217
+⚠️  Node.js 18 and below are deprecated and will no longer be supported in future versions of @supabase/supabase-js. Please upgrade to Node.js 20 or later. For more information, visit: https://github.com/orgs/supabase/discussions/37217
+⚠️  Node.js 18 and below are deprecated and will no longer be supported in future versions of @supabase/supabase-js. Please upgrade to Node.js 20 or later. For more information, visit: https://github.com/orgs/supabase/discussions/37217
+⚠️  Node.js 18 and below are deprecated and will no longer be supported in future versions of @supabase/supabase-js. Please upgrade to Node.js 20 or later. For more information, visit: https://github.com/orgs/supabase/discussions/37217
+⚠️  Node.js 18 and below are deprecated and will no longer be supported in future versions of @supabase/supabase-js. Please upgrade to Node.js 20 or later. For more information, visit: https://github.com/orgs/supabase/discussions/37217
+⚠️  Node.js 18 and below are deprecated and will no longer be supported in future versions of @supabase/supabase-js. Please upgrade to Node.js 20 or later. For more information, visit: https://github.com/orgs/supabase/discussions/37217
+⚠️  Node.js 18 and below are deprecated and will no longer be supported in future versions of @supabase/supabase-js. Please upgrade to Node.js 20 or later. For more information, visit: https://github.com/orgs/supabase/discussions/37217
+   Generating static pages (0/32) ...
+⚠️  Node.js 18 and below are deprecated and will no longer be supported in future versions of @supabase/supabase-js. Please upgrade to Node.js 20 or later. For more information, visit: https://github.com/orgs/supabase/discussions/37217
+⚠️  Node.js 18 and below are deprecated and will no longer be supported in future versions of @supabase/supabase-js. Please upgrade to Node.js 20 or later. For more information, visit: https://github.com/orgs/supabase/discussions/37217
+⚠️  Node.js 18 and below are deprecated and will no longer be supported in future versions of @supabase/supabase-js. Please upgrade to Node.js 20 or later. For more information, visit: https://github.com/orgs/supabase/discussions/37217
+   Generating static pages (8/32) 
+⚠️  Node.js 18 and below are deprecated and will no longer be supported in future versions of @supabase/supabase-js. Please upgrade to Node.js 20 or later. For more information, visit: https://github.com/orgs/supabase/discussions/37217
+   Generating static pages (16/32) 
+⚠️  Node.js 18 and below are deprecated and will no longer be supported in future versions of @supabase/supabase-js. Please upgrade to Node.js 20 or later. For more information, visit: https://github.com/orgs/supabase/discussions/37217
+   Generating static pages (24/32) 
+ ✓ Generating static pages (32/32)
+   Finalizing page optimization ...
+   Collecting build traces ...
+
+Route (app)                         Size  First Load JS
+┌ ○ /                              938 B         193 kB
+├ ○ /_not-found                      0 B         192 kB
+├ ○ /2fa-setup                   4.17 kB         196 kB
+├ ○ /admin/active-profiles       3.21 kB         199 kB
+├ ○ /admin/dashboard             2.25 kB         198 kB
+├ ○ /admin/login                 2.81 kB         262 kB
+├ ○ /admin/profiles              3.21 kB         199 kB
+├ ○ /admin/settings                974 B         197 kB
+├ ○ /admin/users                 15.6 kB         211 kB
+├ ○ /admin/verification-queue    2.77 kB         198 kB
+├ ƒ /api/admin/auth/login            0 B            0 B
+├ ƒ /api/admin/profiles              0 B            0 B
+├ ƒ /api/admin/profiles/status       0 B            0 B
+├ ƒ /api/admin/profiles/verify       0 B            0 B
+├ ƒ /api/admin/setup                 0 B            0 B
+├ ƒ /api/admin/stats                 0 B            0 B
+├ ƒ /api/admin/users                 0 B            0 B
+├ ƒ /api/admin/users/[id]            0 B            0 B
+├ ƒ /api/auth/callback               0 B            0 B
+├ ƒ /api/auth/confirm                0 B            0 B
+├ ƒ /api/auth/signout                0 B            0 B
+├ ƒ /api/upload                      0 B            0 B
+├ ƒ /dashboard                    7.7 kB         200 kB
+├ ○ /forgot-password             3.23 kB         259 kB
+├ ○ /login                       4.74 kB         261 kB
+├ ƒ /profile/[id]                10.3 kB         203 kB
+├ ƒ /profile/create              7.35 kB         290 kB
+├ ƒ /profile/edit                13.2 kB         232 kB
+├ ƒ /reset-password              3.56 kB         260 kB
+├ ƒ /search                      10.7 kB         229 kB
+├ ○ /signup                      3.94 kB         260 kB
+└ ○ /verify-otp                    827 B         193 kB
++ First Load JS shared by all     202 kB
+  ├ chunks/2008ffcf9e5b170c.js     13 kB
+  ├ chunks/25fbea50b095c333.js   59.2 kB
+  ├ chunks/56f90dc135d854c1.js   17.2 kB
+  ├ chunks/bab8b880165d4663.js   10.5 kB
+  ├ chunks/d8ec5a57dd5c1438.js   10.9 kB
+  └ chunks/eb940ab5579b8716.js   44.3 kB
+  └ other shared chunks (total)  46.6 kB
+
+
+ƒ Middleware                     73.8 kB
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+

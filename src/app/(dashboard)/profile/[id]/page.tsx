@@ -10,6 +10,8 @@ import { toast } from 'sonner'
 import Image from 'next/image'
 import { ArrowLeft, Heart, X } from 'lucide-react'
 
+export const dynamic = 'force-dynamic'
+
 interface ProfileDetailProps {
   params: {
     id: string

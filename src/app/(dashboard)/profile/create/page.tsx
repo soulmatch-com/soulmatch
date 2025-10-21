@@ -9,6 +9,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { toast } from 'sonner'
 import { BasicInfoInput } from '@/lib/validations/profile.schema'
 
+export const dynamic = 'force-dynamic'
+
 export default function CreateProfilePage() {
   const router = useRouter()
   const supabase = createClient()

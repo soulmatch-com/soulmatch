@@ -12,6 +12,8 @@ import { toast } from 'sonner'
 import Link from 'next/link'
 import Image from 'next/image'
 
+export const dynamic = 'force-dynamic'
+
 interface Profile {
   id: string
   user_id: string

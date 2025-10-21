@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { toast } from 'sonner'
-import { CheckCircle2, XCircle, Eye, Filter, Power, PowerOff } from 'lucide-react'
+import { CheckCircle2, XCircle, Eye, UserCheck, PowerOff } from 'lucide-react'
 
 interface Profile {
   id: string
@@ -18,6 +18,7 @@ interface Profile {
   marital_status: string
   city: string
   state: string
+  date_of_birth: string
   profile_status: string
   is_verified: boolean
   verified_at: string | null
@@ -25,12 +26,11 @@ interface Profile {
   profile_photo_url: string | null
 }
 
-export default function AdminProfilesPage() {
+export default function ActiveProfilesPage() {
   const { isAuthenticated } = useAdminStore()
   const router = useRouter()
   const [profiles, setProfiles] = useState<Profile[]>([])
   const [isLoading, setIsLoading] = useState(true)
-  const [filter, setFilter] = useState<'all' | 'verified' | 'unverified'>('all')
   const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
 
@@ -38,25 +38,14 @@ export default function AdminProfilesPage() {
     if (!isAuthenticated()) {
       router.push('/admin/login')
     } else {
-      fetchProfiles()
+      fetchActiveProfiles()
     }
-  }, [isAuthenticated, router, filter, page])
+  }, [isAuthenticated, router, page])
 
-  const fetchProfiles = async () => {
+  const fetchActiveProfiles = async () => {
     setIsLoading(true)
     try {
-      const params = new URLSearchParams({
-        page: page.toString(),
-        limit: '20'
-      })
-
-      if (filter === 'verified') {
-        params.set('verified', 'true')
-      } else if (filter === 'unverified') {
-        params.set('verified', 'false')
-      }
-
-      const response = await fetch(`/api/admin/profiles?${params}`)
+      const response = await fetch(`/api/admin/profiles?status=active&page=${page}&limit=20`)
       const data = await response.json()
 
       if (response.ok) {
@@ -67,7 +56,7 @@ export default function AdminProfilesPage() {
       }
     } catch (error) {
       console.error('Error fetching profiles:', error)
-      toast.error('Failed to load profiles')
+      toast.error('Failed to load active profiles')
     } finally {
       setIsLoading(false)
     }
@@ -85,7 +74,7 @@ export default function AdminProfilesPage() {
 
       if (response.ok) {
         toast.success(data.message)
-        fetchProfiles() // Refresh the list
+        fetchActiveProfiles() // Refresh the list
       } else {
         toast.error(data.error || 'Failed to update verification status')
       }
@@ -107,7 +96,7 @@ export default function AdminProfilesPage() {
 
       if (response.ok) {
         toast.success(data.message)
-        fetchProfiles() // Refresh the list
+        fetchActiveProfiles() // Refresh the list
       } else {
         toast.error(data.error || 'Failed to update profile status')
       }
@@ -115,6 +104,17 @@ export default function AdminProfilesPage() {
       console.error('Error updating profile status:', error)
       toast.error('Failed to update profile status')
     }
+  }
+
+  const calculateAge = (dateOfBirth: string) => {
+    const today = new Date()
+    const birthDate = new Date(dateOfBirth)
+    let age = today.getFullYear() - birthDate.getFullYear()
+    const monthDiff = today.getMonth() - birthDate.getMonth()
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age--
+    }
+    return age
   }
 
   if (!isAuthenticated()) {
@@ -125,66 +125,48 @@ export default function AdminProfilesPage() {
     <div className="container mx-auto py-10 px-4">
       <div className="max-w-7xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-slate-900">Profile Management</h1>
-          <p className="text-slate-600 mt-2">Manage user profiles and verifications</p>
+          <div className="flex items-center gap-3 mb-2">
+            <UserCheck className="w-8 h-8 text-green-600" />
+            <h1 className="text-3xl font-bold text-slate-900">Active Profiles</h1>
+          </div>
+          <p className="text-slate-600">View and manage all active user profiles</p>
         </div>
 
-        {/* Filters */}
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Filter className="w-5 h-5" />
-              Filters
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex gap-2">
-              <Button
-                variant={filter === 'all' ? 'default' : 'outline'}
-                onClick={() => { setFilter('all'); setPage(1) }}
-              >
-                All Profiles
-              </Button>
-              <Button
-                variant={filter === 'verified' ? 'default' : 'outline'}
-                onClick={() => { setFilter('verified'); setPage(1) }}
-              >
-                Verified
-              </Button>
-              <Button
-                variant={filter === 'unverified' ? 'default' : 'outline'}
-                onClick={() => { setFilter('unverified'); setPage(1) }}
-              >
-                Unverified
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Profiles List */}
         <Card>
           <CardHeader>
-            <CardTitle>User Profiles</CardTitle>
+            <CardTitle className="flex items-center justify-between">
+              <span>Active Profiles</span>
+              <Badge variant="secondary" className="text-base">
+                {profiles.length} profiles
+              </Badge>
+            </CardTitle>
             <CardDescription>
-              {isLoading ? 'Loading...' : `${profiles.length} profiles found`}
+              {isLoading ? 'Loading...' : `Showing ${profiles.length} active profiles`}
             </CardDescription>
           </CardHeader>
           <CardContent>
             {isLoading ? (
-              <div className="text-center py-8 text-slate-600">Loading profiles...</div>
+              <div className="text-center py-12 text-slate-600">
+                <UserCheck className="w-12 h-12 mx-auto mb-4 animate-pulse text-slate-400" />
+                Loading active profiles...
+              </div>
             ) : profiles.length === 0 ? (
-              <div className="text-center py-8 text-slate-600">No profiles found</div>
+              <div className="text-center py-12">
+                <UserCheck className="w-16 h-16 mx-auto mb-4 text-slate-400" />
+                <h3 className="text-xl font-semibold text-slate-900 mb-2">No active profiles</h3>
+                <p className="text-slate-600">There are no active profiles at this time.</p>
+              </div>
             ) : (
               <div className="space-y-4">
                 {profiles.map((profile) => (
                   <div
                     key={profile.id}
-                    className="border rounded-lg p-4 hover:bg-slate-50 transition-colors"
+                    className="border rounded-lg p-6 hover:bg-slate-50 transition-colors"
                   >
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="flex gap-4 flex-1">
+                    <div className="flex items-start justify-between gap-6">
+                      <div className="flex gap-6 flex-1">
                         {/* Profile Photo */}
-                        <div className="w-16 h-16 bg-slate-200 rounded-full overflow-hidden flex-shrink-0">
+                        <div className="w-20 h-20 bg-slate-200 rounded-full overflow-hidden flex-shrink-0">
                           {profile.profile_photo_url ? (
                             <img
                               src={profile.profile_photo_url}
@@ -192,7 +174,7 @@ export default function AdminProfilesPage() {
                               className="w-full h-full object-cover"
                             />
                           ) : (
-                            <div className="w-full h-full flex items-center justify-center text-slate-400 font-semibold">
+                            <div className="w-full h-full flex items-center justify-center text-slate-400 font-semibold text-2xl">
                               {profile.first_name[0]}{profile.last_name[0]}
                             </div>
                           )}
@@ -200,8 +182,8 @@ export default function AdminProfilesPage() {
 
                         {/* Profile Info */}
                         <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-1">
-                            <h3 className="font-semibold text-slate-900">
+                          <div className="flex items-center gap-2 mb-2">
+                            <h3 className="text-xl font-semibold text-slate-900">
                               {profile.first_name} {profile.last_name}
                             </h3>
                             {profile.is_verified ? (
@@ -210,30 +192,57 @@ export default function AdminProfilesPage() {
                                 Verified
                               </Badge>
                             ) : (
-                              <Badge variant="secondary">
+                              <Badge variant="secondary" className="bg-orange-100 text-orange-700">
                                 <XCircle className="w-3 h-3 mr-1" />
                                 Unverified
                               </Badge>
                             )}
-                            <Badge
-                              variant="outline"
-                              className={
-                                profile.profile_status === 'active'
-                                  ? 'bg-blue-50 text-blue-700'
-                                  : 'bg-gray-100 text-gray-700'
-                              }
-                            >
-                              {profile.profile_status}
+                            <Badge variant="outline" className="bg-blue-50 text-blue-700">
+                              Active
                             </Badge>
                           </div>
-                          <div className="text-sm text-slate-600 space-y-1">
-                            <p>{profile.gender} • {profile.marital_status.replace('_', ' ')}</p>
-                            <p>{profile.city}, {profile.state}</p>
-                            <p className="text-xs">Created: {new Date(profile.created_at).toLocaleDateString()}</p>
+
+                          <div className="grid grid-cols-2 gap-x-8 gap-y-2 text-sm">
+                            <div>
+                              <span className="text-slate-500">Age:</span>
+                              <span className="ml-2 font-medium text-slate-900">
+                                {calculateAge(profile.date_of_birth)} years
+                              </span>
+                            </div>
+                            <div>
+                              <span className="text-slate-500">Gender:</span>
+                              <span className="ml-2 font-medium text-slate-900 capitalize">
+                                {profile.gender}
+                              </span>
+                            </div>
+                            <div>
+                              <span className="text-slate-500">Marital Status:</span>
+                              <span className="ml-2 font-medium text-slate-900 capitalize">
+                                {profile.marital_status.replace('_', ' ')}
+                              </span>
+                            </div>
+                            <div>
+                              <span className="text-slate-500">Location:</span>
+                              <span className="ml-2 font-medium text-slate-900">
+                                {profile.city}, {profile.state}
+                              </span>
+                            </div>
+                          </div>
+
+                          <div className="mt-3 text-xs text-slate-500">
+                            Registered: {new Date(profile.created_at).toLocaleDateString('en-US', {
+                              year: 'numeric',
+                              month: 'long',
+                              day: 'numeric',
+                              hour: '2-digit',
+                              minute: '2-digit'
+                            })}
                             {profile.verified_at && (
-                              <p className="text-xs text-green-600">
-                                Verified: {new Date(profile.verified_at).toLocaleDateString()}
-                              </p>
+                              <> • Verified: {new Date(profile.verified_at).toLocaleDateString('en-US', {
+                                year: 'numeric',
+                                month: 'long',
+                                day: 'numeric'
+                              })}</>
                             )}
                           </div>
                         </div>
@@ -246,8 +255,8 @@ export default function AdminProfilesPage() {
                           size="sm"
                           onClick={() => router.push(`/profile/${profile.user_id}`)}
                         >
-                          <Eye className="w-4 h-4 mr-1" />
-                          View
+                          <Eye className="w-4 h-4 mr-2" />
+                          View Full Profile
                         </Button>
                         {profile.is_verified ? (
                           <Button
@@ -256,7 +265,7 @@ export default function AdminProfilesPage() {
                             onClick={() => handleVerifyProfile(profile.id, false)}
                             className="text-red-600 hover:text-red-700"
                           >
-                            <XCircle className="w-4 h-4 mr-1" />
+                            <XCircle className="w-4 h-4 mr-2" />
                             Unverify
                           </Button>
                         ) : (
@@ -266,31 +275,19 @@ export default function AdminProfilesPage() {
                             onClick={() => handleVerifyProfile(profile.id, true)}
                             className="bg-green-600 hover:bg-green-700"
                           >
-                            <CheckCircle2 className="w-4 h-4 mr-1" />
-                            Verify
+                            <CheckCircle2 className="w-4 h-4 mr-2" />
+                            Verify Profile
                           </Button>
                         )}
-                        {profile.profile_status === 'active' ? (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleUpdateStatus(profile.id, 'inactive')}
-                            className="text-orange-600 hover:text-orange-700"
-                          >
-                            <PowerOff className="w-4 h-4 mr-1" />
-                            Deactivate
-                          </Button>
-                        ) : (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleUpdateStatus(profile.id, 'active')}
-                            className="text-green-600 hover:text-green-700"
-                          >
-                            <Power className="w-4 h-4 mr-1" />
-                            Activate
-                          </Button>
-                        )}
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleUpdateStatus(profile.id, 'inactive')}
+                          className="text-orange-600 hover:text-orange-700"
+                        >
+                          <PowerOff className="w-4 h-4 mr-2" />
+                          Deactivate
+                        </Button>
                       </div>
                     </div>
                   </div>

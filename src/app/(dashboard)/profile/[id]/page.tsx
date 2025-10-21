@@ -3,9 +3,9 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
+import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { toast } from 'sonner'
 import Image from 'next/image'
 import { ArrowLeft, Heart, X } from 'lucide-react'
@@ -16,14 +16,54 @@ interface ProfileDetailProps {
   }
 }
 
+interface Profile {
+  id: string
+  first_name: string
+  last_name: string
+  date_of_birth: string
+  city: string
+  state: string
+  marital_status?: string
+  height_cm?: number
+  weight_kg?: number
+  profile_photo_url?: string
+  about_me?: string
+  education?: string
+  occupation?: string
+  company_name?: string
+  annual_income?: number
+  income_currency?: string
+  employment_type?: string
+  work_location?: string
+  religion?: string
+  caste?: string
+  mother_tongue?: string
+  complexion?: string
+  blood_group?: string
+  father_name?: string
+  father_occupation?: string
+  mother_name?: string
+  mother_occupation?: string
+  family_type?: string
+  family_status?: string
+  family_values?: string
+  total_siblings?: number
+  brothers_married?: number
+  brothers_unmarried?: number
+  sisters_married?: number
+  sisters_unmarried?: number
+  hobbies?: string[]
+}
+
 export default function ProfileDetailPage({ params }: ProfileDetailProps) {
   const router = useRouter()
   const supabase = createClient()
-  const [profile, setProfile] = useState<any>(null)
+  const [profile, setProfile] = useState<Profile | null>(null)
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     loadProfile()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.id])
 
   const loadProfile = async () => {
@@ -150,7 +190,7 @@ export default function ProfileDetailPage({ params }: ProfileDetailProps) {
                   {profile.height_cm && (
                     <div>
                       <p className="text-slate-600">Height</p>
-                      <p className="font-medium">{profile.height_cm} cm ({Math.floor(profile.height_cm / 30.48)}''{Math.round((profile.height_cm % 30.48) / 2.54)}\")</p>
+                      <p className="font-medium">{profile.height_cm} cm ({Math.floor(Number(profile.height_cm) / 30.48)}&apos;&apos;{Math.round((Number(profile.height_cm) % 30.48) / 2.54)}&quot;)</p>
                     </div>
                   )}
                   {profile.weight_kg && (
@@ -337,7 +377,7 @@ export default function ProfileDetailPage({ params }: ProfileDetailProps) {
         )}
 
         {/* Siblings Information */}
-        {profile.total_siblings > 0 && (
+        {profile.total_siblings && profile.total_siblings > 0 && (
           <Card>
             <CardHeader>
               <CardTitle>Siblings</CardTitle>

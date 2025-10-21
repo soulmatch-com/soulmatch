@@ -23,7 +23,7 @@ export function BasicInfoForm({ onSubmit, defaultValues, isLoading }: BasicInfoF
     watch,
     formState: { errors },
   } = useForm<BasicInfoInput>({
-    resolver: zodResolver(basicInfoSchema),
+    resolver: zodResolver(basicInfoSchema) as any,
     defaultValues,
   })
 

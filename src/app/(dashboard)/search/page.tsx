@@ -72,6 +72,7 @@ export default function SearchPage() {
         .from('profiles')
         .select('*')
         .eq('profile_status', 'active')
+        .eq('is_verified', true)
         .neq('user_id', user.id)
 
       // Apply filters

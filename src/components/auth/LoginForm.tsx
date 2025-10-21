@@ -62,8 +62,21 @@ export function LoginForm() {
         setUser(authData.user)
       }
 
+      // Check if user has completed their profile
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('id, profile_status')
+        .eq('user_id', authData.user.id)
+        .single()
+
       toast.success('Welcome back!')
-      router.push('/dashboard')
+
+      // Redirect to profile creation if no profile exists
+      if (!profile) {
+        router.push('/profile/create')
+      } else {
+        router.push('/dashboard')
+      }
       router.refresh()
     } catch (error) {
       toast.error('Something went wrong. Please try again.')

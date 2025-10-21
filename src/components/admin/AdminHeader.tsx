@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Shield, Users, Settings, BarChart3, LogOut, Menu, X } from "lucide-react";
+import { Shield, Users, Settings, BarChart3, LogOut, Menu, X, Clock, UserCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -43,6 +43,14 @@ export default function AdminHeader() {
             </Link>
             <Link href={ADMIN_CONFIG.ROUTES.PROFILES} className="text-slate-300 hover:text-white transition-colors">
               Profiles
+            </Link>
+            <Link href="/admin/active-profiles" className="text-slate-300 hover:text-white transition-colors">
+              <UserCheck className="h-5 w-5 inline mr-2" />
+              Active Profiles
+            </Link>
+            <Link href="/admin/verification-queue" className="text-slate-300 hover:text-white transition-colors">
+              <Clock className="h-5 w-5 inline mr-2" />
+              Verification Queue
             </Link>
             <Link href={ADMIN_CONFIG.ROUTES.SETTINGS} className="text-slate-300 hover:text-white transition-colors">
               <Settings className="h-5 w-5 inline mr-2" />
@@ -105,6 +113,22 @@ export default function AdminHeader() {
               onClick={toggleMenu}
             >
               Profiles
+            </Link>
+            <Link
+              href="/admin/active-profiles"
+              className="block text-slate-300 hover:text-white transition-colors py-2"
+              onClick={toggleMenu}
+            >
+              <UserCheck className="h-5 w-5 inline mr-2" />
+              Active Profiles
+            </Link>
+            <Link
+              href="/admin/verification-queue"
+              className="block text-slate-300 hover:text-white transition-colors py-2"
+              onClick={toggleMenu}
+            >
+              <Clock className="h-5 w-5 inline mr-2" />
+              Verification Queue
             </Link>
             <Link
               href="/admin/settings"

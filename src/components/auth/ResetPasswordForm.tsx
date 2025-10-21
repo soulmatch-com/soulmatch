@@ -41,15 +41,37 @@ export function ResetPasswordForm() {
   })
 
   useEffect(() => {
-    // Check if we have an error or access_token in the URL
+    // Check if we have an error in the URL query params
     const error = searchParams.get('error')
     const errorDescription = searchParams.get('error_description')
 
     if (error) {
       toast.error(errorDescription || 'Invalid or expired reset link')
       setTimeout(() => router.push('/forgot-password'), 3000)
+      return
     }
-  }, [searchParams, router])
+
+    // Check for hash fragments (tokens from Supabase)
+    const hashParams = new URLSearchParams(window.location.hash.substring(1))
+    const accessToken = hashParams.get('access_token')
+    const type = hashParams.get('type')
+
+    // If we have a recovery token, the session is already set by Supabase
+    // Just verify we're in recovery mode
+    if (type === 'recovery' && accessToken) {
+      console.log('Password recovery session detected')
+      // Clean up the URL hash
+      window.history.replaceState(null, '', window.location.pathname)
+    } else if (!error) {
+      // No recovery token and no error - check if user has an active session
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        if (!session) {
+          toast.error('Invalid or expired reset link')
+          setTimeout(() => router.push('/forgot-password'), 3000)
+        }
+      })
+    }
+  }, [searchParams, router, supabase])
 
   const onSubmit = async (data: ResetPasswordInput) => {
     setIsLoading(true)

@@ -21,7 +21,7 @@ export default function VerifyOTPPage() {
           Click the link in the email to verify your account and complete the signup process.
         </p>
         <p className="text-sm text-slate-600">
-          If you don't see the email, check your spam folder.
+          If you don&apos;t see the email, check your spam folder.
         </p>
       </CardContent>
     </Card>

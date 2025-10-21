@@ -37,10 +37,10 @@ export function ForgotPasswordForm() {
     setIsLoading(true)
     try {
       console.log('Sending password reset email to:', data.email)
-      console.log('Redirect URL:', `${window.location.origin}/reset-password`)
+      console.log('Redirect URL:', `${window.location.origin}/api/auth/confirm`)
 
       const { data: resetData, error } = await supabase.auth.resetPasswordForEmail(data.email, {
-        redirectTo: `${window.location.origin}/reset-password`,
+        redirectTo: `${window.location.origin}/api/auth/confirm`,
       })
 
       console.log('Reset password response:', { resetData, error })

@@ -35,18 +35,44 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
-  if (
-    !user &&
-    !request.nextUrl.pathname.startsWith('/login') &&
-    !request.nextUrl.pathname.startsWith('/signup') &&
-    !request.nextUrl.pathname.startsWith('/verify-otp') &&
-    !request.nextUrl.pathname.startsWith('/forgot-password') &&
-    request.nextUrl.pathname !== '/'
-  ) {
+  // Allow public routes without authentication
+  const publicRoutes = [
+    '/',
+    '/login',
+    '/signup',
+    '/verify-otp',
+    '/forgot-password',
+    '/reset-password',
+  ]
+
+  const isPublicRoute = publicRoutes.some(route =>
+    request.nextUrl.pathname === route || request.nextUrl.pathname.startsWith(route + '/')
+  )
+
+  const isApiAuthRoute = request.nextUrl.pathname.startsWith('/api/auth')
+  const isProfileCreateRoute = request.nextUrl.pathname === '/profile/create'
+
+  if (!user && !isPublicRoute && !isApiAuthRoute) {
     // no user, potentially respond by redirecting the user to the login page
     const url = request.nextUrl.clone()
     url.pathname = '/login'
     return NextResponse.redirect(url)
+  }
+
+  // Check if authenticated user has completed their profile
+  if (user && !isPublicRoute && !isApiAuthRoute && !isProfileCreateRoute) {
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('id, profile_status')
+      .eq('user_id', user.id)
+      .single()
+
+    // If no profile exists or profile is incomplete, redirect to profile creation
+    if (!profile) {
+      const url = request.nextUrl.clone()
+      url.pathname = '/profile/create'
+      return NextResponse.redirect(url)
+    }
   }
 
   // IMPORTANT: You *must* return the supabaseResponse object as it is. If you're

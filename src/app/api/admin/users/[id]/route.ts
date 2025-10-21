@@ -5,11 +5,11 @@ import { createClient } from '@/lib/supabase/server'
 // GET single user
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const supabase = await createClient()
-    const userId = params.id
+    const { id: userId } = await params
 
     // Get profile
     const { data: profile, error: profileError } = await supabase
@@ -48,11 +48,11 @@ export async function GET(
 // PATCH - Update user status
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const supabase = await createClient()
-    const userId = params.id
+    const { id: userId } = await params
     const body = await request.json()
     const { profile_status, is_verified } = body
 
@@ -99,11 +99,11 @@ export async function PATCH(
 // DELETE user
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const supabase = await createClient()
-    const userId = params.id
+    const { id: userId } = await params
 
     // Delete profile
     const { error: profileError } = await supabase

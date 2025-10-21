@@ -46,7 +46,25 @@ export function TwoFactorVerification({ factorId, onSuccess, onCancel }: TwoFact
       if (onSuccess) {
         onSuccess()
       } else {
-        router.push('/dashboard')
+        // Check if user has completed their profile
+        const { data: { user } } = await supabase.auth.getUser()
+
+        if (user) {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('id, profile_status')
+            .eq('user_id', user.id)
+            .single()
+
+          // Redirect to profile creation if no profile exists
+          if (!profile) {
+            router.push('/profile/create')
+          } else {
+            router.push('/dashboard')
+          }
+        } else {
+          router.push('/dashboard')
+        }
         router.refresh()
       }
     } catch (error) {

@@ -198,7 +198,7 @@ export default function AdminUsersPage() {
                     </div>
                     <div className="flex items-center gap-3">
                       {user.is_verified && (
-                        <CheckCircle className="h-4 w-4 text-green-600" title="Verified" />
+                        <CheckCircle className="h-4 w-4 text-green-600" />
                       )}
                       <span className={`text-xs px-2 py-1 rounded capitalize ${getStatusColor(user.profile_status)}`}>
                         {user.profile_status}

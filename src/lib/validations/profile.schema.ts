@@ -5,17 +5,16 @@ export const profileSchema = z.object({
   firstName: z.string().min(2, 'First name must be at least 2 characters').max(50, 'First name too long'),
   lastName: z.string().min(2, 'Last name must be at least 2 characters').max(50, 'Last name too long'),
   dateOfBirth: z.coerce.date({
-    required_error: 'Date of birth is required',
-    invalid_type_error: 'Invalid date',
+    message: 'Date of birth is required',
   }).refine((date) => {
     const age = new Date().getFullYear() - date.getFullYear()
     return age >= 18 && age <= 100
   }, 'Age must be between 18 and 100 years'),
   gender: z.enum(['male', 'female', 'other'], {
-    required_error: 'Please select a gender',
+    message: 'Please select a gender',
   }),
   maritalStatus: z.enum(['never_married', 'divorced', 'widowed', 'awaiting_divorce'], {
-    required_error: 'Please select marital status',
+    message: 'Please select marital status',
   }),
 
   // Physical Attributes

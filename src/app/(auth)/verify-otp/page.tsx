@@ -2,8 +2,9 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { useSearchParams } from 'next/navigation'
+import { Suspense } from 'react'
 
-export default function VerifyOTPPage() {
+function VerifyOTPContent() {
   const searchParams = useSearchParams()
   const email = searchParams.get('email')
 
@@ -25,5 +26,13 @@ export default function VerifyOTPPage() {
         </p>
       </CardContent>
     </Card>
+  )
+}
+
+export default function VerifyOTPPage() {
+  return (
+    <Suspense fallback={<Card><CardContent className="py-10">Loading...</CardContent></Card>}>
+      <VerifyOTPContent />
+    </Suspense>
   )
 }

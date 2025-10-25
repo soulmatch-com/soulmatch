@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Heart, Shield, Sparkles, Lock, Users, CheckCircle } from "lucide-react";
+import { Heart, Shield, Sparkles, Lock, Users, CheckCircle, Award, UserCheck, Star, TrendingUp, Clock, Globe } from "lucide-react";
 import { useAuthStore } from "@/store/authStore";
 
 export default function Home() {
@@ -17,30 +17,29 @@ export default function Home() {
             {/* Left Content */}
             <div className="space-y-8 text-center md:text-left">
               <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-100 to-pink-100 dark:from-purple-900/50 dark:to-pink-900/50 text-purple-700 dark:text-purple-300 rounded-full text-sm font-medium shadow-sm">
-                <Heart className="h-4 w-4" fill="currentColor" />
-                Trusted by 10,000+ users
+                <Award className="h-4 w-4" />
+                India's Most Trusted Matrimony Platform
               </div>
 
               <h1 className="text-5xl md:text-7xl font-bold text-slate-900 dark:text-white leading-tight">
-                Find Your <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent inline-block animate-pulse">SoulMatch</span>
+                Find Your <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent inline-block">Life Partner</span>
               </h1>
 
               <p className="text-lg md:text-xl text-slate-600 dark:text-slate-300 leading-relaxed max-w-xl">
-                Connect with compatible partners who share your values, interests, and life goals.
-                Start your journey to finding your perfect match today.
+                Discover meaningful connections with verified profiles from families who share your values, traditions, and vision for marriage.
               </p>
 
               {!user && (
                 <div className="flex gap-4 justify-center md:justify-start flex-wrap pt-4">
                   <Link href="/signup">
                     <Button size="lg" className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-base px-8 py-6 shadow-lg hover:shadow-xl transition-all group">
-                      Find Your Match in 5 Minutes
-                      <Heart className="ml-2 h-5 w-5 group-hover:scale-110 transition-transform" fill="currentColor" />
+                      Register Free
+                      <UserCheck className="ml-2 h-5 w-5 group-hover:scale-110 transition-transform" />
                     </Button>
                   </Link>
                   <Link href="/login">
                     <Button size="lg" variant="outline" className="text-base px-8 py-6 border-2 hover:bg-purple-50 dark:hover:bg-purple-950 hover:border-purple-300 dark:hover:border-purple-600 hover:text-purple-600 dark:hover:text-purple-400">
-                      Sign In
+                      Login
                     </Button>
                   </Link>
                 </div>
@@ -50,32 +49,45 @@ export default function Home() {
                 <div className="flex gap-4 justify-center md:justify-start flex-wrap pt-4">
                   <Link href="/dashboard">
                     <Button size="lg" className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-base px-8 py-6 shadow-lg hover:shadow-xl transition-all">
-                      Go to Dashboard
+                      My Dashboard
                     </Button>
                   </Link>
                   <Link href="/search">
                     <Button size="lg" variant="outline" className="text-base px-8 py-6 border-2 hover:bg-purple-50 dark:hover:bg-purple-950 hover:border-purple-300 dark:hover:border-purple-600 hover:text-purple-600 dark:hover:text-purple-400">
-                      Find Matches
+                      Browse Profiles
                     </Button>
                   </Link>
                 </div>
               )}
 
-              <div className="flex items-center gap-6 justify-center md:justify-start text-sm text-slate-600 dark:text-slate-400 pt-4">
+              <div className="flex flex-wrap items-center gap-4 md:gap-6 justify-center md:justify-start text-sm text-slate-600 dark:text-slate-400 pt-4">
                 <div className="flex items-center gap-2">
-                  <CheckCircle className="h-5 w-5 text-purple-600 dark:text-purple-400" />
-                  <span>No credit card required</span>
+                  <Shield className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+                  <span>100% Verified Profiles</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Lock className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+                  <span>Secure & Private</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <CheckCircle className="h-5 w-5 text-purple-600 dark:text-purple-400" />
-                  <span>Free forever</span>
+                  <span>Free Registration</span>
                 </div>
               </div>
 
               {!user && (
-                <p className="text-xs text-center md:text-left text-slate-500 dark:text-slate-400 pt-2">
-                  <span className="font-semibold text-purple-600 dark:text-purple-400">1,234 users</span> signed up today
-                </p>
+                <div className="flex items-center gap-4 pt-4 justify-center md:justify-start">
+                  <div className="flex -space-x-2">
+                    {[1, 2, 3, 4].map((i) => (
+                      <div key={i} className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-400 to-pink-400 border-2 border-white dark:border-slate-900 flex items-center justify-center text-white text-xs font-bold">
+                        {String.fromCharCode(64 + i)}
+                      </div>
+                    ))}
+                  </div>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                    <span className="font-semibold text-purple-600 dark:text-purple-400">2,000+</span> marriages celebrated this year
+                  </p>
+                </div>
               )}
             </div>
 
@@ -120,10 +132,10 @@ export default function Home() {
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-4">
-              Why Choose <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">SoulMatch</span>?
+              Why Families Trust <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">SoulMatch</span>
             </h2>
             <p className="text-slate-600 dark:text-slate-300 max-w-2xl mx-auto">
-              Join thousands of happy couples who found their perfect match through our platform
+              India's most trusted matrimony service helping thousands of families find the perfect match
             </p>
           </div>
 
@@ -132,24 +144,140 @@ export default function Home() {
               <div className="w-12 h-12 bg-gradient-to-br from-purple-100 to-pink-100 dark:from-purple-900 dark:to-pink-900 rounded-xl flex items-center justify-center mb-4">
                 <Shield className="h-6 w-6 text-purple-600 dark:text-purple-400" />
               </div>
-              <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-2">Verified Profiles</h3>
-              <p className="text-slate-600 dark:text-slate-300 leading-relaxed">All profiles are verified for authenticity and safety. Connect with real people.</p>
+              <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-2">100% Verified Profiles</h3>
+              <p className="text-slate-600 dark:text-slate-300 leading-relaxed">Every profile is manually verified with ID and photo verification for your safety and trust.</p>
             </div>
 
             <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 border border-purple-100 dark:border-purple-800">
               <div className="w-12 h-12 bg-gradient-to-br from-purple-100 to-pink-100 dark:from-purple-900 dark:to-pink-900 rounded-xl flex items-center justify-center mb-4">
-                <Sparkles className="h-6 w-6 text-purple-600 dark:text-purple-400" />
+                <Users className="h-6 w-6 text-purple-600 dark:text-purple-400" />
               </div>
-              <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-2">Smart Matching</h3>
-              <p className="text-slate-600 dark:text-slate-300 leading-relaxed">Advanced algorithm to find your perfect match based on compatibility.</p>
+              <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-2">Personalized Matches</h3>
+              <p className="text-slate-600 dark:text-slate-300 leading-relaxed">Advanced matching based on community, education, profession, family values and preferences.</p>
             </div>
 
             <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 border border-purple-100 dark:border-purple-800">
               <div className="w-12 h-12 bg-gradient-to-br from-purple-100 to-pink-100 dark:from-purple-900 dark:to-pink-900 rounded-xl flex items-center justify-center mb-4">
                 <Lock className="h-6 w-6 text-pink-600 dark:text-pink-400" />
               </div>
-              <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-2">Privacy First</h3>
-              <p className="text-slate-600 dark:text-slate-300 leading-relaxed">Your data is secure and under your control. We never share your information.</p>
+              <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-2">Complete Privacy</h3>
+              <p className="text-slate-600 dark:text-slate-300 leading-relaxed">Your contact details remain private. Share only when you're comfortable and ready.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Statistics Section */}
+      <div className="bg-gradient-to-r from-purple-600 to-pink-600 dark:from-purple-900 dark:to-pink-900 py-16">
+        <div className="container mx-auto px-4">
+          <div className="max-w-6xl mx-auto">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+              <div className="text-center">
+                <div className="text-4xl md:text-5xl font-bold text-white mb-2">50L+</div>
+                <div className="text-purple-100 text-sm md:text-base">Active Profiles</div>
+              </div>
+              <div className="text-center">
+                <div className="text-4xl md:text-5xl font-bold text-white mb-2">2000+</div>
+                <div className="text-purple-100 text-sm md:text-base">Marriages This Year</div>
+              </div>
+              <div className="text-center">
+                <div className="text-4xl md:text-5xl font-bold text-white mb-2">100+</div>
+                <div className="text-purple-100 text-sm md:text-base">Communities</div>
+              </div>
+              <div className="text-center">
+                <div className="text-4xl md:text-5xl font-bold text-white mb-2">24/7</div>
+                <div className="text-purple-100 text-sm md:text-base">Support Available</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Success Stories Section */}
+      <div className="container mx-auto px-4 py-20">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-4">
+              Success Stories
+            </h2>
+            <p className="text-slate-600 dark:text-slate-300 max-w-2xl mx-auto">
+              Real couples who found their perfect match through SoulMatch
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {[
+              { name: "Priya & Rahul", location: "Mumbai", story: "We found each other through SoulMatch and got married last month. The platform made it easy to connect with families who share our values. Forever grateful!" },
+              { name: "Anjali & Vikram", location: "Delhi", story: "After months of searching, we found our perfect match here. The detailed profiles and verification process gave us confidence. Highly recommended!" },
+              { name: "Sneha & Arjun", location: "Bangalore", story: "SoulMatch helped us find not just partners, but soulmates. The matching algorithm really works! We're now happily married with our families' blessings." }
+            ].map((story, index) => (
+              <div key={index} className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-purple-100 dark:border-purple-800">
+                <div className="flex items-center gap-1 mb-4">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <Star key={star} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                  ))}
+                </div>
+                <p className="text-slate-600 dark:text-slate-300 mb-4 italic">"{story.story}"</p>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-400 to-pink-400 flex items-center justify-center text-white font-bold">
+                    {story.name.charAt(0)}
+                  </div>
+                  <div>
+                    <div className="font-semibold text-slate-900 dark:text-white">{story.name}</div>
+                    <div className="text-xs text-slate-500 dark:text-slate-400">{story.location}</div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* How It Works Section */}
+      <div className="bg-slate-50 dark:bg-slate-900/50 py-20">
+        <div className="container mx-auto px-4">
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-4">
+                Find Your Life Partner in 3 Simple Steps
+              </h2>
+              <p className="text-slate-600 dark:text-slate-300 max-w-2xl mx-auto">
+                A simple and trusted process to help you find your perfect match
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-8">
+              <div className="text-center">
+                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-purple-100 to-pink-100 dark:from-purple-900 dark:to-pink-900 flex items-center justify-center">
+                  <span className="text-2xl font-bold text-purple-600 dark:text-purple-400">1</span>
+                </div>
+                <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-2">Register for Free</h3>
+                <p className="text-slate-600 dark:text-slate-300">Create your profile with details about yourself, family, and partner preferences</p>
+              </div>
+
+              <div className="text-center">
+                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-purple-100 to-pink-100 dark:from-purple-900 dark:to-pink-900 flex items-center justify-center">
+                  <span className="text-2xl font-bold text-purple-600 dark:text-purple-400">2</span>
+                </div>
+                <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-2">Connect & Communicate</h3>
+                <p className="text-slate-600 dark:text-slate-300">Browse verified profiles, send interest, and chat with potential matches</p>
+              </div>
+
+              <div className="text-center">
+                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-purple-100 to-pink-100 dark:from-purple-900 dark:to-pink-900 flex items-center justify-center">
+                  <span className="text-2xl font-bold text-purple-600 dark:text-purple-400">3</span>
+                </div>
+                <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-2">Meet & Marry</h3>
+                <p className="text-slate-600 dark:text-slate-300">Take the relationship forward with family involvement and tie the knot</p>
+              </div>
+            </div>
+
+            <div className="text-center mt-12">
+              <Link href="/signup">
+                <Button size="lg" className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-base px-8 py-6 shadow-lg hover:shadow-xl transition-all">
+                  Start Your Journey Today
+                </Button>
+              </Link>
             </div>
           </div>
         </div>

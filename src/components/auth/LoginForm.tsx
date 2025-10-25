@@ -15,7 +15,7 @@ import { toast } from 'sonner'
 import Link from 'next/link'
 import { SocialLogin } from '@/components/auth/SocialLogin'
 import { TwoFactorVerification } from '@/components/auth/TwoFactorVerification'
-import { Eye, EyeOff, Loader2, Mail, Lock, AlertCircle } from 'lucide-react'
+import { Eye, EyeOff, Loader2, Mail, Lock, AlertCircle, LogIn } from 'lucide-react'
 
 export function LoginForm() {
   const router = useRouter()
@@ -109,10 +109,10 @@ export function LoginForm() {
   }
 
   return (
-    <Card className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl shadow-2xl border-purple-100 dark:border-purple-900">
+    <Card className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-xl shadow-2xl border-blue-100 dark:border-blue-900">
       <CardHeader className="space-y-1">
-        <CardTitle className="text-2xl font-bold text-center">Welcome back</CardTitle>
-        <CardDescription className="text-center">Sign in to continue your journey</CardDescription>
+        <CardTitle className="text-2xl font-bold text-center">Welcome Back</CardTitle>
+        <CardDescription className="text-center">Sign in to continue your matrimonial journey</CardDescription>
       </CardHeader>
       <form onSubmit={handleSubmit(onSubmit)}>
         <CardContent className="space-y-4">
@@ -142,7 +142,7 @@ export function LoginForm() {
               <Label htmlFor="password">Password</Label>
               <Link
                 href="/forgot-password"
-                className="text-sm text-purple-600 hover:text-purple-700 dark:text-purple-400 dark:hover:text-purple-300 hover:underline font-medium"
+                className="text-sm text-blue-700 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 hover:underline font-medium"
               >
                 Forgot password?
               </Link>
@@ -160,7 +160,7 @@ export function LoginForm() {
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-blue-700 dark:hover:text-blue-400 transition-colors"
                 tabIndex={-1}
               >
                 {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -178,19 +178,28 @@ export function LoginForm() {
         <CardFooter className="flex flex-col space-y-4">
           <Button
             type="submit"
-            className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 shadow-lg hover:shadow-xl transition-all"
+            className="w-full bg-gradient-to-r from-blue-700 to-emerald-700 hover:from-blue-800 hover:to-emerald-800 shadow-lg hover:shadow-xl transition-all group"
             disabled={isLoading}
           >
-            {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            {isLoading ? 'Signing in...' : 'Sign in'}
+            {isLoading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Signing in...
+              </>
+            ) : (
+              <>
+                Sign In
+                <LogIn className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform duration-200" />
+              </>
+            )}
           </Button>
 
           <SocialLogin />
 
           <p className="text-sm text-center text-slate-600 dark:text-slate-400">
             Don't have an account?{' '}
-            <Link href="/signup" className="text-purple-600 dark:text-purple-400 font-medium hover:underline">
-              Sign up
+            <Link href="/signup" className="text-blue-700 dark:text-blue-400 font-medium hover:underline">
+              Register Now
             </Link>
           </p>
         </CardFooter>

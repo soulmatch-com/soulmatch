@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { ProgressRing } from '@/components/ui/progress-ring'
-import { Users, Heart, MessageSquare, TrendingUp, CheckCircle, AlertCircle } from 'lucide-react'
+import { Users, Heart, MessageSquare, TrendingUp, CheckCircle, AlertCircle, Settings } from 'lucide-react'
 import Link from 'next/link'
 import Image from 'next/image'
 
@@ -24,44 +24,44 @@ export default async function DashboardPage() {
     .single()
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-rose-50 dark:from-slate-900 dark:via-purple-950 dark:to-slate-900">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-slate-50 to-emerald-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
       <div className="container mx-auto py-10 px-4">
         <div className="max-w-6xl mx-auto">
           {/* Hero Section */}
           <div className="mb-8">
             <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
               <div>
-                <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                  Welcome back!
+                <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-700 to-emerald-700 bg-clip-text text-transparent">
+                  Welcome Back
                 </h1>
                 <p className="text-slate-600 dark:text-slate-400 mt-2">
-                  Continue your journey to find your perfect match
+                  Continue your journey to discover compatible families
                 </p>
               </div>
               <Link href="/search">
-                <Button size="lg" className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 shadow-lg hover:shadow-xl transition-all">
+                <Button size="lg" className="bg-gradient-to-r from-blue-700 to-emerald-700 hover:from-blue-800 hover:to-emerald-800 shadow-lg hover:shadow-xl transition-all">
                   <Users className="mr-2 h-5 w-5" />
-                  Find Matches
+                  Search Profiles
                 </Button>
               </Link>
             </div>
           </div>
 
           {!profile ? (
-            <Card className="bg-white/80 dark:bg-slate-800/80 backdrop-blur shadow-xl">
+            <Card className="bg-white/90 dark:bg-slate-800/90 backdrop-blur shadow-xl border border-blue-100 dark:border-blue-900">
               <CardHeader className="text-center">
                 <div className="flex justify-center mb-4">
-                  <AlertCircle className="h-16 w-16 text-purple-600" />
+                  <AlertCircle className="h-16 w-16 text-blue-700" />
                 </div>
-                <CardTitle className="text-2xl">Welcome to SoulMatch!</CardTitle>
+                <CardTitle className="text-2xl">Welcome to MyThirumanam.in</CardTitle>
                 <CardDescription className="text-base">
-                  Complete your profile to start finding your perfect match
+                  Create your verified profile to begin discovering compatible families
                 </CardDescription>
               </CardHeader>
               <CardContent className="flex justify-center">
                 <Link href="/profile/create">
-                  <Button size="lg" className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700">
-                    <CheckCircle className="mr-2 h-5 w-5" />
+                  <Button size="lg" className="bg-gradient-to-r from-blue-700 to-emerald-700 hover:from-blue-800 hover:to-emerald-800 group">
+                    <CheckCircle className="mr-2 h-5 w-5 group-hover:scale-110 group-hover:rotate-12 transition-all duration-200" />
                     Create Profile
                   </Button>
                 </Link>
@@ -70,13 +70,13 @@ export default async function DashboardPage() {
           ) : (
             <div className="grid lg:grid-cols-3 gap-6">
               {/* Profile Card - Spans 2 columns */}
-              <Card className="lg:col-span-2 bg-white/80 dark:bg-slate-800/80 backdrop-blur shadow-xl">
+              <Card className="lg:col-span-2 bg-white/90 dark:bg-slate-800/90 backdrop-blur shadow-xl border border-blue-100 dark:border-blue-900">
                 <CardContent className="pt-6">
                   <div className="flex flex-col md:flex-row items-start gap-6">
                     {/* Profile Photo & Progress Ring */}
                     <div className="flex flex-col items-center gap-4">
                       {profile.profile_photo_url ? (
-                        <div className="relative w-32 h-32 rounded-full overflow-hidden ring-4 ring-purple-200 dark:ring-purple-800">
+                        <div className="relative w-32 h-32 rounded-full overflow-hidden ring-4 ring-blue-200 dark:ring-blue-800">
                           <Image
                             src={profile.profile_photo_url}
                             alt={`${profile.first_name} ${profile.last_name}`}
@@ -86,8 +86,8 @@ export default async function DashboardPage() {
                           />
                         </div>
                       ) : (
-                        <Avatar className="w-32 h-32 ring-4 ring-purple-200 dark:ring-purple-800">
-                          <AvatarFallback className="text-3xl bg-gradient-to-br from-purple-100 to-pink-100 dark:from-purple-900 dark:to-pink-900 text-purple-700 dark:text-purple-300">
+                        <Avatar className="w-32 h-32 ring-4 ring-blue-200 dark:ring-blue-800">
+                          <AvatarFallback className="text-3xl bg-gradient-to-br from-blue-100 to-emerald-100 dark:from-blue-900 dark:to-emerald-900 text-blue-700 dark:text-blue-300">
                             {profile.first_name[0]}{profile.last_name[0]}
                           </AvatarFallback>
                         </Avatar>
@@ -132,7 +132,8 @@ export default async function DashboardPage() {
                       </div>
 
                       <Link href="/profile/edit">
-                        <Button variant="outline" className="w-full md:w-auto">
+                        <Button variant="outline" className="w-full md:w-auto group">
+                          <Settings className="mr-2 h-4 w-4 group-hover:rotate-90 transition-transform duration-300" />
                           Edit Profile
                         </Button>
                       </Link>
@@ -142,45 +143,45 @@ export default async function DashboardPage() {
               </Card>
 
               {/* Quick Stats Card */}
-              <Card className="bg-white/80 dark:bg-slate-800/80 backdrop-blur shadow-xl">
+              <Card className="bg-white/90 dark:bg-slate-800/90 backdrop-blur shadow-xl border border-blue-100 dark:border-blue-900">
                 <CardHeader>
-                  <CardTitle className="text-lg">Quick Stats</CardTitle>
-                  <CardDescription>Your activity overview</CardDescription>
+                  <CardTitle className="text-lg">Activity Overview</CardTitle>
+                  <CardDescription>Your profile engagement</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    <div className="flex items-center justify-between p-3 bg-purple-50 dark:bg-purple-950 rounded-lg">
+                    <div className="flex items-center justify-between p-3 bg-blue-50 dark:bg-blue-950 rounded-lg">
                       <div className="flex items-center gap-3">
-                        <div className="p-2 bg-purple-100 dark:bg-purple-900 rounded-lg">
-                          <Heart className="h-5 w-5 text-purple-600" />
+                        <div className="p-2 bg-blue-100 dark:bg-blue-900 rounded-lg">
+                          <Heart className="h-5 w-5 text-blue-700" />
                         </div>
                         <div>
-                          <p className="text-2xl font-bold text-purple-700 dark:text-purple-300">0</p>
-                          <p className="text-xs text-slate-600 dark:text-slate-400">Matches</p>
+                          <p className="text-2xl font-bold text-blue-700 dark:text-blue-300">0</p>
+                          <p className="text-xs text-slate-600 dark:text-slate-400">Compatible Prospects</p>
                         </div>
                       </div>
-                      <TrendingUp className="h-4 w-4 text-green-600" />
+                      <TrendingUp className="h-4 w-4 text-emerald-600" />
                     </div>
 
-                    <div className="flex items-center justify-between p-3 bg-pink-50 dark:bg-pink-950 rounded-lg">
+                    <div className="flex items-center justify-between p-3 bg-emerald-50 dark:bg-emerald-950 rounded-lg">
                       <div className="flex items-center gap-3">
-                        <div className="p-2 bg-pink-100 dark:bg-pink-900 rounded-lg">
-                          <Users className="h-5 w-5 text-pink-600" />
+                        <div className="p-2 bg-emerald-100 dark:bg-emerald-900 rounded-lg">
+                          <Users className="h-5 w-5 text-emerald-700" />
                         </div>
                         <div>
-                          <p className="text-2xl font-bold text-pink-700 dark:text-pink-300">0</p>
-                          <p className="text-xs text-slate-600 dark:text-slate-400">Interests</p>
+                          <p className="text-2xl font-bold text-emerald-700 dark:text-emerald-300">0</p>
+                          <p className="text-xs text-slate-600 dark:text-slate-400">Family Connections</p>
                         </div>
                       </div>
                     </div>
 
-                    <div className="flex items-center justify-between p-3 bg-rose-50 dark:bg-rose-950 rounded-lg">
+                    <div className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800 rounded-lg">
                       <div className="flex items-center gap-3">
-                        <div className="p-2 bg-rose-100 dark:bg-rose-900 rounded-lg">
-                          <MessageSquare className="h-5 w-5 text-rose-600" />
+                        <div className="p-2 bg-slate-100 dark:bg-slate-700 rounded-lg">
+                          <MessageSquare className="h-5 w-5 text-slate-700 dark:text-slate-300" />
                         </div>
                         <div>
-                          <p className="text-2xl font-bold text-rose-700 dark:text-rose-300">0</p>
+                          <p className="text-2xl font-bold text-slate-700 dark:text-slate-300">0</p>
                           <p className="text-xs text-slate-600 dark:text-slate-400">Messages</p>
                         </div>
                       </div>

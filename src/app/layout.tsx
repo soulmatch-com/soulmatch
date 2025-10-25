@@ -4,7 +4,6 @@ import { Toaster } from "sonner";
 import ConditionalHeader from "@/components/ConditionalHeader";
 import { AuthProvider } from "@/components/providers/AuthProvider";
 import { QueryProvider } from "@/components/providers/QueryProvider";
-import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -18,8 +17,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "SoulMatch - Find Your Perfect Match",
-  description: "Connect with compatible partners and find your soulmate",
+  title: "MyThirumanam.in - Trusted Matrimonial Service for Indian Families",
+  description: "Discover compatible families through verified profiles. Connect with families who share your cultural values, traditions, and commitment to lifelong partnerships.",
 };
 
 export default function RootLayout({
@@ -28,19 +27,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <ThemeProvider>
-          <QueryProvider>
-            <AuthProvider>
-              <ConditionalHeader />
-              {children}
-              <Toaster position="top-center" richColors />
-            </AuthProvider>
-          </QueryProvider>
-        </ThemeProvider>
+        <QueryProvider>
+          <AuthProvider>
+            <ConditionalHeader />
+            {children}
+            <Toaster position="top-center" richColors />
+          </AuthProvider>
+        </QueryProvider>
       </body>
     </html>
   );

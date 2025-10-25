@@ -6,6 +6,21 @@
   --card-bg: #ffffff;
   --header-bg: rgba(255, 255, 255, 0.8);
   --border-color: #e2e8f0;
+
+  /* Professional Matrimonial Color System */
+  --primary-navy: #1e3a8a;
+  --primary-navy-light: #1e40af;
+  --primary-navy-dark: #1e293b;
+  --secondary-emerald: #047857;
+  --secondary-emerald-light: #059669;
+  --secondary-emerald-dark: #065f46;
+  --accent-gold: #ca8a04;
+  --accent-gold-light: #eab308;
+  --accent-gold-dark: #a16207;
+  --success-green: #059669;
+  --trust-blue: #0284c7;
+  --warm-earth: #92400e;
+  --warm-earth-light: #a16207;
 }
 
 .dark {
@@ -14,6 +29,21 @@
   --card-bg: #1e293b;
   --header-bg: rgba(15, 23, 42, 0.8);
   --border-color: #334155;
+
+  /* Dark Mode Matrimonial Colors */
+  --primary-navy: #1e40af;
+  --primary-navy-light: #3b82f6;
+  --primary-navy-dark: #1e293b;
+  --secondary-emerald: #059669;
+  --secondary-emerald-light: #10b981;
+  --secondary-emerald-dark: #047857;
+  --accent-gold: #eab308;
+  --accent-gold-light: #fbbf24;
+  --accent-gold-dark: #ca8a04;
+  --success-green: #10b981;
+  --trust-blue: #0ea5e9;
+  --warm-earth: #a16207;
+  --warm-earth-light: #ca8a04;
 }
 
 @theme inline {
@@ -55,29 +85,116 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Custom Animations */
-@keyframes float {
+/* Professional Animations */
+@keyframes subtle-float {
   0%, 100% {
     transform: translateY(0px);
   }
   50% {
-    transform: translateY(-20px);
+    transform: translateY(-8px);
   }
 }
 
-@keyframes float-delayed {
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+@keyframes icon-bounce {
   0%, 100% {
-    transform: translateY(0px);
+    transform: scale(1);
   }
   50% {
-    transform: translateY(-15px);
+    transform: scale(1.1);
   }
 }
 
-.animate-float {
-  animation: float 3s ease-in-out infinite;
+@keyframes icon-slide-right {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(4px);
+  }
 }
 
-.animate-float-delayed {
-  animation: float-delayed 3s ease-in-out infinite 1.5s;
+@keyframes icon-rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-subtle-float {
+  animation: subtle-float 4s ease-in-out infinite;
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.6s ease-out forwards;
+}
+
+.animate-shimmer {
+  animation: shimmer 2s infinite linear;
+  background: linear-gradient(
+    to right,
+    transparent 0%,
+    rgba(255, 255, 255, 0.3) 50%,
+    transparent 100%
+  );
+  background-size: 1000px 100%;
+}
+
+/* Button Icon Hover Animations */
+.icon-hover-scale {
+  transition: transform 200ms ease-out;
+}
+
+.icon-hover-scale:hover {
+  transform: scale(1.1);
+}
+
+.icon-hover-slide {
+  transition: transform 200ms ease-out;
+}
+
+.icon-hover-slide:hover {
+  transform: translateX(4px);
+}
+
+.icon-hover-rotate {
+  transition: transform 300ms ease-out;
+}
+
+.icon-hover-rotate:hover {
+  transform: rotate(360deg);
+}
+
+/* Verification Badge Styles */
+.verified-badge {
+  @apply inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium;
+  background: linear-gradient(135deg, var(--success-green), var(--secondary-emerald));
+  color: white;
+}
+
+/* Trust Indicator Styles */
+.trust-indicator {
+  @apply flex items-center gap-2 text-sm;
+  color: var(--trust-blue);
 }

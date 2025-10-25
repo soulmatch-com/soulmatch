@@ -6,7 +6,7 @@
   "regions": ["bom1"],
   "build": {
     "env": {
-      "NODE_VERSION": "20.x"
+      "NODE_VERSION": "22.x"
     }
   },
   "functions": {

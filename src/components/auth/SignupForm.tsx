@@ -13,7 +13,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { toast } from 'sonner'
 import Link from 'next/link'
 import { SocialLogin } from '@/components/auth/SocialLogin'
-import { Eye, EyeOff, Loader2, Mail, Lock, AlertCircle } from 'lucide-react'
+import { Eye, EyeOff, Loader2, Mail, Lock, AlertCircle, UserCheck } from 'lucide-react'
 
 export function SignupForm() {
   const router = useRouter()
@@ -206,18 +206,27 @@ export function SignupForm() {
         <CardFooter className="flex flex-col space-y-4">
           <Button
             type="submit"
-            className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 shadow-lg hover:shadow-xl transition-all"
+            className="w-full bg-gradient-to-r from-blue-700 to-emerald-700 hover:from-blue-800 hover:to-emerald-800 shadow-lg hover:shadow-xl transition-all group"
             disabled={isLoading}
           >
-            {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            {isLoading ? 'Creating account...' : 'Sign up'}
+            {isLoading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Creating account...
+              </>
+            ) : (
+              <>
+                Sign up
+                <UserCheck className="ml-2 h-4 w-4 group-hover:scale-110 group-hover:rotate-6 transition-all duration-200" />
+              </>
+            )}
           </Button>
 
           <SocialLogin />
 
           <p className="text-sm text-center text-slate-600 dark:text-slate-400">
             Already have an account?{' '}
-            <Link href="/login" className="text-purple-600 dark:text-purple-400 font-medium hover:underline">
+            <Link href="/login" className="text-blue-700 dark:text-blue-400 font-medium hover:underline">
               Sign in
             </Link>
           </p>

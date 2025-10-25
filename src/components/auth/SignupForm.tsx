@@ -13,11 +13,38 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { toast } from 'sonner'
 import Link from 'next/link'
 import { SocialLogin } from '@/components/auth/SocialLogin'
+import { Eye, EyeOff, Loader2, Mail, Lock, AlertCircle } from 'lucide-react'
 
 export function SignupForm() {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [passwordStrength, setPasswordStrength] = useState(0)
   const supabase = createClient()
+
+  const calculatePasswordStrength = (password: string): number => {
+    let strength = 0
+    if (password.length >= 8) strength += 25
+    if (password.length >= 12) strength += 15
+    if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength += 20
+    if (/\d/.test(password)) strength += 20
+    if (/[^a-zA-Z0-9]/.test(password)) strength += 20
+    return Math.min(strength, 100)
+  }
+
+  const getStrengthColor = (strength: number): string => {
+    if (strength < 40) return 'bg-red-500'
+    if (strength < 70) return 'bg-yellow-500'
+    return 'bg-green-500'
+  }
+
+  const getStrengthLabel = (strength: number): string => {
+    if (strength === 0) return ''
+    if (strength < 40) return 'Weak'
+    if (strength < 70) return 'Medium'
+    return 'Strong'
+  }
 
   const {
     register,
@@ -71,66 +98,126 @@ export function SignupForm() {
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Create an account</CardTitle>
-        <CardDescription>Enter your details to get started</CardDescription>
+    <Card className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl shadow-2xl border-purple-100 dark:border-purple-900">
+      <CardHeader className="space-y-1">
+        <CardTitle className="text-2xl font-bold text-center">Create an account</CardTitle>
+        <CardDescription className="text-center">Enter your details to get started</CardDescription>
       </CardHeader>
       <form onSubmit={handleSubmit(onSubmit)}>
         <CardContent className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="you@example.com"
-              {...register('email')}
-              disabled={isLoading}
-            />
+            <div className="relative">
+              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
+              <Input
+                id="email"
+                type="email"
+                placeholder="you@example.com"
+                {...register('email')}
+                disabled={isLoading}
+                className={`pl-10 ${errors.email ? 'border-red-500 focus-visible:ring-red-500' : ''}`}
+              />
+            </div>
             {errors.email && (
-              <p className="text-sm text-red-600">{errors.email.message}</p>
+              <div className="flex items-center gap-1 text-sm text-red-600">
+                <AlertCircle className="h-4 w-4" />
+                <p>{errors.email.message}</p>
+              </div>
             )}
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="password">Password</Label>
-            <Input
-              id="password"
-              type="password"
-              placeholder="••••••••"
-              {...register('password')}
-              disabled={isLoading}
-            />
+            <div className="relative">
+              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
+              <Input
+                id="password"
+                type={showPassword ? 'text' : 'password'}
+                placeholder="••••••••"
+                {...register('password', {
+                  onChange: (e) => setPasswordStrength(calculatePasswordStrength(e.target.value))
+                })}
+                disabled={isLoading}
+                className={`pl-10 pr-10 ${errors.password ? 'border-red-500 focus-visible:ring-red-500' : ''}`}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
+                tabIndex={-1}
+              >
+                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
+            {passwordStrength > 0 && (
+              <div className="space-y-1">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-slate-600">Password strength</span>
+                  <span className={`font-medium ${passwordStrength < 40 ? 'text-red-600' : passwordStrength < 70 ? 'text-yellow-600' : 'text-green-600'}`}>
+                    {getStrengthLabel(passwordStrength)}
+                  </span>
+                </div>
+                <div className="h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                  <div
+                    className={`h-full transition-all duration-300 ${getStrengthColor(passwordStrength)}`}
+                    style={{ width: `${passwordStrength}%` }}
+                  />
+                </div>
+              </div>
+            )}
             {errors.password && (
-              <p className="text-sm text-red-600">{errors.password.message}</p>
+              <div className="flex items-center gap-1 text-sm text-red-600">
+                <AlertCircle className="h-4 w-4" />
+                <p>{errors.password.message}</p>
+              </div>
             )}
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="confirmPassword">Confirm Password</Label>
-            <Input
-              id="confirmPassword"
-              type="password"
-              placeholder="••••••••"
-              {...register('confirmPassword')}
-              disabled={isLoading}
-            />
+            <div className="relative">
+              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
+              <Input
+                id="confirmPassword"
+                type={showConfirmPassword ? 'text' : 'password'}
+                placeholder="••••••••"
+                {...register('confirmPassword')}
+                disabled={isLoading}
+                className={`pl-10 pr-10 ${errors.confirmPassword ? 'border-red-500 focus-visible:ring-red-500' : ''}`}
+              />
+              <button
+                type="button"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
+                tabIndex={-1}
+              >
+                {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
             {errors.confirmPassword && (
-              <p className="text-sm text-red-600">{errors.confirmPassword.message}</p>
+              <div className="flex items-center gap-1 text-sm text-red-600">
+                <AlertCircle className="h-4 w-4" />
+                <p>{errors.confirmPassword.message}</p>
+              </div>
             )}
           </div>
         </CardContent>
 
         <CardFooter className="flex flex-col space-y-4">
-          <Button type="submit" className="w-full" disabled={isLoading}>
+          <Button
+            type="submit"
+            className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 shadow-lg hover:shadow-xl transition-all"
+            disabled={isLoading}
+          >
+            {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             {isLoading ? 'Creating account...' : 'Sign up'}
           </Button>
 
           <SocialLogin />
 
-          <p className="text-sm text-center text-slate-600">
+          <p className="text-sm text-center text-slate-600 dark:text-slate-400">
             Already have an account?{' '}
-            <Link href="/login" className="text-slate-900 font-medium hover:underline">
+            <Link href="/login" className="text-purple-600 dark:text-purple-400 font-medium hover:underline">
               Sign in
             </Link>
           </p>

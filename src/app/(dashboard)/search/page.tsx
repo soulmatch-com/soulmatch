@@ -8,6 +8,9 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import { ProfileCardSkeleton } from '@/components/dashboard/ProfileCardSkeleton'
+import { Badge } from '@/components/ui/badge'
+import { Heart, MessageSquare, Star, Loader2, X, ChevronDown, ChevronUp, Search as SearchIcon } from 'lucide-react'
 import { toast } from 'sonner'
 import Link from 'next/link'
 import Image from 'next/image'
@@ -41,6 +44,7 @@ export default function SearchPage() {
   const supabase = createClient()
   const [profiles, setProfiles] = useState<Profile[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [showFilters, setShowFilters] = useState(false)
 
   // Search filters
   const [filters, setFilters] = useState({
@@ -55,6 +59,8 @@ export default function SearchPage() {
     minHeight: '',
     maxHeight: '',
   })
+
+  const activeFiltersCount = Object.values(filters).filter(v => v && v !== 'any').length
 
   useEffect(() => {
     loadProfiles()
@@ -170,20 +176,88 @@ export default function SearchPage() {
   }
 
   return (
-    <div className="container mx-auto py-10 px-4">
-      <div className="max-w-7xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold">Find Your Match</h1>
-          <p className="text-slate-600 mt-2">Search for compatible partners</p>
-        </div>
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-rose-50 dark:from-slate-900 dark:via-purple-950 dark:to-slate-900">
+      <div className="container mx-auto py-10 px-4">
+        <div className="max-w-7xl mx-auto">
+          {/* Hero Section */}
+          <div className="mb-8">
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+              Find Your Match
+            </h1>
+            <p className="text-slate-600 dark:text-slate-400 mt-2">
+              Discover compatible partners who share your values and interests
+            </p>
+          </div>
 
-        {/* Search Filters */}
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle>Search Filters</CardTitle>
-            <CardDescription>Refine your search criteria</CardDescription>
-          </CardHeader>
-          <CardContent>
+          {/* Search Filters */}
+          <Card className="mb-6 bg-white/80 dark:bg-slate-800/80 backdrop-blur shadow-xl">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="flex items-center gap-2">
+                    <SearchIcon className="h-5 w-5 text-purple-600" />
+                    Search Filters
+                    {activeFiltersCount > 0 && (
+                      <Badge variant="secondary" className="ml-2">
+                        {activeFiltersCount} active
+                      </Badge>
+                    )}
+                  </CardTitle>
+                  <CardDescription>Refine your search criteria</CardDescription>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowFilters(!showFilters)}
+                  className="md:hidden"
+                >
+                  {showFilters ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                </Button>
+              </div>
+
+              {/* Active Filter Chips */}
+              {activeFiltersCount > 0 && (
+                <div className="flex flex-wrap gap-2 mt-4">
+                  {filters.gender && filters.gender !== 'any' && (
+                    <Badge variant="outline" className="gap-1">
+                      Gender: {filters.gender}
+                      <X
+                        className="h-3 w-3 cursor-pointer"
+                        onClick={() => handleFilterChange('gender', '')}
+                      />
+                    </Badge>
+                  )}
+                  {filters.minAge && (
+                    <Badge variant="outline" className="gap-1">
+                      Min Age: {filters.minAge}
+                      <X
+                        className="h-3 w-3 cursor-pointer"
+                        onClick={() => handleFilterChange('minAge', '')}
+                      />
+                    </Badge>
+                  )}
+                  {filters.maxAge && (
+                    <Badge variant="outline" className="gap-1">
+                      Max Age: {filters.maxAge}
+                      <X
+                        className="h-3 w-3 cursor-pointer"
+                        onClick={() => handleFilterChange('maxAge', '')}
+                      />
+                    </Badge>
+                  )}
+                  {filters.city && (
+                    <Badge variant="outline" className="gap-1">
+                      City: {filters.city}
+                      <X
+                        className="h-3 w-3 cursor-pointer"
+                        onClick={() => handleFilterChange('city', '')}
+                      />
+                    </Badge>
+                  )}
+                </div>
+              )}
+            </CardHeader>
+            <CardContent className={`${showFilters ? 'block' : 'hidden'} md:block`}>
             <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {/* Gender */}
               <div className="space-y-2">
@@ -300,16 +374,30 @@ export default function SearchPage() {
             </div>
 
             <div className="flex gap-4 mt-6">
-              <Button onClick={handleSearch}>Search</Button>
-              <Button variant="outline" onClick={handleClearFilters}>Clear Filters</Button>
+              <Button
+                onClick={handleSearch}
+                disabled={isLoading}
+                className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+              >
+                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Search
+              </Button>
+              <Button variant="outline" onClick={handleClearFilters} disabled={isLoading}>
+                Clear Filters
+              </Button>
             </div>
           </CardContent>
         </Card>
 
         {/* Results */}
         {isLoading ? (
-          <div className="text-center py-10">
-            <p className="text-slate-600">Loading profiles...</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <ProfileCardSkeleton />
+            <ProfileCardSkeleton />
+            <ProfileCardSkeleton />
+            <ProfileCardSkeleton />
+            <ProfileCardSkeleton />
+            <ProfileCardSkeleton />
           </div>
         ) : profiles.length === 0 ? (
           <Card>
@@ -389,16 +477,17 @@ export default function SearchPage() {
                         )}
                       </div>
 
-                      <Button className="w-full mt-6" asChild>
-                        <Link href={`/profile/${profile.id}`}>View Profile</Link>
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+                        <Button className="w-full mt-6 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700" asChild>
+                          <Link href={`/profile/${profile.id}`}>View Profile</Link>
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   )

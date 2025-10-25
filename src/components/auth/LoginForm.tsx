@@ -15,10 +15,12 @@ import { toast } from 'sonner'
 import Link from 'next/link'
 import { SocialLogin } from '@/components/auth/SocialLogin'
 import { TwoFactorVerification } from '@/components/auth/TwoFactorVerification'
+import { Eye, EyeOff, Loader2, Mail, Lock, AlertCircle } from 'lucide-react'
 
 export function LoginForm() {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
   const [requires2FA, setRequires2FA] = useState(false)
   const [factorId, setFactorId] = useState<string | null>(null)
   const supabase = createClient()
@@ -107,24 +109,31 @@ export function LoginForm() {
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Welcome back</CardTitle>
-        <CardDescription>Sign in to your account</CardDescription>
+    <Card className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl shadow-2xl border-purple-100 dark:border-purple-900">
+      <CardHeader className="space-y-1">
+        <CardTitle className="text-2xl font-bold text-center">Welcome back</CardTitle>
+        <CardDescription className="text-center">Sign in to continue your journey</CardDescription>
       </CardHeader>
       <form onSubmit={handleSubmit(onSubmit)}>
         <CardContent className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="you@example.com"
-              {...register('email')}
-              disabled={isLoading}
-            />
+            <div className="relative">
+              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
+              <Input
+                id="email"
+                type="email"
+                placeholder="you@example.com"
+                {...register('email')}
+                disabled={isLoading}
+                className={`pl-10 ${errors.email ? 'border-red-500 focus-visible:ring-red-500' : ''}`}
+              />
+            </div>
             {errors.email && (
-              <p className="text-sm text-red-600">{errors.email.message}</p>
+              <div className="flex items-center gap-1 text-sm text-red-600">
+                <AlertCircle className="h-4 w-4" />
+                <p>{errors.email.message}</p>
+              </div>
             )}
           </div>
 
@@ -133,34 +142,54 @@ export function LoginForm() {
               <Label htmlFor="password">Password</Label>
               <Link
                 href="/forgot-password"
-                className="text-sm text-slate-600 hover:text-slate-900 hover:underline"
+                className="text-sm text-purple-600 hover:text-purple-700 dark:text-purple-400 dark:hover:text-purple-300 hover:underline font-medium"
               >
                 Forgot password?
               </Link>
             </div>
-            <Input
-              id="password"
-              type="password"
-              placeholder="••••••••"
-              {...register('password')}
-              disabled={isLoading}
-            />
+            <div className="relative">
+              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
+              <Input
+                id="password"
+                type={showPassword ? 'text' : 'password'}
+                placeholder="••••••••"
+                {...register('password')}
+                disabled={isLoading}
+                className={`pl-10 pr-10 ${errors.password ? 'border-red-500 focus-visible:ring-red-500' : ''}`}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
+                tabIndex={-1}
+              >
+                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
             {errors.password && (
-              <p className="text-sm text-red-600">{errors.password.message}</p>
+              <div className="flex items-center gap-1 text-sm text-red-600">
+                <AlertCircle className="h-4 w-4" />
+                <p>{errors.password.message}</p>
+              </div>
             )}
           </div>
         </CardContent>
 
         <CardFooter className="flex flex-col space-y-4">
-          <Button type="submit" className="w-full" disabled={isLoading}>
+          <Button
+            type="submit"
+            className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 shadow-lg hover:shadow-xl transition-all"
+            disabled={isLoading}
+          >
+            {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             {isLoading ? 'Signing in...' : 'Sign in'}
           </Button>
 
           <SocialLogin />
 
-          <p className="text-sm text-center text-slate-600">
+          <p className="text-sm text-center text-slate-600 dark:text-slate-400">
             Don't have an account?{' '}
-            <Link href="/signup" className="text-slate-900 font-medium hover:underline">
+            <Link href="/signup" className="text-purple-600 dark:text-purple-400 font-medium hover:underline">
               Sign up
             </Link>
           </p>

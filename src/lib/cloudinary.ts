@@ -24,7 +24,7 @@ export function getUploadUrl() {
 }
 
 // Helper function to get optimized image URL
-export function getOptimizedImageUrl(publicId: string, options?: {
+export function getOptimizedImageUrl(publicId: string, options?: { 
   width?: number
   height?: number
   crop?: string

@@ -1,51 +1,35 @@
 
 > soulmatch-web@0.1.0 build
-> next build --turbopack
+> next build
 
-   ▲ Next.js 15.5.4 (Turbopack)
+   ▲ Next.js 15.5.4
    - Environments: .env.local
    - Experiments (use with caution):
      · optimizePackageImports
 
    Creating an optimized production build ...
-
-[2m[258.14ms][22m [@tailwindcss/postcss] src/app/globals.css
-[2m[  0.24ms][22m  [2m ↳ [22mQuick bail check
-[2m[ 75.02ms][22m  [2m ↳ [22mSetup compiler
-[2m[  1.03ms][22m    [2m ↳ [22mPostCSS AST -> Tailwind CSS AST
-[2m[ 73.87ms][22m    [2m ↳ [22mCreate compiler
-[2m[  0.34ms][22m  [2m ↳ [22mRegister full rebuild paths
-[2m[  2.66ms][22m  [2m ↳ [22mSetup scanner
-[2m[ 19.34ms][22m  [2m ↳ [22mScan for candidates
-[2m[ 16.58ms][22m  [2m ↳ [22mRegister dependency messages
-[2m[ 92.12ms][22m  [2m ↳ [22mBuild utilities
-[2m[ 44.26ms][22m  [2m ↳ [22mOptimization
-[2m[  2.71ms][22m    [2m ↳ [22mAST -> CSS
-[2m[ 15.37ms][22m    [2m ↳ [22mLightning CSS
-[2m[ 26.01ms][22m    [2m ↳ [22mCSS -> PostCSS AST
-[2m[  5.96ms][22m  [2m ↳ [22mUpdate PostCSS AST
-
- ✓ Finished writing to disk in 67ms
- ✓ Compiled successfully in 12.7s
+ ✓ Compiled successfully in 5.5s
    Linting and checking validity of types ...
 
 ./src/app/(dashboard)/profile/[id]/page.tsx
-334:65  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
-340:65  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
-346:65  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
-352:65  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+344:65  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+350:65  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+356:65  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+362:65  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
 
 ./src/app/(dashboard)/profile/edit/page.tsx
-12:18  Warning: 'AvatarImage' is defined but never used.  @typescript-eslint/no-unused-vars
-72:6  Warning: React Hook useEffect has a missing dependency: 'loadProfile'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
-485:54  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
-720:53  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
-730:59  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
-742:53  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
-752:59  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+74:6  Warning: React Hook useEffect has a missing dependency: 'loadProfile'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+487:54  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+722:53  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+732:59  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+744:53  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+754:59  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
 
 ./src/app/(dashboard)/search/page.tsx
-59:6  Warning: React Hook useEffect has a missing dependency: 'loadProfiles'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+13:10  Warning: 'Heart' is defined but never used.  @typescript-eslint/no-unused-vars
+13:17  Warning: 'MessageSquare' is defined but never used.  @typescript-eslint/no-unused-vars
+13:32  Warning: 'Star' is defined but never used.  @typescript-eslint/no-unused-vars
+67:6  Warning: React Hook useEffect has a missing dependency: 'loadProfiles'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
 
 ./src/app/admin/active-profiles/page.tsx
 43:6  Warning: React Hook useEffect has a missing dependency: 'fetchActiveProfiles'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
@@ -87,7 +71,10 @@
 24:38  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
 
 ./src/components/Header.tsx
-26:14  Warning: 'error' is defined but never used.  @typescript-eslint/no-unused-vars
+39:14  Warning: 'error' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./src/components/ThemeToggle.tsx
+8:11  Warning: 'theme' is assigned a value but never used.  @typescript-eslint/no-unused-vars
 
 ./src/components/auth/ForgotPasswordForm.tsx
 75:15  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
@@ -95,8 +82,8 @@
 109:42  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
 
 ./src/components/auth/LoginForm.tsx
-81:14  Warning: 'error' is defined but never used.  @typescript-eslint/no-unused-vars
-162:16  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+83:14  Warning: 'error' is defined but never used.  @typescript-eslint/no-unused-vars
+191:16  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
 
 ./src/components/auth/ResetPasswordForm.tsx
 95:14  Warning: 'error' is defined but never used.  @typescript-eslint/no-unused-vars
@@ -158,67 +145,56 @@ info  - Need to disable some ESLint rules? Learn more here: https://nextjs.org/d
 ⚠️  Node.js 18 and below are deprecated and will no longer be supported in future versions of @supabase/supabase-js. Please upgrade to Node.js 20 or later. For more information, visit: https://github.com/orgs/supabase/discussions/37217
 ⚠️  Node.js 18 and below are deprecated and will no longer be supported in future versions of @supabase/supabase-js. Please upgrade to Node.js 20 or later. For more information, visit: https://github.com/orgs/supabase/discussions/37217
 ⚠️  Node.js 18 and below are deprecated and will no longer be supported in future versions of @supabase/supabase-js. Please upgrade to Node.js 20 or later. For more information, visit: https://github.com/orgs/supabase/discussions/37217
-⚠️  Node.js 18 and below are deprecated and will no longer be supported in future versions of @supabase/supabase-js. Please upgrade to Node.js 20 or later. For more information, visit: https://github.com/orgs/supabase/discussions/37217
-⚠️  Node.js 18 and below are deprecated and will no longer be supported in future versions of @supabase/supabase-js. Please upgrade to Node.js 20 or later. For more information, visit: https://github.com/orgs/supabase/discussions/37217
-⚠️  Node.js 18 and below are deprecated and will no longer be supported in future versions of @supabase/supabase-js. Please upgrade to Node.js 20 or later. For more information, visit: https://github.com/orgs/supabase/discussions/37217
-⚠️  Node.js 18 and below are deprecated and will no longer be supported in future versions of @supabase/supabase-js. Please upgrade to Node.js 20 or later. For more information, visit: https://github.com/orgs/supabase/discussions/37217
    Generating static pages (0/32) ...
-⚠️  Node.js 18 and below are deprecated and will no longer be supported in future versions of @supabase/supabase-js. Please upgrade to Node.js 20 or later. For more information, visit: https://github.com/orgs/supabase/discussions/37217
 ⚠️  Node.js 18 and below are deprecated and will no longer be supported in future versions of @supabase/supabase-js. Please upgrade to Node.js 20 or later. For more information, visit: https://github.com/orgs/supabase/discussions/37217
 ⚠️  Node.js 18 and below are deprecated and will no longer be supported in future versions of @supabase/supabase-js. Please upgrade to Node.js 20 or later. For more information, visit: https://github.com/orgs/supabase/discussions/37217
    Generating static pages (8/32) 
 ⚠️  Node.js 18 and below are deprecated and will no longer be supported in future versions of @supabase/supabase-js. Please upgrade to Node.js 20 or later. For more information, visit: https://github.com/orgs/supabase/discussions/37217
-   Generating static pages (16/32) 
 ⚠️  Node.js 18 and below are deprecated and will no longer be supported in future versions of @supabase/supabase-js. Please upgrade to Node.js 20 or later. For more information, visit: https://github.com/orgs/supabase/discussions/37217
+   Generating static pages (16/32) 
    Generating static pages (24/32) 
  ✓ Generating static pages (32/32)
    Finalizing page optimization ...
    Collecting build traces ...
 
-Route (app)                         Size  First Load JS
-┌ ○ /                              938 B         193 kB
-├ ○ /_not-found                      0 B         192 kB
-├ ○ /2fa-setup                   4.17 kB         196 kB
-├ ○ /admin/active-profiles       3.21 kB         199 kB
-├ ○ /admin/dashboard             2.25 kB         198 kB
-├ ○ /admin/login                 2.81 kB         262 kB
-├ ○ /admin/profiles              3.21 kB         199 kB
-├ ○ /admin/settings                974 B         197 kB
-├ ○ /admin/users                 15.6 kB         211 kB
-├ ○ /admin/verification-queue    2.77 kB         198 kB
-├ ƒ /api/admin/auth/login            0 B            0 B
-├ ƒ /api/admin/profiles              0 B            0 B
-├ ƒ /api/admin/profiles/status       0 B            0 B
-├ ƒ /api/admin/profiles/verify       0 B            0 B
-├ ƒ /api/admin/setup                 0 B            0 B
-├ ƒ /api/admin/stats                 0 B            0 B
-├ ƒ /api/admin/users                 0 B            0 B
-├ ƒ /api/admin/users/[id]            0 B            0 B
-├ ƒ /api/auth/callback               0 B            0 B
-├ ƒ /api/auth/confirm                0 B            0 B
-├ ƒ /api/auth/signout                0 B            0 B
-├ ƒ /api/upload                      0 B            0 B
-├ ƒ /dashboard                    7.7 kB         200 kB
-├ ○ /forgot-password             3.23 kB         259 kB
-├ ○ /login                       4.74 kB         261 kB
-├ ƒ /profile/[id]                10.3 kB         203 kB
-├ ƒ /profile/create              7.35 kB         290 kB
-├ ƒ /profile/edit                13.2 kB         232 kB
-├ ƒ /reset-password              3.56 kB         260 kB
-├ ƒ /search                      10.7 kB         229 kB
-├ ○ /signup                      3.94 kB         260 kB
-└ ○ /verify-otp                    827 B         193 kB
-+ First Load JS shared by all     202 kB
-  ├ chunks/2008ffcf9e5b170c.js     13 kB
-  ├ chunks/25fbea50b095c333.js   59.2 kB
-  ├ chunks/56f90dc135d854c1.js   17.2 kB
-  ├ chunks/bab8b880165d4663.js   10.5 kB
-  ├ chunks/d8ec5a57dd5c1438.js   10.9 kB
-  └ chunks/eb940ab5579b8716.js   44.3 kB
-  └ other shared chunks (total)  46.6 kB
+Route (app)                                 Size  First Load JS
+┌ ○ /                                    4.43 kB         118 kB
+├ ○ /_not-found                            998 B         103 kB
+├ ○ /2fa-setup                           3.92 kB         169 kB
+├ ○ /admin/active-profiles               3.33 kB         125 kB
+├ ○ /admin/dashboard                     4.62 kB         114 kB
+├ ○ /admin/login                         4.91 kB         151 kB
+├ ○ /admin/profiles                      3.24 kB         125 kB
+├ ○ /admin/settings                       2.3 kB         112 kB
+├ ○ /admin/users                         9.43 kB         137 kB
+├ ○ /admin/verification-queue            4.33 kB         124 kB
+├ ƒ /api/admin/auth/login                  167 B         102 kB
+├ ƒ /api/admin/profiles                    167 B         102 kB
+├ ƒ /api/admin/profiles/status             167 B         102 kB
+├ ƒ /api/admin/profiles/verify             167 B         102 kB
+├ ƒ /api/admin/setup                       167 B         102 kB
+├ ƒ /api/admin/stats                       167 B         102 kB
+├ ƒ /api/admin/users                       167 B         102 kB
+├ ƒ /api/admin/users/[id]                  167 B         102 kB
+├ ƒ /api/auth/callback                     167 B         102 kB
+├ ƒ /api/auth/confirm                      167 B         102 kB
+├ ƒ /api/auth/signout                      167 B         102 kB
+├ ƒ /api/upload                            167 B         102 kB
+├ ƒ /dashboard                           3.13 kB         114 kB
+├ ○ /forgot-password                     2.75 kB         197 kB
+├ ○ /login                               5.85 kB         200 kB
+├ ƒ /profile/[id]                        5.76 kB         176 kB
+├ ƒ /profile/create                      6.03 kB         225 kB
+├ ƒ /profile/edit                        7.64 kB         205 kB
+├ ƒ /reset-password                      3.12 kB         194 kB
+├ ƒ /search                              5.77 kB         207 kB
+├ ○ /signup                              5.04 kB         200 kB
+└ ○ /verify-otp                          1.02 kB         111 kB
++ First Load JS shared by all             102 kB
+  ├ chunks/1255-1622f43a1c0ebec5.js      45.7 kB
+  ├ chunks/4bd1b696-f785427dddbba9fb.js  54.2 kB
+  └ other shared chunks (total)          1.94 kB
 
-
-ƒ Middleware                     73.8 kB
 
 ○  (Static)   prerendered as static content
 ƒ  (Dynamic)  server-rendered on demand

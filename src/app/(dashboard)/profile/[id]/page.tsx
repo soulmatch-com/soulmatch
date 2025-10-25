@@ -13,9 +13,9 @@ import { ArrowLeft, Heart, X } from 'lucide-react'
 export const dynamic = 'force-dynamic'
 
 interface ProfileDetailProps {
-  params: {
+  params: Promise<{
     id: string
-  }
+  }>
 }
 
 interface Profile {
@@ -62,18 +62,27 @@ export default function ProfileDetailPage({ params }: ProfileDetailProps) {
   const supabase = createClient()
   const [profile, setProfile] = useState<Profile | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [profileId, setProfileId] = useState<string | null>(null)
 
   useEffect(() => {
-    loadProfile()
+    params.then(({ id }) => setProfileId(id))
+  }, [params])
+
+  useEffect(() => {
+    if (profileId) {
+      loadProfile()
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [params.id])
+  }, [profileId])
 
   const loadProfile = async () => {
+    if (!profileId) return
+
     try {
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
-        .eq('id', params.id)
+        .eq('id', profileId)
         .single()
 
       if (error) {

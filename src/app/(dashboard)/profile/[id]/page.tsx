@@ -13,9 +13,8 @@ import { ArrowLeft, Heart, X } from 'lucide-react'
 export const dynamic = 'force-dynamic'
 
 interface ProfileDetailProps {
-  params: Promise<{
-    id: string
-  }>
+  params: Promise<{ id: string }>
+  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>
 }
 
 interface Profile {

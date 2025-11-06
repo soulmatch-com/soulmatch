@@ -9,6 +9,138 @@ export type Json =
 export interface Database {
   public: {
     Tables: {
+      interests: {
+        Row: {
+          id: string
+          sender_profile_id: string
+          receiver_profile_id: string
+          status: 'pending' | 'accepted' | 'declined' | 'withdrawn'
+          message: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          sender_profile_id: string
+          receiver_profile_id: string
+          status?: 'pending' | 'accepted' | 'declined' | 'withdrawn'
+          message?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          sender_profile_id?: string
+          receiver_profile_id?: string
+          status?: 'pending' | 'accepted' | 'declined' | 'withdrawn'
+          message?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      notifications: {
+        Row: {
+          id: string
+          user_id: string
+          profile_id: string
+          type: 'interest_received' | 'interest_accepted' | 'interest_declined' | 'message_received' | 'profile_view'
+          title: string
+          message: string
+          related_profile_id: string | null
+          related_interest_id: string | null
+          is_read: boolean
+          read_at: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          profile_id: string
+          type: 'interest_received' | 'interest_accepted' | 'interest_declined' | 'message_received' | 'profile_view'
+          title: string
+          message: string
+          related_profile_id?: string | null
+          related_interest_id?: string | null
+          is_read?: boolean
+          read_at?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          profile_id?: string
+          type?: 'interest_received' | 'interest_accepted' | 'interest_declined' | 'message_received' | 'profile_view'
+          title?: string
+          message?: string
+          related_profile_id?: string | null
+          related_interest_id?: string | null
+          is_read?: boolean
+          read_at?: string | null
+          created_at?: string
+        }
+      }
+      success_stories: {
+        Row: {
+          id: string
+          profile1_id: string | null
+          profile2_id: string | null
+          couple_names: string
+          location: string
+          story_text: string
+          couple_photo_url: string | null
+          wedding_photos: string[] | null
+          marriage_date: string | null
+          is_featured: boolean
+          is_published: boolean
+          display_order: number
+          submission_type: 'admin' | 'user_submitted'
+          status: 'pending' | 'approved' | 'rejected'
+          submitted_by: string | null
+          approved_by: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          profile1_id?: string | null
+          profile2_id?: string | null
+          couple_names: string
+          location: string
+          story_text: string
+          couple_photo_url?: string | null
+          wedding_photos?: string[] | null
+          marriage_date?: string | null
+          is_featured?: boolean
+          is_published?: boolean
+          display_order?: number
+          submission_type?: 'admin' | 'user_submitted'
+          status?: 'pending' | 'approved' | 'rejected'
+          submitted_by?: string | null
+          approved_by?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          profile1_id?: string | null
+          profile2_id?: string | null
+          couple_names?: string
+          location?: string
+          story_text?: string
+          couple_photo_url?: string | null
+          wedding_photos?: string[] | null
+          marriage_date?: string | null
+          is_featured?: boolean
+          is_published?: boolean
+          display_order?: number
+          submission_type?: 'admin' | 'user_submitted'
+          status?: 'pending' | 'approved' | 'rejected'
+          submitted_by?: string | null
+          approved_by?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+      }
       profiles: {
         Row: {
           id: string

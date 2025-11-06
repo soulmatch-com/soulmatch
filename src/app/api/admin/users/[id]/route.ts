@@ -1,6 +1,6 @@
 // Admin API - Get, Update, or Delete specific user
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 // GET single user
 export async function GET(
@@ -8,7 +8,7 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const supabase = await createClient()
+    const supabase = createAdminClient()
     const { id: userId } = await params
 
     // Get profile
@@ -51,7 +51,7 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const supabase = await createClient()
+    const supabase = createAdminClient()
     const { id: userId } = await params
     const body = await request.json()
     const { profile_status, is_verified } = body
@@ -102,7 +102,7 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const supabase = await createClient()
+    const supabase = createAdminClient()
     const { id: userId } = await params
 
     // Delete profile

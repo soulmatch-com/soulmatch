@@ -8,7 +8,8 @@ import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { toast } from 'sonner'
 import Image from 'next/image'
-import { ArrowLeft, Heart, X } from 'lucide-react'
+import { ArrowLeft, Heart, X, Edit } from 'lucide-react'
+import Link from 'next/link'
 
 export const dynamic = 'force-dynamic'
 
@@ -54,6 +55,23 @@ interface Profile {
   sisters_married?: number
   sisters_unmarried?: number
   hobbies?: string[]
+  // New Basic Details fields
+  profile_created_for?: string
+  body_type?: string
+  physical_status?: string
+  drinking_habits?: string
+  smoking_habits?: string
+  eating_habits?: string
+  // New Religion Information fields
+  sub_caste?: string
+  gothram?: string
+  star?: string
+  raasi?: string
+  dosham?: string
+  // New Location fields
+  country?: string
+  citizenship?: string
+  ancestral_origin?: string
 }
 
 export default function ProfileDetailPage({ params }: ProfileDetailProps) {
@@ -121,7 +139,7 @@ export default function ProfileDetailPage({ params }: ProfileDetailProps) {
 
   if (isLoading) {
     return (
-      <div className="container max-w-4xl mx-auto py-10 px-4">
+      <div className="container max-w-7xl mx-auto py-10 px-4">
         <Card>
           <CardContent className="py-10 text-center">
             <p>Loading profile...</p>
@@ -133,7 +151,7 @@ export default function ProfileDetailPage({ params }: ProfileDetailProps) {
 
   if (!profile) {
     return (
-      <div className="container max-w-4xl mx-auto py-10 px-4">
+      <div className="container max-w-7xl mx-auto py-10 px-4">
         <Card>
           <CardContent className="py-10 text-center">
             <p>Profile not found</p>
@@ -147,7 +165,7 @@ export default function ProfileDetailPage({ params }: ProfileDetailProps) {
   }
 
   return (
-    <div className="container max-w-4xl mx-auto py-10 px-4">
+    <div className="container max-w-7xl mx-auto py-10 px-4">
       {/* Back Button */}
       <Button variant="ghost" onClick={() => router.back()} className="mb-4">
         <ArrowLeft className="w-4 h-4 mr-2" />
@@ -227,6 +245,146 @@ export default function ProfileDetailPage({ params }: ProfileDetailProps) {
           </CardContent>
         </Card>
 
+        {/* Basic Details */}
+        <Card className="bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-slate-700">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+            <CardTitle className="text-lg font-semibold">Basic Details</CardTitle>
+            <Link href="/profile/edit">
+              <Button size="sm" className="bg-blue-600 hover:bg-blue-700">
+                <Edit className="h-3 w-3 mr-1" />
+                Edit
+              </Button>
+            </Link>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+              {/* Left Column */}
+              <div className="space-y-4">
+                <div>
+                  <p className="text-sm text-slate-600 dark:text-slate-400">Profile created for</p>
+                  <p className="font-medium text-slate-900 dark:text-slate-100">
+                    {profile.profile_created_for || (
+                      <Link href="/profile/edit" className="text-blue-600 hover:text-blue-700">
+                        Add Profile Type ▸
+                      </Link>
+                    )}
+                  </p>
+                </div>
+
+                <div>
+                  <p className="text-sm text-slate-600 dark:text-slate-400">Body Type</p>
+                  <p className="font-medium text-slate-900 dark:text-slate-100">
+                    {profile.body_type || (
+                      <Link href="/profile/edit" className="text-blue-600 hover:text-blue-700">
+                        Add Body Type ▸
+                      </Link>
+                    )}
+                  </p>
+                </div>
+
+                <div>
+                  <p className="text-sm text-slate-600 dark:text-slate-400">Physical Status</p>
+                  <p className="font-medium text-slate-900 dark:text-slate-100">
+                    {profile.physical_status || 'Normal'}
+                  </p>
+                </div>
+
+                <div>
+                  <p className="text-sm text-slate-600 dark:text-slate-400">Weight</p>
+                  <p className="font-medium text-slate-900 dark:text-slate-100">
+                    {profile.weight_kg ? `${profile.weight_kg} kg` : (
+                      <Link href="/profile/edit" className="text-blue-600 hover:text-blue-700">
+                        Add Weight ▸
+                      </Link>
+                    )}
+                  </p>
+                </div>
+
+                <div>
+                  <p className="text-sm text-slate-600 dark:text-slate-400">Marital Status</p>
+                  <p className="font-medium text-slate-900 dark:text-slate-100 capitalize">
+                    {profile.marital_status?.replace('_', ' ') || 'Not specified'}
+                  </p>
+                </div>
+
+                <div>
+                  <p className="text-sm text-slate-600 dark:text-slate-400">Drinking Habits</p>
+                  <p className="font-medium text-slate-900 dark:text-slate-100">
+                    {profile.drinking_habits || (
+                      <Link href="/profile/edit" className="text-blue-600 hover:text-blue-700">
+                        Add Drinking Habits ▸
+                      </Link>
+                    )}
+                  </p>
+                </div>
+              </div>
+
+              {/* Right Column */}
+              <div className="space-y-4">
+                <div>
+                  <p className="text-sm text-slate-600 dark:text-slate-400">Name</p>
+                  <p className="font-medium text-slate-900 dark:text-slate-100">
+                    {profile.first_name} {profile.last_name}
+                  </p>
+                </div>
+
+                <div>
+                  <p className="text-sm text-slate-600 dark:text-slate-400">Age</p>
+                  <p className="font-medium text-slate-900 dark:text-slate-100">
+                    {calculateAge(profile.date_of_birth)} Years
+                  </p>
+                </div>
+
+                <div>
+                  <p className="text-sm text-slate-600 dark:text-slate-400">Height</p>
+                  <p className="font-medium text-slate-900 dark:text-slate-100">
+                    {profile.height_cm ? (
+                      `${Math.floor(Number(profile.height_cm) / 30.48)} Ft ${Math.round((Number(profile.height_cm) % 30.48) / 2.54)} In / ${profile.height_cm} Cms`
+                    ) : (
+                      <Link href="/profile/edit" className="text-blue-600 hover:text-blue-700">
+                        Add Height ▸
+                      </Link>
+                    )}
+                  </p>
+                </div>
+
+                <div>
+                  <p className="text-sm text-slate-600 dark:text-slate-400">Mother Tongue</p>
+                  <p className="font-medium text-slate-900 dark:text-slate-100">
+                    {profile.mother_tongue || (
+                      <Link href="/profile/edit" className="text-blue-600 hover:text-blue-700">
+                        Add Mother Tongue ▸
+                      </Link>
+                    )}
+                  </p>
+                </div>
+
+                <div>
+                  <p className="text-sm text-slate-600 dark:text-slate-400">Eating Habits</p>
+                  <p className="font-medium text-slate-900 dark:text-slate-100">
+                    {profile.eating_habits || (
+                      <Link href="/profile/edit" className="text-blue-600 hover:text-blue-700">
+                        Add Eating Habits ▸
+                      </Link>
+                    )}
+                  </p>
+                </div>
+
+                <div>
+                  <p className="text-sm text-slate-600 dark:text-slate-400">Smoking Habits</p>
+                  <p className="font-medium text-slate-900 dark:text-slate-100">
+                    {profile.smoking_habits || (
+                      <Link href="/profile/edit" className="text-blue-600 hover:text-blue-700">
+                        Add Smoking Habits ▸
+                      </Link>
+                    )}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
         {/* About Me */}
         {profile.about_me && (
           <Card>
@@ -290,52 +448,194 @@ export default function ProfileDetailPage({ params }: ProfileDetailProps) {
           </Card>
         )}
 
-        {/* Cultural & Personal Details */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Personal Details</CardTitle>
+        {/* Religion Information */}
+        <Card className="bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-slate-700">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+            <CardTitle className="text-lg font-semibold">Religion Information</CardTitle>
+            <Link href="/profile/edit">
+              <Button size="sm" className="bg-blue-600 hover:bg-blue-700">
+                <Edit className="h-3 w-3 mr-1" />
+                Edit
+              </Button>
+            </Link>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {profile.religion && (
+            <div className="space-y-4">
+              <div>
+                <p className="text-sm text-slate-600 dark:text-slate-400">Religion</p>
+                <p className="font-medium text-slate-900 dark:text-slate-100">
+                  {profile.religion || (
+                    <Link href="/profile/edit" className="text-blue-600 hover:text-blue-700">
+                      Add Religion ▸
+                    </Link>
+                  )}
+                </p>
+              </div>
+
+              <div>
+                <p className="text-sm text-slate-600 dark:text-slate-400">Caste / Sub Caste</p>
+                <p className="font-medium text-slate-900 dark:text-slate-100">
+                  {profile.caste ? `${profile.caste} - ${profile.sub_caste || 'Not Specified'}` : (
+                    <Link href="/profile/edit" className="text-blue-600 hover:text-blue-700">
+                      Add Caste ▸
+                    </Link>
+                  )}
+                </p>
+              </div>
+
+              <div>
+                <p className="text-sm text-slate-600 dark:text-slate-400">Gothram</p>
+                <p className="font-medium text-slate-900 dark:text-slate-100">
+                  {profile.gothram || '-'}
+                </p>
+              </div>
+
+              <div>
+                <p className="text-sm text-slate-600 dark:text-slate-400">Star / Raasi</p>
+                <p className="font-medium text-slate-900 dark:text-slate-100">
+                  {profile.star && profile.raasi
+                    ? `${profile.star} / ${profile.raasi}`
+                    : profile.star || profile.raasi || (
+                      <Link href="/profile/edit" className="text-blue-600 hover:text-blue-700">
+                        Add Star / Raasi ▸
+                      </Link>
+                    )}
+                </p>
+              </div>
+
+              <div>
+                <p className="text-sm text-slate-600 dark:text-slate-400">Dosham</p>
+                <p className="font-medium text-slate-900 dark:text-slate-100">
+                  {profile.dosham || (
+                    <Link href="/profile/edit" className="text-blue-600 hover:text-blue-700">
+                      Add Dosham Status ▸
+                    </Link>
+                  )}
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Physical & Other Details */}
+        {(profile.complexion || profile.blood_group) && (
+          <Card className="bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-slate-700">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+              <CardTitle className="text-lg font-semibold">Physical Details</CardTitle>
+              <Link href="/profile/edit">
+                <Button size="sm" className="bg-blue-600 hover:bg-blue-700">
+                  <Edit className="h-3 w-3 mr-1" />
+                  Edit
+                </Button>
+              </Link>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+                {profile.complexion && (
+                  <div>
+                    <p className="text-sm text-slate-600 dark:text-slate-400">Complexion</p>
+                    <p className="font-medium text-slate-900 dark:text-slate-100 capitalize">
+                      {profile.complexion.replace('_', ' ')}
+                    </p>
+                  </div>
+                )}
+                {profile.blood_group && (
+                  <div>
+                    <p className="text-sm text-slate-600 dark:text-slate-400">Blood Group</p>
+                    <p className="font-medium text-slate-900 dark:text-slate-100">
+                      {profile.blood_group}
+                    </p>
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Groom's/Bride's Location */}
+        <Card className="bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-slate-700">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+            <CardTitle className="text-lg font-semibold">Groom&apos;s Location</CardTitle>
+            <Link href="/profile/edit">
+              <Button size="sm" className="bg-blue-600 hover:bg-blue-700">
+                <Edit className="h-3 w-3 mr-1" />
+                Edit
+              </Button>
+            </Link>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+              {/* Left Column */}
+              <div className="space-y-4">
                 <div>
-                  <p className="text-slate-600 text-sm">Religion</p>
-                  <p className="font-medium">{profile.religion}</p>
+                  <p className="text-sm text-slate-600 dark:text-slate-400">Country</p>
+                  <p className="font-medium text-slate-900 dark:text-slate-100">
+                    {profile.country || (
+                      <Link href="/profile/edit" className="text-blue-600 hover:text-blue-700">
+                        Add Country ▸
+                      </Link>
+                    )}
+                  </p>
                 </div>
-              )}
-              {profile.caste && (
+
                 <div>
-                  <p className="text-slate-600 text-sm">Caste</p>
-                  <p className="font-medium">{profile.caste}</p>
+                  <p className="text-sm text-slate-600 dark:text-slate-400">State</p>
+                  <p className="font-medium text-slate-900 dark:text-slate-100">
+                    {profile.state || (
+                      <Link href="/profile/edit" className="text-blue-600 hover:text-blue-700">
+                        Add State ▸
+                      </Link>
+                    )}
+                  </p>
                 </div>
-              )}
-              {profile.mother_tongue && (
+
                 <div>
-                  <p className="text-slate-600 text-sm">Mother Tongue</p>
-                  <p className="font-medium">{profile.mother_tongue}</p>
+                  <p className="text-sm text-slate-600 dark:text-slate-400">Ancestral Origin</p>
+                  <p className="font-medium text-slate-900 dark:text-slate-100">
+                    {profile.ancestral_origin || 'Not Specified'}
+                  </p>
                 </div>
-              )}
-              {profile.complexion && (
+              </div>
+
+              {/* Right Column */}
+              <div className="space-y-4">
                 <div>
-                  <p className="text-slate-600 text-sm">Complexion</p>
-                  <p className="font-medium capitalize">{profile.complexion.replace('_', ' ')}</p>
+                  <p className="text-sm text-slate-600 dark:text-slate-400">City</p>
+                  <p className="font-medium text-slate-900 dark:text-slate-100">
+                    {profile.city || (
+                      <Link href="/profile/edit" className="text-blue-600 hover:text-blue-700">
+                        Add City ▸
+                      </Link>
+                    )}
+                  </p>
                 </div>
-              )}
-              {profile.blood_group && (
+
                 <div>
-                  <p className="text-slate-600 text-sm">Blood Group</p>
-                  <p className="font-medium">{profile.blood_group}</p>
+                  <p className="text-sm text-slate-600 dark:text-slate-400">Citizenship</p>
+                  <p className="font-medium text-slate-900 dark:text-slate-100">
+                    {profile.citizenship || (
+                      <Link href="/profile/edit" className="text-blue-600 hover:text-blue-700">
+                        Add Citizenship ▸
+                      </Link>
+                    )}
+                  </p>
                 </div>
-              )}
+              </div>
             </div>
           </CardContent>
         </Card>
 
         {/* Family Information */}
         {(profile.father_name || profile.mother_name || profile.family_type) && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Family Information</CardTitle>
+          <Card className="bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-slate-700">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+              <CardTitle className="text-lg font-semibold">Family Information</CardTitle>
+              <Link href="/profile/edit">
+                <Button size="sm" className="bg-blue-600 hover:bg-blue-700">
+                  <Edit className="h-3 w-3 mr-1" />
+                  Edit
+                </Button>
+              </Link>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

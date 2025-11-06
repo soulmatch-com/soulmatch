@@ -38,16 +38,22 @@ npm run lint         # Run ESLint
 ### Route Organization
 
 **App Router Structure** (`src/app/`):
-- `(auth)/` - Route group for authentication pages (login, signup, verify-otp)
+- `(auth)/` - Route group for authentication pages (login, signup, verify-otp, forgot-password, reset-password)
   - Not protected by auth middleware
   - Uses auth layout without navigation
-- `(dashboard)/` - Route group for authenticated pages
+- `(dashboard)/` - Route group for authenticated user pages
   - Protected by middleware - redirects to `/login` if not authenticated
   - Includes: dashboard, search, profile (create/edit/[id])
+- `admin/` - Admin portal with separate authentication system
+  - Uses separate admin layout with AdminHeader
+  - Separate authentication via adminStore (localStorage-persisted)
+  - Routes: dashboard, users, profiles, verification-queue, active-profiles, success-stories, settings
+  - API routes under `/api/admin/`
 - `api/` - API routes
   - `api/auth/callback` - Handles email confirmation redirects
   - `api/auth/signout` - Signs out user and redirects to home
   - `api/upload` - Handles Cloudinary image uploads
+  - `api/admin/*` - Admin-specific API endpoints
 
 ### Database Schema
 
@@ -59,6 +65,13 @@ npm run lint         # Run ESLint
 - Family: parents' details, family type/status/values
 - Siblings: detailed sibling breakdown
 - Other: about_me, hobbies (array), profile_completion_percentage
+
+**Success Stories Table**: Matrimonial success stories with moderation workflow:
+- Couple information: names, location, marriage date
+- Story content: story_text, couple_photo_url, wedding_photos (array)
+- Publishing controls: is_featured, is_published, display_order
+- Moderation: submission_type (admin/user_submitted), status (pending/approved/rejected)
+- Audit trail: submitted_by, approved_by, created_at, updated_at
 
 **Key Functions**:
 - `calculate_profile_completion()`: Automatically calculates completion % based on 30 fields
@@ -86,7 +99,9 @@ npm run lint         # Run ESLint
 
 ### State Management
 
-- **Zustand**: Global state management (see `src/store/authStore.ts`)
+- **Zustand**: Global state management
+  - `authStore.ts` - User authentication state (ephemeral)
+  - `adminStore.ts` - Admin authentication state (localStorage-persisted with role-based access)
 - **React Hook Form + Zod**: Form validation throughout app
 - **TanStack Query**: For data fetching (installed but not yet implemented)
 
@@ -101,6 +116,7 @@ npm run lint         # Run ESLint
 - Zod schemas in `src/lib/validations/`
 - `auth.schema.ts`: Login, signup validation
 - `profile.schema.ts`: Profile form validation
+- `success-story.schema.ts`: Success story submission validation
 
 ## Important Implementation Details
 
@@ -125,9 +141,13 @@ npm run lint         # Run ESLint
 - Do not redirect email confirmations directly to protected routes
 
 ### Middleware Behavior
-- Protects all routes except: `/`, `/login`, `/signup`, `/verify-otp`, `/forgot-password`
+- Middleware defined in `middleware.ts` (root level) delegates to `src/lib/supabase/middleware.ts`
+- **Public routes** (no auth required): `/`, `/login`, `/signup`, `/verify-otp`, `/forgot-password`, `/reset-password`
+- **Protected routes**: All other routes except API auth endpoints
+- **Profile enforcement**: Authenticated users without complete profiles redirected to `/profile/create`
 - Unauthenticated users redirected to `/login`
 - Auth state managed via Supabase cookies
+- **Admin portal**: Separate authentication system, not managed by Supabase middleware
 
 ## Environment Variables
 
@@ -152,6 +172,7 @@ NEXT_PUBLIC_APP_URL=                # Application URL (e.g., http://localhost:30
 1. `database/schema.sql` - Initial schema with profiles table, triggers, RLS policies
 2. `supabase/migrations/add_professional_and_family_fields.sql` - Adds professional, family, sibling fields
 3. `database/update_profile_completion_function.sql` - Updates completion calculation for new fields
+4. `database/migrations/create_success_stories_table.sql` - Success stories table with moderation workflow
 
 **Running Migrations**:
 - Execute SQL files in Supabase SQL Editor
@@ -176,6 +197,13 @@ NEXT_PUBLIC_APP_URL=                # Application URL (e.g., http://localhost:30
 1. Define Zod schema in `src/lib/validations/`
 2. Use with React Hook Form: `resolver: zodResolver(yourSchema)`
 3. Access errors: `formState: { errors }`
+
+### Admin Portal Development
+1. Admin routes go under `src/app/admin/`
+2. Admin API endpoints under `src/app/api/admin/`
+3. Use `useAdminStore` for admin authentication state
+4. Admin config centralized in `src/modules/admin/config/index.ts`
+5. Admin components in `src/components/admin/`
 
 ## Path Aliases
 

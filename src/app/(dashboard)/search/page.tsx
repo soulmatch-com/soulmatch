@@ -10,10 +10,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { ProfileCardSkeleton } from '@/components/dashboard/ProfileCardSkeleton'
 import { Badge } from '@/components/ui/badge'
-import { Heart, MessageSquare, Star, Loader2, X, ChevronDown, ChevronUp, Search as SearchIcon } from 'lucide-react'
+import { Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle } from '@/components/ui/sheet'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
+import { Heart, MessageSquare, Star, Loader2, X, ChevronDown, ChevronUp, ChevronRight, Search as SearchIcon, Sparkles, Info, Filter, SlidersHorizontal } from 'lucide-react'
 import { toast } from 'sonner'
 import Link from 'next/link'
 import Image from 'next/image'
+import { SendInterestButton } from '@/components/interests/SendInterestButton'
 
 export const dynamic = 'force-dynamic'
 
@@ -44,7 +47,20 @@ export default function SearchPage() {
   const supabase = createClient()
   const [profiles, setProfiles] = useState<Profile[]>([])
   const [isLoading, setIsLoading] = useState(true)
-  const [showFilters, setShowFilters] = useState(false)
+  const [showFilterDrawer, setShowFilterDrawer] = useState(false)
+  const [currentUserProfile, setCurrentUserProfile] = useState<{ gender: string; religion: string | null; caste: string | null } | null>(null)
+  const [autoFiltersApplied, setAutoFiltersApplied] = useState(false)
+  const [isLoadingUserProfile, setIsLoadingUserProfile] = useState(true)
+  const [sortBy, setSortBy] = useState<'newest' | 'recommended' | 'distance'>('newest')
+
+  // Quick filter toggles
+  const [quickFilters, setQuickFilters] = useState({
+    newlyJoined: false,
+    notSeen: false,
+    withPhoto: false,
+    verified: false,
+    neverMarried: false,
+  })
 
   // Search filters
   const [filters, setFilters] = useState({
@@ -52,6 +68,7 @@ export default function SearchPage() {
     minAge: '',
     maxAge: '',
     religion: '',
+    caste: '',
     maritalStatus: '',
     state: '',
     city: '',
@@ -63,11 +80,87 @@ export default function SearchPage() {
   const activeFiltersCount = Object.values(filters).filter(v => v && v !== 'any').length
 
   useEffect(() => {
-    loadProfiles()
+    fetchCurrentUserProfile()
   }, [])
 
-  const loadProfiles = async () => {
+  // Trigger search when quick filters or sort changes
+  useEffect(() => {
+    if (!isLoadingUserProfile && profiles.length >= 0) {
+      loadProfiles()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [quickFilters, sortBy])
+
+  const fetchCurrentUserProfile = async () => {
+    setIsLoadingUserProfile(true)
+    try {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) {
+        setIsLoadingUserProfile(false)
+        return
+      }
+
+      const { data: profile, error } = await supabase
+        .from('profiles')
+        .select('gender, religion, caste')
+        .eq('user_id', user.id)
+        .single()
+
+      if (error || !profile) {
+        console.error('Failed to load user profile:', error)
+        setIsLoadingUserProfile(false)
+        // Still load profiles even if user profile not found
+        loadProfiles()
+        return
+      }
+
+      setCurrentUserProfile(profile)
+      applyAutoFilters(profile)
+    } catch (error) {
+      console.error('Error fetching user profile:', error)
+      setIsLoadingUserProfile(false)
+      loadProfiles()
+    }
+  }
+
+  const applyAutoFilters = (userProfile: { gender: string; religion: string | null; caste: string | null }) => {
+    const autoFilters = { ...filters }
+    let filtersApplied = false
+
+    // 1. Opposite Gender Filter
+    if (userProfile.gender === 'male') {
+      autoFilters.gender = 'female'
+      filtersApplied = true
+    } else if (userProfile.gender === 'female') {
+      autoFilters.gender = 'male'
+      filtersApplied = true
+    }
+    // If gender is 'other', don't auto-apply gender filter
+
+    // 2. Same Religion Filter
+    if (userProfile.religion) {
+      autoFilters.religion = userProfile.religion
+      filtersApplied = true
+    }
+
+    // 3. Same Caste Filter
+    if (userProfile.caste) {
+      autoFilters.caste = userProfile.caste
+      filtersApplied = true
+    }
+
+    setFilters(autoFilters)
+    setAutoFiltersApplied(filtersApplied)
+    setIsLoadingUserProfile(false)
+
+    // Automatically trigger search with auto-filters
+    loadProfilesWithFilters(autoFilters)
+  }
+
+  const loadProfilesWithFilters = async (filterOverride?: typeof filters) => {
     setIsLoading(true)
+    const activeFilters = filterOverride || filters
+
     try {
       const { data: { user } } = await supabase.auth.getUser()
 
@@ -80,34 +173,55 @@ export default function SearchPage() {
         .from('profiles')
         .select('*')
         .eq('profile_status', 'active')
-        .eq('is_verified', true)
         .neq('user_id', user.id)
 
-      // Apply filters
-      if (filters.gender && filters.gender !== 'any') {
-        query = query.eq('gender', filters.gender)
+      // Apply quick filters
+      if (!quickFilters.verified) {
+        query = query.eq('is_verified', true)
       }
-      if (filters.religion) {
-        query = query.eq('religion', filters.religion)
+      if (quickFilters.withPhoto) {
+        query = query.not('photo_url', 'is', null)
       }
-      if (filters.maritalStatus && filters.maritalStatus !== 'any') {
-        query = query.eq('marital_status', filters.maritalStatus)
+      if (quickFilters.neverMarried) {
+        query = query.eq('marital_status', 'never_married')
       }
-      if (filters.state) {
-        query = query.eq('state', filters.state)
+
+      // Apply advanced filters
+      if (activeFilters.gender && activeFilters.gender !== 'any') {
+        query = query.eq('gender', activeFilters.gender)
       }
-      if (filters.city) {
-        query = query.ilike('city', `%${filters.city}%`)
+      if (activeFilters.religion) {
+        query = query.eq('religion', activeFilters.religion)
       }
-      if (filters.education) {
-        query = query.ilike('education', `%${filters.education}%`)
+      if (activeFilters.caste) {
+        query = query.eq('caste', activeFilters.caste)
       }
-      if (filters.minHeight) {
-        query = query.gte('height_cm', parseInt(filters.minHeight))
+      if (activeFilters.maritalStatus && activeFilters.maritalStatus !== 'any') {
+        query = query.eq('marital_status', activeFilters.maritalStatus)
       }
-      if (filters.maxHeight) {
-        query = query.lte('height_cm', parseInt(filters.maxHeight))
+      if (activeFilters.state) {
+        query = query.eq('state', activeFilters.state)
       }
+      if (activeFilters.city) {
+        query = query.ilike('city', `%${activeFilters.city}%`)
+      }
+      if (activeFilters.education) {
+        query = query.ilike('education', `%${activeFilters.education}%`)
+      }
+      if (activeFilters.minHeight) {
+        query = query.gte('height_cm', parseInt(activeFilters.minHeight))
+      }
+      if (activeFilters.maxHeight) {
+        query = query.lte('height_cm', parseInt(activeFilters.maxHeight))
+      }
+
+      // Apply sorting
+      if (sortBy === 'newest') {
+        query = query.order('created_at', { ascending: false })
+      } else if (sortBy === 'recommended') {
+        query = query.order('profile_completion_percentage', { ascending: false })
+      }
+      // Note: 'distance' sorting would require location data and calculation
 
       const { data, error } = await query.limit(20)
 
@@ -119,17 +233,29 @@ export default function SearchPage() {
 
       // Filter by age if specified
       let filteredData = data || []
-      if (filters.minAge || filters.maxAge) {
+      if (activeFilters.minAge || activeFilters.maxAge) {
         const currentYear = new Date().getFullYear()
         filteredData = filteredData.filter(profile => {
           const birthYear = new Date(profile.date_of_birth).getFullYear()
           const age = currentYear - birthYear
 
-          if (filters.minAge && age < parseInt(filters.minAge)) return false
-          if (filters.maxAge && age > parseInt(filters.maxAge)) return false
+          if (activeFilters.minAge && age < parseInt(activeFilters.minAge)) return false
+          if (activeFilters.maxAge && age > parseInt(activeFilters.maxAge)) return false
           return true
         })
       }
+
+      // Apply client-side quick filters (for features not in DB query)
+      if (quickFilters.newlyJoined) {
+        const sevenDaysAgo = new Date()
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
+        filteredData = filteredData.filter(profile =>
+          new Date(profile.created_at) >= sevenDaysAgo
+        )
+      }
+
+      // Note: 'notSeen' filter would require a separate user interaction tracking table
+      // For now, we'll skip implementing it until that table exists
 
       setProfiles(filteredData)
     } catch (error) {
@@ -138,6 +264,10 @@ export default function SearchPage() {
     } finally {
       setIsLoading(false)
     }
+  }
+
+  const loadProfiles = async () => {
+    loadProfilesWithFilters()
   }
 
   const handleFilterChange = (field: string, value: string) => {
@@ -154,6 +284,7 @@ export default function SearchPage() {
       minAge: '',
       maxAge: '',
       religion: '',
+      caste: '',
       maritalStatus: '',
       state: '',
       city: '',
@@ -161,6 +292,7 @@ export default function SearchPage() {
       minHeight: '',
       maxHeight: '',
     })
+    setAutoFiltersApplied(false) // User explicitly cleared, don't re-apply auto-filters
     setTimeout(() => loadProfiles(), 100)
   }
 
@@ -189,213 +321,365 @@ export default function SearchPage() {
             </p>
           </div>
 
-          {/* Search Filters */}
-          <Card className="mb-6 bg-white/90 dark:bg-slate-800/90 backdrop-blur shadow-xl border border-blue-100 dark:border-blue-900">
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle className="flex items-center gap-2">
-                    <SearchIcon className="h-5 w-5 text-blue-700" />
-                    Compatibility Filters
-                    {activeFiltersCount > 0 && (
-                      <Badge variant="secondary" className="ml-2 bg-blue-100 text-blue-700">
-                        {activeFiltersCount} active
-                      </Badge>
-                    )}
-                  </CardTitle>
-                  <CardDescription>Refine by cultural values and family preferences</CardDescription>
-                </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setShowFilters(!showFilters)}
-                  className="md:hidden"
-                >
-                  {showFilters ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-                </Button>
-              </div>
-
-              {/* Active Filter Chips */}
-              {activeFiltersCount > 0 && (
-                <div className="flex flex-wrap gap-2 mt-4">
-                  {filters.gender && filters.gender !== 'any' && (
-                    <Badge variant="outline" className="gap-1">
-                      Gender: {filters.gender}
-                      <X
-                        className="h-3 w-3 cursor-pointer"
-                        onClick={() => handleFilterChange('gender', '')}
-                      />
-                    </Badge>
-                  )}
-                  {filters.minAge && (
-                    <Badge variant="outline" className="gap-1">
-                      Min Age: {filters.minAge}
-                      <X
-                        className="h-3 w-3 cursor-pointer"
-                        onClick={() => handleFilterChange('minAge', '')}
-                      />
-                    </Badge>
-                  )}
-                  {filters.maxAge && (
-                    <Badge variant="outline" className="gap-1">
-                      Max Age: {filters.maxAge}
-                      <X
-                        className="h-3 w-3 cursor-pointer"
-                        onClick={() => handleFilterChange('maxAge', '')}
-                      />
-                    </Badge>
-                  )}
-                  {filters.city && (
-                    <Badge variant="outline" className="gap-1">
-                      City: {filters.city}
-                      <X
-                        className="h-3 w-3 cursor-pointer"
-                        onClick={() => handleFilterChange('city', '')}
-                      />
-                    </Badge>
-                  )}
-                </div>
-              )}
-            </CardHeader>
-            <CardContent className={`${showFilters ? 'block' : 'hidden'} md:block`}>
-            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {/* Gender */}
-              <div className="space-y-2">
-                <Label>Gender</Label>
-                <Select value={filters.gender || undefined} onValueChange={(value) => handleFilterChange('gender', value)}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Any" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="any">Any</SelectItem>
-                    <SelectItem value="male">Male</SelectItem>
-                    <SelectItem value="female">Female</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {/* Age Range */}
-              <div className="space-y-2">
-                <Label>Min Age</Label>
-                <Input
-                  type="number"
-                  placeholder="18"
-                  value={filters.minAge}
-                  onChange={(e) => handleFilterChange('minAge', e.target.value)}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label>Max Age</Label>
-                <Input
-                  type="number"
-                  placeholder="60"
-                  value={filters.maxAge}
-                  onChange={(e) => handleFilterChange('maxAge', e.target.value)}
-                />
-              </div>
-
-              {/* Religion */}
-              <div className="space-y-2">
-                <Label>Religion</Label>
-                <Input
-                  placeholder="Hindu, Muslim, etc."
-                  value={filters.religion}
-                  onChange={(e) => handleFilterChange('religion', e.target.value)}
-                />
-              </div>
-
-              {/* Marital Status */}
-              <div className="space-y-2">
-                <Label>Marital Status</Label>
-                <Select value={filters.maritalStatus || undefined} onValueChange={(value) => handleFilterChange('maritalStatus', value)}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Any" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="any">Any</SelectItem>
-                    <SelectItem value="never_married">Never Married</SelectItem>
-                    <SelectItem value="divorced">Divorced</SelectItem>
-                    <SelectItem value="widowed">Widowed</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {/* State */}
-              <div className="space-y-2">
-                <Label>State</Label>
-                <Input
-                  placeholder="Maharashtra"
-                  value={filters.state}
-                  onChange={(e) => handleFilterChange('state', e.target.value)}
-                />
-              </div>
-
-              {/* City */}
-              <div className="space-y-2">
-                <Label>City</Label>
-                <Input
-                  placeholder="Mumbai"
-                  value={filters.city}
-                  onChange={(e) => handleFilterChange('city', e.target.value)}
-                />
-              </div>
-
-              {/* Education */}
-              <div className="space-y-2">
-                <Label>Education</Label>
-                <Input
-                  placeholder="B.Tech, MBA, etc."
-                  value={filters.education}
-                  onChange={(e) => handleFilterChange('education', e.target.value)}
-                />
-              </div>
-
-              {/* Height Range */}
-              <div className="space-y-2">
-                <Label>Min Height (cm)</Label>
-                <Input
-                  type="number"
-                  placeholder="150"
-                  value={filters.minHeight}
-                  onChange={(e) => handleFilterChange('minHeight', e.target.value)}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label>Max Height (cm)</Label>
-                <Input
-                  type="number"
-                  placeholder="200"
-                  value={filters.maxHeight}
-                  onChange={(e) => handleFilterChange('maxHeight', e.target.value)}
-                />
-              </div>
-            </div>
-
-            <div className="flex gap-4 mt-6">
-              <Button
-                onClick={handleSearch}
-                disabled={isLoading}
-                className="bg-gradient-to-r from-blue-700 to-emerald-700 hover:from-blue-800 hover:to-emerald-800 group"
-              >
-                {isLoading ? (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                ) : (
-                  <SearchIcon className="mr-2 h-4 w-4 group-hover:scale-110 transition-transform duration-200" />
+          {/* Auto-Filter Info Banner */}
+          {autoFiltersApplied && currentUserProfile && (
+            <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/30 rounded-lg border border-blue-200 dark:border-blue-800">
+              <div className="text-sm text-blue-700 dark:text-blue-300 flex items-center gap-2 flex-wrap">
+                <Info className="h-4 w-4 flex-shrink-0" />
+                <span>Auto-filtered based on your profile:</span>
+                {currentUserProfile.gender && (currentUserProfile.gender === 'male' || currentUserProfile.gender === 'female') && (
+                  <Badge variant="secondary" className="bg-blue-100 dark:bg-blue-800 text-blue-700 dark:text-blue-200">
+                    <Sparkles className="h-3 w-3 mr-1" />
+                    {currentUserProfile.gender === 'male' ? 'Female' : 'Male'} profiles
+                  </Badge>
                 )}
-                Search Profiles
-              </Button>
-              <Button variant="outline" onClick={handleClearFilters} disabled={isLoading} className="border-slate-300 dark:border-slate-600 group">
-                <X className="mr-2 h-4 w-4 group-hover:rotate-90 transition-transform duration-200" />
-                Clear All
+                {currentUserProfile.religion && (
+                  <Badge variant="secondary" className="bg-blue-100 dark:bg-blue-800 text-blue-700 dark:text-blue-200">
+                    <Sparkles className="h-3 w-3 mr-1" />
+                    {currentUserProfile.religion}
+                  </Badge>
+                )}
+                {currentUserProfile.caste && (
+                  <Badge variant="secondary" className="bg-blue-100 dark:bg-blue-800 text-blue-700 dark:text-blue-200">
+                    <Sparkles className="h-3 w-3 mr-1" />
+                    {currentUserProfile.caste}
+                  </Badge>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Horizontal Scrollable Filter Bar */}
+          <div className="mb-6 flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide">
+            {/* Filter Button */}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowFilterDrawer(true)}
+              className="flex-shrink-0 border-blue-200 dark:border-blue-800 hover:bg-blue-50 dark:hover:bg-blue-900/30"
+            >
+              <SlidersHorizontal className="h-4 w-4 mr-2" />
+              Filters
+              {activeFiltersCount > 0 && (
+                <Badge variant="secondary" className="ml-2 bg-blue-100 text-blue-700">
+                  {activeFiltersCount}
+                </Badge>
+              )}
+            </Button>
+
+            {/* Sort Dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm" className="flex-shrink-0 border-blue-200 dark:border-blue-800 hover:bg-blue-50 dark:hover:bg-blue-900/30">
+                  Sort by
+                  <ChevronDown className="h-4 w-4 ml-2" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem onClick={() => setSortBy('newest')}>
+                  {sortBy === 'newest' && '✓ '}Newest
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setSortBy('recommended')}>
+                  {sortBy === 'recommended' && '✓ '}Recommended
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setSortBy('distance')}>
+                  {sortBy === 'distance' && '✓ '}Distance
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            {/* Quick Filter Chips */}
+            <Badge
+              variant={quickFilters.newlyJoined ? "default" : "outline"}
+              className={`cursor-pointer flex-shrink-0 ${quickFilters.newlyJoined ? 'bg-blue-600 hover:bg-blue-700' : 'hover:bg-blue-50 dark:hover:bg-blue-900/30'}`}
+              onClick={() => setQuickFilters(prev => ({ ...prev, newlyJoined: !prev.newlyJoined }))}
+            >
+              Newly joined
+            </Badge>
+
+            <Badge
+              variant={quickFilters.notSeen ? "default" : "outline"}
+              className={`cursor-pointer flex-shrink-0 ${quickFilters.notSeen ? 'bg-blue-600 hover:bg-blue-700' : 'hover:bg-blue-50 dark:hover:bg-blue-900/30'}`}
+              onClick={() => setQuickFilters(prev => ({ ...prev, notSeen: !prev.notSeen }))}
+            >
+              Not seen
+            </Badge>
+
+            <Badge
+              variant={quickFilters.withPhoto ? "default" : "outline"}
+              className={`cursor-pointer flex-shrink-0 ${quickFilters.withPhoto ? 'bg-blue-600 hover:bg-blue-700' : 'hover:bg-blue-50 dark:hover:bg-blue-900/30'}`}
+              onClick={() => setQuickFilters(prev => ({ ...prev, withPhoto: !prev.withPhoto }))}
+            >
+              Profiles with photo
+            </Badge>
+
+            <Badge
+              variant={quickFilters.verified ? "default" : "outline"}
+              className={`cursor-pointer flex-shrink-0 ${quickFilters.verified ? 'bg-blue-600 hover:bg-blue-700' : 'hover:bg-blue-50 dark:hover:bg-blue-900/30'}`}
+              onClick={() => setQuickFilters(prev => ({ ...prev, verified: !prev.verified }))}
+            >
+              Verified
+            </Badge>
+
+            <Badge
+              variant={quickFilters.neverMarried ? "default" : "outline"}
+              className={`cursor-pointer flex-shrink-0 ${quickFilters.neverMarried ? 'bg-blue-600 hover:bg-blue-700' : 'hover:bg-blue-50 dark:hover:bg-blue-900/30'}`}
+              onClick={() => setQuickFilters(prev => ({ ...prev, neverMarried: !prev.neverMarried }))}
+            >
+              Never married
+            </Badge>
+
+            {/* Scroll Indicator */}
+            <ChevronRight className="h-5 w-5 text-gray-400 flex-shrink-0 ml-auto" />
+          </div>
+
+          {/* Active Filter Chips Below */}
+          {activeFiltersCount > 0 && (
+            <div className="flex flex-wrap gap-2 mb-6">
+              {filters.religion && (
+                <Badge
+                  variant={autoFiltersApplied && currentUserProfile?.religion === filters.religion ? "default" : "outline"}
+                  className={`gap-1 ${autoFiltersApplied && currentUserProfile?.religion === filters.religion ? 'bg-blue-100 text-blue-700 border-blue-300 dark:bg-blue-900 dark:text-blue-200' : ''}`}
+                >
+                  {autoFiltersApplied && currentUserProfile?.religion === filters.religion && <Sparkles className="h-3 w-3" />}
+                  Religion: {filters.religion}
+                  <X
+                    className="h-3 w-3 cursor-pointer hover:text-red-600"
+                    onClick={() => handleFilterChange('religion', '')}
+                  />
+                </Badge>
+              )}
+              {filters.caste && (
+                <Badge
+                  variant={autoFiltersApplied && currentUserProfile?.caste === filters.caste ? "default" : "outline"}
+                  className={`gap-1 ${autoFiltersApplied && currentUserProfile?.caste === filters.caste ? 'bg-blue-100 text-blue-700 border-blue-300 dark:bg-blue-900 dark:text-blue-200' : ''}`}
+                >
+                  {autoFiltersApplied && currentUserProfile?.caste === filters.caste && <Sparkles className="h-3 w-3" />}
+                  Caste: {filters.caste}
+                  <X
+                    className="h-3 w-3 cursor-pointer hover:text-red-600"
+                    onClick={() => handleFilterChange('caste', '')}
+                  />
+                </Badge>
+              )}
+              {filters.minAge && (
+                <Badge variant="outline" className="gap-1">
+                  Min Age: {filters.minAge}
+                  <X
+                    className="h-3 w-3 cursor-pointer hover:text-red-600"
+                    onClick={() => handleFilterChange('minAge', '')}
+                  />
+                </Badge>
+              )}
+              {filters.maxAge && (
+                <Badge variant="outline" className="gap-1">
+                  Max Age: {filters.maxAge}
+                  <X
+                    className="h-3 w-3 cursor-pointer hover:text-red-600"
+                    onClick={() => handleFilterChange('maxAge', '')}
+                  />
+                </Badge>
+              )}
+              {filters.city && (
+                <Badge variant="outline" className="gap-1">
+                  City: {filters.city}
+                  <X
+                    className="h-3 w-3 cursor-pointer hover:text-red-600"
+                    onClick={() => handleFilterChange('city', '')}
+                  />
+                </Badge>
+              )}
+              {filters.maritalStatus && filters.maritalStatus !== 'any' && (
+                <Badge variant="outline" className="gap-1">
+                  Marital: {filters.maritalStatus.replace('_', ' ')}
+                  <X
+                    className="h-3 w-3 cursor-pointer hover:text-red-600"
+                    onClick={() => handleFilterChange('maritalStatus', '')}
+                  />
+                </Badge>
+              )}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleClearFilters}
+                className="h-6 text-xs text-red-600 hover:text-red-700 hover:bg-red-50"
+              >
+                Clear all
               </Button>
             </div>
-          </CardContent>
-        </Card>
+          )}
+
+          {/* Advanced Filters Drawer */}
+          <Sheet open={showFilterDrawer} onOpenChange={setShowFilterDrawer}>
+            <SheetContent side="right" className="w-[400px] sm:w-[540px] overflow-y-auto">
+              <SheetHeader>
+                <SheetTitle className="flex items-center gap-2">
+                  <Filter className="h-5 w-5" />
+                  Advanced Filters
+                </SheetTitle>
+                <SheetDescription>
+                  Refine your search with detailed criteria
+                </SheetDescription>
+              </SheetHeader>
+
+              <div className="mt-6 space-y-6">
+                {/* Age Range */}
+                <div className="space-y-4">
+                  <h3 className="font-semibold text-sm">Age Range</h3>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label>Min Age</Label>
+                      <Input
+                        type="number"
+                        placeholder="18"
+                        value={filters.minAge}
+                        onChange={(e) => handleFilterChange('minAge', e.target.value)}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Max Age</Label>
+                      <Input
+                        type="number"
+                        placeholder="60"
+                        value={filters.maxAge}
+                        onChange={(e) => handleFilterChange('maxAge', e.target.value)}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Cultural Preferences */}
+                <div className="space-y-4">
+                  <h3 className="font-semibold text-sm">Cultural Preferences</h3>
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label>Religion</Label>
+                      <Input
+                        placeholder="Hindu, Muslim, etc."
+                        value={filters.religion}
+                        onChange={(e) => handleFilterChange('religion', e.target.value)}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Caste</Label>
+                      <Input
+                        placeholder="Brahmin, Kshatriya, etc."
+                        value={filters.caste}
+                        onChange={(e) => handleFilterChange('caste', e.target.value)}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Marital Status</Label>
+                      <Select value={filters.maritalStatus || undefined} onValueChange={(value) => handleFilterChange('maritalStatus', value)}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Any" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="any">Any</SelectItem>
+                          <SelectItem value="never_married">Never Married</SelectItem>
+                          <SelectItem value="divorced">Divorced</SelectItem>
+                          <SelectItem value="widowed">Widowed</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Location */}
+                <div className="space-y-4">
+                  <h3 className="font-semibold text-sm">Location</h3>
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label>State</Label>
+                      <Input
+                        placeholder="Maharashtra"
+                        value={filters.state}
+                        onChange={(e) => handleFilterChange('state', e.target.value)}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>City</Label>
+                      <Input
+                        placeholder="Mumbai"
+                        value={filters.city}
+                        onChange={(e) => handleFilterChange('city', e.target.value)}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Education */}
+                <div className="space-y-4">
+                  <h3 className="font-semibold text-sm">Education</h3>
+                  <div className="space-y-2">
+                    <Label>Education Level</Label>
+                    <Input
+                      placeholder="B.Tech, MBA, etc."
+                      value={filters.education}
+                      onChange={(e) => handleFilterChange('education', e.target.value)}
+                    />
+                  </div>
+                </div>
+
+                {/* Height Range */}
+                <div className="space-y-4">
+                  <h3 className="font-semibold text-sm">Height Range (cm)</h3>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label>Min Height</Label>
+                      <Input
+                        type="number"
+                        placeholder="150"
+                        value={filters.minHeight}
+                        onChange={(e) => handleFilterChange('minHeight', e.target.value)}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Max Height</Label>
+                      <Input
+                        type="number"
+                        placeholder="200"
+                        value={filters.maxHeight}
+                        onChange={(e) => handleFilterChange('maxHeight', e.target.value)}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <SheetFooter className="mt-6 flex gap-2">
+                <Button
+                  onClick={() => {
+                    handleSearch()
+                    setShowFilterDrawer(false)
+                  }}
+                  disabled={isLoading}
+                  className="flex-1 bg-gradient-to-r from-blue-700 to-emerald-700 hover:from-blue-800 hover:to-emerald-800"
+                >
+                  {isLoading ? (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  ) : (
+                    <SearchIcon className="mr-2 h-4 w-4" />
+                  )}
+                  Apply Filters
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    handleClearFilters()
+                    setShowFilterDrawer(false)
+                  }}
+                  disabled={isLoading}
+                >
+                  <X className="mr-2 h-4 w-4" />
+                  Clear
+                </Button>
+              </SheetFooter>
+            </SheetContent>
+          </Sheet>
 
         {/* Results */}
-        {isLoading ? (
+        {(isLoading || isLoadingUserProfile) ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <ProfileCardSkeleton />
             <ProfileCardSkeleton />
@@ -407,9 +691,14 @@ export default function SearchPage() {
         ) : profiles.length === 0 ? (
           <Card>
             <CardContent className="py-10 text-center">
-              <p className="text-slate-600">No profiles found matching your criteria.</p>
+              <p className="text-slate-600 mb-2">No profiles found matching your criteria.</p>
+              {autoFiltersApplied && (
+                <p className="text-sm text-slate-500 mb-4">
+                  Try removing some auto-applied filters to see more profiles
+                </p>
+              )}
               <Button variant="outline" onClick={handleClearFilters} className="mt-4">
-                Clear Filters
+                Clear All Filters
               </Button>
             </CardContent>
           </Card>
@@ -482,12 +771,14 @@ export default function SearchPage() {
                         )}
                       </div>
 
-                        <Button className="w-full mt-6 bg-gradient-to-r from-blue-700 to-emerald-700 hover:from-blue-800 hover:to-emerald-800 group" asChild>
-                          <Link href={`/profile/${profile.id}`}>
-                            View Full Profile
-                            <Heart className="ml-2 h-4 w-4 group-hover:scale-110 transition-transform duration-200" />
-                          </Link>
-                        </Button>
+                        <div className="flex gap-2 mt-6">
+                          <SendInterestButton receiverProfileId={profile.id} onInterestSent={loadProfiles} />
+                          <Button variant="outline" className="flex-1" asChild>
+                            <Link href={`/profile/${profile.id}`}>
+                              View Profile
+                            </Link>
+                          </Button>
+                        </div>
                       </div>
                     </CardContent>
                   </Card>

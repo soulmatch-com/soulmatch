@@ -6,13 +6,42 @@ import { Shield, Lock, Users, CheckCircle, Award, UserCheck, Star, Globe, Heart,
 import { useAuthStore } from "@/store/authStore";
 import { useState, useEffect } from "react";
 
+interface SuccessStory {
+  id: string;
+  couple_names: string;
+  location: string;
+  story_text: string;
+  couple_photo_url: string | null;
+  is_featured: boolean;
+}
+
 export default function Home() {
   const { user } = useAuthStore();
   const [mounted, setMounted] = useState(false);
+  const [successStories, setSuccessStories] = useState<SuccessStory[]>([]);
+  const [storiesLoading, setStoriesLoading] = useState(true);
 
   // Prevent hydration mismatch
   useEffect(() => {
     setMounted(true);
+  }, []);
+
+  // Fetch success stories
+  useEffect(() => {
+    async function fetchSuccessStories() {
+      try {
+        const response = await fetch('/api/success-stories?limit=6&featured_only=true');
+        if (response.ok) {
+          const data = await response.json();
+          setSuccessStories(data.stories);
+        }
+      } catch (error) {
+        console.error('Failed to fetch success stories:', error);
+      } finally {
+        setStoriesLoading(false);
+      }
+    }
+    fetchSuccessStories();
   }, []);
 
   return (
@@ -217,32 +246,68 @@ export default function Home() {
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
-            {[
-              { name: "Priya & Rahul", location: "Mumbai", story: "Our families connected through MyThirumanam.in and we celebrated our wedding last month. The platform's verification process and cultural matching helped our families trust the alliance. Forever grateful!" },
-              { name: "Anjali & Vikram", location: "Delhi", story: "After careful consideration, both families found the perfect match. The detailed family information and professional approach made the process smooth. Highly recommended by both families!" },
-              { name: "Sneha & Arjun", location: "Bangalore", story: "MyThirumanam.in helped our families discover not just compatibility, but shared values and traditions. We're now happily married with our parents' complete blessings and support." }
-            ].map((story, index) => (
-              <div key={index} className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-blue-100 dark:border-blue-900">
-                <div className="flex items-center gap-1 mb-4">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <Star key={star} className="h-4 w-4 fill-amber-400 text-amber-400" />
-                  ))}
-                </div>
-                <p className="text-slate-600 dark:text-slate-300 mb-4 italic leading-relaxed">"{story.story}"</p>
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-emerald-500 flex items-center justify-center text-white font-bold shadow-sm">
-                    {story.name.charAt(0)}
+            {storiesLoading ? (
+              // Loading skeleton
+              Array.from({ length: 3 }).map((_, index) => (
+                <div key={index} className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-blue-100 dark:border-blue-900 animate-pulse">
+                  <div className="flex items-center gap-1 mb-4">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <div key={star} className="h-4 w-4 bg-slate-200 dark:bg-slate-700 rounded"></div>
+                    ))}
                   </div>
-                  <div>
-                    <div className="font-semibold text-slate-900 dark:text-white">{story.name}</div>
-                    <div className="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1">
-                      <Globe className="h-3 w-3" />
-                      {story.location}
+                  <div className="space-y-3 mb-4">
+                    <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-full"></div>
+                    <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-5/6"></div>
+                    <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-4/6"></div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-700"></div>
+                    <div className="space-y-2 flex-1">
+                      <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-1/2"></div>
+                      <div className="h-3 bg-slate-200 dark:bg-slate-700 rounded w-1/3"></div>
                     </div>
                   </div>
                 </div>
+              ))
+            ) : successStories.length > 0 ? (
+              // Render dynamic success stories
+              successStories.map((story) => (
+                <div key={story.id} className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-blue-100 dark:border-blue-900">
+                  <div className="flex items-center gap-1 mb-4">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <Star key={star} className="h-4 w-4 fill-amber-400 text-amber-400" />
+                    ))}
+                  </div>
+                  <p className="text-slate-600 dark:text-slate-300 mb-4 italic leading-relaxed">"{story.story_text}"</p>
+                  <div className="flex items-center gap-3">
+                    {story.couple_photo_url ? (
+                      <img
+                        src={story.couple_photo_url}
+                        alt={story.couple_names}
+                        className="w-10 h-10 rounded-full object-cover shadow-sm"
+                      />
+                    ) : (
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-emerald-500 flex items-center justify-center text-white font-bold shadow-sm">
+                        {story.couple_names.charAt(0)}
+                      </div>
+                    )}
+                    <div>
+                      <div className="font-semibold text-slate-900 dark:text-white">{story.couple_names}</div>
+                      <div className="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1">
+                        <Globe className="h-3 w-3" />
+                        {story.location}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))
+            ) : (
+              // Fallback when no stories available
+              <div className="col-span-3 text-center py-12">
+                <Heart className="h-12 w-12 text-slate-300 dark:text-slate-600 mx-auto mb-4" />
+                <p className="text-slate-600 dark:text-slate-400">No success stories available yet</p>
               </div>
-            ))}
+            )}
           </div>
         </div>
       </div>

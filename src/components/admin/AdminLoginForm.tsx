@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -21,7 +20,6 @@ const adminLoginSchema = z.object({
 type AdminLoginInput = z.infer<typeof adminLoginSchema>
 
 export function AdminLoginForm() {
-  const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
   const { setAdmin } = useAdminStore()
 
@@ -39,13 +37,20 @@ export function AdminLoginForm() {
       // Use admin service layer - easy to replace with microservice later
       const { admin } = await adminAuthService.login(data)
 
+      // Set admin in store
       setAdmin(admin)
+
+      // Show success message
       toast.success('Welcome back, Admin!')
-      router.push(ADMIN_CONFIG.ROUTES.DASHBOARD)
+
+      // Small delay to ensure store persists to localStorage
+      await new Promise(resolve => setTimeout(resolve, 150))
+
+      // Use window.location for a hard navigation to ensure clean state
+      window.location.href = ADMIN_CONFIG.ROUTES.DASHBOARD
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Something went wrong'
       toast.error(message)
-    } finally {
       setIsLoading(false)
     }
   }

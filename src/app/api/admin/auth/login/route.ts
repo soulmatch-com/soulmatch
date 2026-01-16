@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { comparePassword } from '@/lib/utils/password'
 
 export async function POST(request: NextRequest) {
@@ -15,8 +15,8 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Get Supabase client
-    const supabase = await createClient()
+    // Get Supabase admin client with service role key
+    const supabase = createAdminClient()
 
     // Find admin by email
     const { data: admin, error: fetchError } = await supabase

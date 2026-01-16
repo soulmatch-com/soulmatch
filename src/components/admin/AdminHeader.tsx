@@ -4,21 +4,22 @@ import Link from "next/link";
 import { Shield, Users, Settings, BarChart3, LogOut, Menu, X, Clock, UserCheck, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { useAdminStore, ADMIN_CONFIG } from "@/modules/admin";
 import { toast } from "sonner";
 
 export default function AdminHeader() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { admin, clearAdmin } = useAdminStore();
-  const router = useRouter();
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
   const handleLogout = () => {
     clearAdmin();
     toast.success("Logged out successfully");
-    router.push(ADMIN_CONFIG.ROUTES.LOGIN);
+    // Use window.location for hard navigation to ensure clean state
+    setTimeout(() => {
+      window.location.href = ADMIN_CONFIG.ROUTES.LOGIN;
+    }, 100);
   };
 
   return (

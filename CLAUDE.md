@@ -2,6 +2,17 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## 📚 Additional Documentation
+
+For detailed guides and analysis, see the **claudedocs/** directory:
+- **claudedocs/MIGRATIONS.md** - Complete database migration guide
+- **claudedocs/PROJECT_HISTORY.md** - Implementation timeline
+- **claudedocs/GAPS_ANALYSIS.md** - Feature gaps and missing implementations
+- **claudedocs/ADMIN_LOGIN_COMPLETE.md** - Admin login fix documentation
+- **claudedocs/README.md** - Full documentation index
+
+---
+
 ## Project Overview
 
 **SoulMatch Web** is a matrimonial/matchmaking web application built with Next.js 15.5.4, React 19, TypeScript, and Tailwind CSS v4. The application uses Supabase for authentication and database, Cloudinary for image uploads, and follows the Next.js App Router architecture.
@@ -166,18 +177,26 @@ NEXT_PUBLIC_APP_URL=                # Application URL (e.g., http://localhost:30
 
 ## Database Migrations
 
-**Location**: `database/` and `supabase/migrations/`
+**📚 Complete Guide**: See `claudedocs/MIGRATIONS.md` for comprehensive migration documentation
+
+**Location**: Migrations are organized across 3 directories:
+- `database/` - Core schema and functions
+- `database/migrations/` - Feature-specific tables
+- `supabase/migrations/` - Profile field additions
+- `src/lib/database/migrations/` - Admin system
 
 **Key Migrations**:
 1. `database/schema.sql` - Initial schema with profiles table, triggers, RLS policies
 2. `supabase/migrations/add_professional_and_family_fields.sql` - Adds professional, family, sibling fields
 3. `database/update_profile_completion_function.sql` - Updates completion calculation for new fields
 4. `database/migrations/create_success_stories_table.sql` - Success stories table with moderation workflow
+5. `src/lib/database/migrations/create_admins_table_simple.sql` - Admin authentication table
 
 **Running Migrations**:
 - Execute SQL files in Supabase SQL Editor
 - Or use Supabase CLI: `supabase db push`
 - After schema changes, update `src/types/database.types.ts`
+- **See claudedocs/MIGRATIONS.md for detailed execution order and dependencies**
 
 ## Common Patterns
 
@@ -216,3 +235,38 @@ NEXT_PUBLIC_APP_URL=                # Application URL (e.g., http://localhost:30
 - Custom font variables: `--font-geist-sans`, `--font-geist-mono`
 - Dark mode support ready via CSS classes
 - Component styles follow shadcn/ui conventions
+
+## Project History & Major Features
+
+For detailed implementation history, completed features, and technical decisions, see **[PROJECT_HISTORY.md](PROJECT_HISTORY.md)**.
+
+**Major Features Implemented:**
+1. ✅ Extended Profile System (30+ fields, auto-completion calculation)
+2. ✅ Admin Portal with Verification Workflow
+3. ✅ Interest & Notification System (send/receive interests, real-time notifications)
+4. ✅ Success Stories with Moderation
+5. ✅ Advanced Search with Filters (gender, religion, caste)
+6. ✅ Cloudinary Image Upload with Optimization
+7. ✅ Production Deployment (Vercel + VPS guides)
+
+## Additional Documentation
+
+**Setup & Deployment:**
+- `SETUP.md` - Local development setup
+- `ADMIN_SETUP.md` - Admin portal configuration
+- `DEPLOYMENT.md` - Vercel deployment guide
+- `VPS_DEPLOYMENT_GUIDE.md` - VPS deployment (Hetzner, DigitalOcean)
+- `SERVER_SECURITY.md` - Security hardening checklist
+- `SERVER_MAINTENANCE.md` - Ongoing maintenance guide
+
+**Feature Guides:**
+- `ADMIN_PROFILE_VERIFICATION.md` - Admin verification workflow
+- `PROFILE_COMPLETION_ENFORCEMENT.md` - Profile completion system
+- `TROUBLESHOOTING_PASSWORD_RESET.md` - Password reset troubleshooting
+
+**Implementation Details:**
+- `claudedocs/` - Feature implementation guides and technical documentation
+
+**Gap Analysis & Verification:**
+- `GAPS_ANALYSIS.md` - Comprehensive analysis of implementation gaps and missing features
+- `QUICK_VERIFICATION.md` - Quick checklist to verify critical functionality works

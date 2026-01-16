@@ -100,7 +100,8 @@ VALUES (
 ### Method 3: Programmatically
 
 ```typescript
-import { createClient } from '@/lib/supabase/server'
+import { createClient } from '@/lib
+/supabase/server'
 import { hashPassword } from '@/lib/utils/password'
 
 const supabase = await createClient()
@@ -213,6 +214,22 @@ const admin = await supabase
 4. ✅ Create additional admin users as needed
 5. ⏭️ Consider adding 2FA (future enhancement)
 
+## 🔄 Reset Admin Password
+
+If you forgot your admin password or need to reset it:
+
+```bash
+# Quick reset (recommended)
+npx tsx scripts/quick-reset-admin.ts admin@soulmatch.com NewPassword123
+
+# Or without arguments to see usage
+npx tsx scripts/quick-reset-admin.ts
+```
+
+**See:** `ADMIN_PASSWORD_RESET.md` for detailed instructions
+
+---
+
 ## 🆘 Troubleshooting
 
 **Error: "Missing Supabase environment variables"**
@@ -222,9 +239,13 @@ const admin = await supabase
 - Run the `create_admins_table.sql` migration
 
 **Error: "Invalid email or password"**
-- Verify admin exists in database
+- Reset password: `npx tsx scripts/quick-reset-admin.ts admin@soulmatch.com NewPass123`
+- Verify admin exists: `npx tsx scripts/verify-admin-table.ts`
 - Check password hash is correct
 - Ensure `is_active = true`
 
 **Error: "Account is inactive"**
 - Update admin: `UPDATE admins SET is_active = true WHERE email = '...'`
+
+**Can't login to admin portal?**
+- See: `ADMIN_PASSWORD_RESET.md` for complete troubleshooting guide

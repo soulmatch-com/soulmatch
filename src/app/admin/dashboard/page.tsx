@@ -40,11 +40,18 @@ export default function AdminDashboardPage() {
   const [latestUsers, setLatestUsers] = useState<LatestUser[]>([])
   const [pendingProfiles, setPendingProfiles] = useState<PendingProfile[]>([])
   const [loading, setLoading] = useState(true)
+  const [authChecked, setAuthChecked] = useState(false)
 
   useEffect(() => {
-    if (!isAuthenticated()) {
-      router.push('/admin/login')
-    }
+    // Give store time to rehydrate from localStorage
+    const timer = setTimeout(() => {
+      setAuthChecked(true)
+      if (!isAuthenticated()) {
+        router.push('/admin/login')
+      }
+    }, 100)
+
+    return () => clearTimeout(timer)
   }, [isAuthenticated, router])
 
   useEffect(() => {
@@ -69,8 +76,18 @@ export default function AdminDashboardPage() {
     }
   }
 
-  if (!admin) {
-    return null
+  // Show loading while checking auth
+  if (!authChecked || !admin) {
+    return (
+      <div className="container mx-auto py-10 px-4">
+        <div className="max-w-7xl mx-auto">
+          <div className="mb-8">
+            <h1 className="text-3xl font-bold text-slate-900">Admin Dashboard</h1>
+            <p className="text-slate-600 mt-2">Verifying authentication...</p>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   const statsCards = stats ? [

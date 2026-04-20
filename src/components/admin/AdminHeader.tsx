@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { Shield, Users, Settings, BarChart3, LogOut, Menu, X, Clock, UserCheck, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
@@ -27,9 +28,15 @@ export default function AdminHeader() {
       <nav className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           {/* Logo */}
-          <Link href={ADMIN_CONFIG.ROUTES.DASHBOARD} className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-            <Shield className="h-6 w-6 text-white" />
-            <span className="text-xl font-bold">SoulMatch Admin</span>
+          <Link href={ADMIN_CONFIG.ROUTES.DASHBOARD} className="flex items-center gap-3 hover:opacity-90 transition-opacity">
+            <Image
+              src="/logo-header.png"
+              alt="MyThirumanam.in Admin"
+              width={350}
+              height={70}
+              className="h-14 w-auto brightness-0 invert"
+            />
+            <span className="text-sm font-semibold text-slate-300 border-l border-slate-600 pl-3">Admin</span>
           </Link>
 
           {/* Desktop Navigation */}

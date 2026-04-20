@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Image from 'next/image'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -10,7 +11,6 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { toast } from 'sonner'
-import { Shield } from 'lucide-react'
 
 const adminLoginSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -60,9 +60,13 @@ export function AdminLoginForm() {
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
-            <div className="p-3 bg-slate-900 rounded-full">
-              <Shield className="h-8 w-8 text-white" />
-            </div>
+            <Image
+              src="/logo-header.png"
+              alt="MyThirumanam.in"
+              width={280}
+              height={56}
+              className="h-14 w-auto"
+            />
           </div>
           <CardTitle className="text-2xl">Admin Login</CardTitle>
           <CardDescription>Access the administrative panel</CardDescription>

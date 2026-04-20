@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { Heart, Menu, X, User, LogOut, Settings, HelpCircle, UserCircle, UserCheck, Search, Home, MessageSquare, Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
@@ -52,10 +53,15 @@ export default function Header() {
       <nav className="container mx-auto px-4 py-3">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           {/* Left Section: Logo */}
-          <Link href="/" className="flex items-center gap-2 group transition-all">
-            <div className="bg-gradient-to-r from-orange-500 to-orange-600 px-3 py-2 rounded">
-              <span className="text-white text-xs font-bold leading-tight block">MyThirumanam.in</span>
-            </div>
+          <Link href="/" className="flex items-center gap-2 group transition-all hover:opacity-90">
+            <Image
+              src="/logo-header.png"
+              alt="MyThirumanam.in"
+              width={400}
+              height={80}
+              className="h-16 w-auto"
+              priority
+            />
           </Link>
 
           {/* Center Section: Navigation (only shown when user is logged in) */}

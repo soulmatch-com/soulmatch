@@ -180,7 +180,7 @@ export default function SearchPage() {
         query = query.eq('is_verified', true)
       }
       if (quickFilters.withPhoto) {
-        query = query.not('photo_url', 'is', null)
+        query = query.not('profile_photo_url', 'is', null)
       }
       if (quickFilters.neverMarried) {
         query = query.eq('marital_status', 'never_married')

@@ -1,1 +1,3 @@
-export { default, dynamic } from '../settings/page'
+export const dynamic = 'force-dynamic'
+
+export { default } from '../settings/page'

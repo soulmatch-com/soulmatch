@@ -19,6 +19,13 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "MyThirumanam.in - Trusted Matrimonial Service for Indian Families",
   description: "Discover compatible families through verified profiles. Connect with families who share your cultural values, traditions, and commitment to lifelong partnerships.",
+  icons: {
+    icon: [
+      { url: "/favicon.ico?v=2" },
+      { url: "/icon.png?v=2", type: "image/png", sizes: "500x500" },
+    ],
+    apple: [{ url: "/apple-icon.png?v=2", sizes: "180x180", type: "image/png" }],
+  },
 };
 
 export default function RootLayout({

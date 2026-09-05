@@ -1,6 +1,20 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  async redirects() {
+    return [
+      { source: '/celebrations', destination: '/', permanent: true },
+      { source: '/celebrations/thirukadaiyur', destination: '/', permanent: true },
+      { source: '/celebrations/thirukadaiyur/60th-marriage', destination: '/60th-marriage', permanent: true },
+      { source: '/celebrations/thirukadaiyur/70th-marriage', destination: '/70th-marriage', permanent: true },
+      { source: '/celebrations/thirukadaiyur/80th-marriage', destination: '/80th-marriage', permanent: true },
+      { source: '/celebrations/thirukadaiyur/plan', destination: '/plan', permanent: true },
+      { source: '/celebrations/60th-marriage', destination: '/60th-marriage', permanent: true },
+      { source: '/celebrations/70th-marriage', destination: '/70th-marriage', permanent: true },
+      { source: '/celebrations/80th-marriage', destination: '/80th-marriage', permanent: true },
+      { source: '/celebrations/enquire', destination: '/plan', permanent: true },
+    ]
+  },
   typescript: {
     // Warning: Dangerously allow production builds to successfully complete even if
     // your project has type errors.

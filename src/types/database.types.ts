@@ -9,6 +9,147 @@ export type Json =
 export interface Database {
   public: {
     Tables: {
+      celebration_services: {
+        Row: {
+          id: string
+          code: string
+          name: string
+          description: string | null
+          icon: string | null
+          location: string
+          is_active: boolean
+          display_order: number
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          code: string
+          name: string
+          description?: string | null
+          icon?: string | null
+          location: string
+          is_active?: boolean
+          display_order?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          code?: string
+          name?: string
+          description?: string | null
+          icon?: string | null
+          location?: string
+          is_active?: boolean
+          display_order?: number
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      celebration_enquiries: {
+        Row: {
+          id: string
+          location: string
+          celebration_type: '60th-marriage' | '70th-marriage' | '80th-marriage' | 'not-sure'
+          husband_name: string
+          wife_name: string
+          husband_dob: string
+          wife_dob: string
+          husband_nakshatra: string | null
+          wife_nakshatra: string | null
+          husband_rasi: string | null
+          wife_rasi: string | null
+          preferred_date: string
+          alternative_date: string | null
+          guest_count_range: 'below-20' | '20-50' | '51-100' | '100-plus'
+          travelling_from: string | null
+          arrangement_preference: 'ceremony-only' | 'ceremony-food' | 'ceremony-stay' | 'complete-arrangement' | 'need-guidance'
+          contact_name: string
+          mobile: string
+          email: string | null
+          relationship: string | null
+          preferred_contact_method: 'phone' | 'whatsapp' | 'email'
+          other_service_details: string | null
+          notes: string | null
+          status: 'new' | 'contacted' | 'planning' | 'confirmed' | 'completed' | 'cancelled'
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          location: string
+          celebration_type: '60th-marriage' | '70th-marriage' | '80th-marriage' | 'not-sure'
+          husband_name: string
+          wife_name: string
+          husband_dob: string
+          wife_dob: string
+          husband_nakshatra?: string | null
+          wife_nakshatra?: string | null
+          husband_rasi?: string | null
+          wife_rasi?: string | null
+          preferred_date: string
+          alternative_date?: string | null
+          guest_count_range: 'below-20' | '20-50' | '51-100' | '100-plus'
+          travelling_from?: string | null
+          arrangement_preference: 'ceremony-only' | 'ceremony-food' | 'ceremony-stay' | 'complete-arrangement' | 'need-guidance'
+          contact_name: string
+          mobile: string
+          email?: string | null
+          relationship?: string | null
+          preferred_contact_method: 'phone' | 'whatsapp' | 'email'
+          other_service_details?: string | null
+          notes?: string | null
+          status?: 'new' | 'contacted' | 'planning' | 'confirmed' | 'completed' | 'cancelled'
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          location?: string
+          celebration_type?: '60th-marriage' | '70th-marriage' | '80th-marriage' | 'not-sure'
+          husband_name?: string
+          wife_name?: string
+          husband_dob?: string
+          wife_dob?: string
+          husband_nakshatra?: string | null
+          wife_nakshatra?: string | null
+          husband_rasi?: string | null
+          wife_rasi?: string | null
+          preferred_date?: string
+          alternative_date?: string | null
+          guest_count_range?: 'below-20' | '20-50' | '51-100' | '100-plus'
+          travelling_from?: string | null
+          arrangement_preference?: 'ceremony-only' | 'ceremony-food' | 'ceremony-stay' | 'complete-arrangement' | 'need-guidance'
+          contact_name?: string
+          mobile?: string
+          email?: string | null
+          relationship?: string | null
+          preferred_contact_method?: 'phone' | 'whatsapp' | 'email'
+          other_service_details?: string | null
+          notes?: string | null
+          status?: 'new' | 'contacted' | 'planning' | 'confirmed' | 'completed' | 'cancelled'
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      celebration_enquiry_services: {
+        Row: {
+          enquiry_id: string
+          service_id: string
+          created_at: string
+        }
+        Insert: {
+          enquiry_id: string
+          service_id: string
+          created_at?: string
+        }
+        Update: {
+          enquiry_id?: string
+          service_id?: string
+          created_at?: string
+        }
+      }
       interests: {
         Row: {
           id: string
@@ -301,7 +442,34 @@ export interface Database {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      create_celebration_enquiry: {
+        Args: {
+          p_location: string
+          p_celebration_type: string
+          p_husband_name: string
+          p_wife_name: string
+          p_husband_dob: string
+          p_wife_dob: string
+          p_preferred_date: string
+          p_guest_count_range: string
+          p_arrangement_preference: string
+          p_contact_name: string
+          p_mobile: string
+          p_preferred_contact_method: string
+          p_service_ids?: string[]
+          p_alternative_date?: string | null
+          p_husband_nakshatra?: string | null
+          p_wife_nakshatra?: string | null
+          p_husband_rasi?: string | null
+          p_wife_rasi?: string | null
+          p_travelling_from?: string | null
+          p_email?: string | null
+          p_relationship?: string | null
+          p_other_service_details?: string | null
+          p_notes?: string | null
+        }
+        Returns: string
+      }
     }
     Enums: {
       [_ in never]: never

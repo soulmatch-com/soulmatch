@@ -50,9 +50,11 @@ export async function updateSession(request: NextRequest) {
   )
 
   const isApiAuthRoute = request.nextUrl.pathname.startsWith('/api/auth')
+  const isCelebrationsRoute = request.nextUrl.pathname.startsWith('/celebrations')
+  const isCelebrationsApiRoute = request.nextUrl.pathname.startsWith('/api/celebrations')
   const isProfileCreateRoute = request.nextUrl.pathname === '/profile/create'
 
-  if (!user && !isPublicRoute && !isApiAuthRoute) {
+  if (!user && !isPublicRoute && !isApiAuthRoute && !isCelebrationsRoute && !isCelebrationsApiRoute) {
     // no user, potentially respond by redirecting the user to the login page
     const url = request.nextUrl.clone()
     url.pathname = '/login'
@@ -60,7 +62,7 @@ export async function updateSession(request: NextRequest) {
   }
 
   // Check if authenticated user has completed their profile
-  if (user && !isPublicRoute && !isApiAuthRoute && !isProfileCreateRoute) {
+  if (user && !isPublicRoute && !isApiAuthRoute && !isProfileCreateRoute && !isCelebrationsRoute && !isCelebrationsApiRoute) {
     const { data: profile } = await supabase
       .from('profiles')
       .select('id, profile_status')

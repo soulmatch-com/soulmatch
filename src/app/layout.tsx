@@ -1,13 +1,15 @@
 import type { Metadata } from "next";
 import { Toaster } from "sonner";
 import ConditionalHeader from "@/components/ConditionalHeader";
+import ConditionalFooter from "@/components/ConditionalFooter";
 import { AuthProvider } from "@/components/providers/AuthProvider";
 import { QueryProvider } from "@/components/providers/QueryProvider";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "MyThirumanam.in - Trusted Matrimonial Service for Indian Families",
-  description: "Discover compatible families through verified profiles. Connect with families who share your cultural values, traditions, and commitment to lifelong partnerships.",
+  metadataBase: new URL("https://mythirumanam.in"),
+  title: "Thirukadaiyur Marriage Celebrations | MyThirumanam",
+  description: "Plan traditional 60th, 70th and 80th marriage celebrations in Thirukadaiyur, with Matrimony available as a dedicated secondary service.",
   icons: {
     icon: [
       { url: "/favicon.ico?v=2" },
@@ -31,6 +33,7 @@ export default function RootLayout({
           <AuthProvider>
             <ConditionalHeader />
             {children}
+            <ConditionalFooter />
             <Toaster position="top-center" richColors />
           </AuthProvider>
         </QueryProvider>

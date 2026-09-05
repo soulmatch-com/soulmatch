@@ -1,4 +1,7 @@
 import { Heart } from 'lucide-react'
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = { robots: { index: false, follow: true } }
 
 export default function AuthLayout({
   children,
@@ -36,7 +39,7 @@ export default function AuthLayout({
         {/* Trust Indicators */}
         <div className="mt-8 text-center">
           <p className="text-xs text-slate-500 dark:text-slate-400">
-            🔒 100% Verified Profiles • 2,000+ Successful Alliances
+            Privacy-conscious accounts • Family-focused matrimonial experience
           </p>
         </div>
       </div>

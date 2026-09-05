@@ -29,7 +29,7 @@ export default function AdminHeader() {
           {/* Logo */}
           <Link href={ADMIN_CONFIG.ROUTES.DASHBOARD} className="flex items-center gap-2 hover:opacity-80 transition-opacity">
             <Shield className="h-6 w-6 text-white" />
-            <span className="text-xl font-bold">SoulMatch Admin</span>
+            <span className="text-xl font-bold">MyThirumanam Admin</span>
           </Link>
 
           {/* Desktop Navigation */}

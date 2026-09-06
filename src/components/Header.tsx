@@ -25,6 +25,7 @@ const celebrationLinks = [
   ["60th Marriage", "/60th-marriage"],
   ["70th Marriage", "/70th-marriage"],
   ["80th Marriage", "/80th-marriage"],
+  ["Gallery", "/gallery"],
 ] as const;
 
 export default function Header() {
@@ -34,7 +35,7 @@ export default function Header() {
   const router = useRouter();
   const pathname = usePathname();
   const supabase = createClient();
-  const isCelebrationPublicRoute = pathname === '/' || pathname === '/plan' || pathname === '/60th-marriage' || pathname === '/70th-marriage' || pathname === '/80th-marriage';
+  const isCelebrationPublicRoute = pathname === '/' || pathname === '/plan' || pathname === '/about' || pathname === '/gallery' || pathname === '/60th-marriage' || pathname === '/70th-marriage' || pathname === '/80th-marriage';
 
   const isActive = (path: string) => pathname === path;
 
@@ -44,6 +45,8 @@ export default function Header() {
 
   // Prevent hydration mismatch by only rendering auth-dependent UI after mount
   useEffect(() => {
+    // The header needs a client-only mounted flag before it can show auth state.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
   }, []);
 
@@ -63,7 +66,7 @@ export default function Header() {
       clearUser();
       toast.success("Logged out successfully");
       router.push("/");
-    } catch (error) {
+    } catch {
       toast.error("Failed to logout");
     }
   };
@@ -73,14 +76,15 @@ export default function Header() {
       <nav className="container mx-auto px-4 py-3">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           {/* Left Section: Logo */}
-          <Link href="/" className="flex items-center transition-opacity hover:opacity-90">
+          <Link href="/" className="flex shrink-0 items-center rounded-md transition-opacity hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-700">
             <Image
-              src="/mythirumanam-logo.png"
+              src="/brand/mythirumanam-logo.png"
               alt="MyThirumanam"
-              width={260}
-              height={77}
+              width={1690}
+              height={859}
+              sizes="(min-width: 1024px) 220px, (min-width: 640px) 216px, 210px"
               priority
-              className="h-12 w-auto"
+              className="h-auto w-[210px] sm:w-[216px] lg:w-[220px]"
             />
           </Link>
 

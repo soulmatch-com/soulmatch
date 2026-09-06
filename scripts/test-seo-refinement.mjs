@@ -11,6 +11,8 @@ const publicPages = [
   ['src/app/celebrations/thirukadaiyur/70th-marriage/page.tsx', 'https://mythirumanam.in/70th-marriage'],
   ['src/app/celebrations/thirukadaiyur/80th-marriage/page.tsx', 'https://mythirumanam.in/80th-marriage'],
   ['src/app/matrimony/page.tsx', 'https://mythirumanam.in/matrimony'],
+  ['src/app/about/page.tsx', 'https://mythirumanam.in/about'],
+  ['src/app/gallery/page.tsx', 'https://mythirumanam.in/gallery'],
 ]
 
 test('metadata base and concise Celebrations-first homepage title are configured', async () => {
@@ -21,7 +23,7 @@ test('metadata base and concise Celebrations-first homepage title are configured
 test('public pages have descriptions, matching canonical and Open Graph URLs, and site name', async () => {
   for (const [path, canonical] of publicPages) {
     const source = await read(path)
-    assert.match(source, /description:/)
+    assert.match(source, /description[:,]/)
     assert.ok(source.includes(`const url = '${canonical}'`))
     assert.match(source, /alternates: \{ canonical: url \}/)
     assert.match(source, /openGraph: .*url, siteName: 'MyThirumanam'/)

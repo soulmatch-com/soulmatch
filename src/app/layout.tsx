@@ -10,13 +10,7 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://mythirumanam.in"),
   title: "Thirukadaiyur Marriage Celebrations | MyThirumanam",
   description: "Plan traditional 60th, 70th and 80th marriage celebrations in Thirukadaiyur, with Matrimony available as a dedicated secondary service.",
-  icons: {
-    icon: [
-      { url: "/favicon.ico?v=2" },
-      { url: "/icon.png?v=2", type: "image/png", sizes: "500x500" },
-    ],
-    apple: [{ url: "/apple-icon.png?v=2", sizes: "180x180", type: "image/png" }],
-  },
+  // Next.js file metadata supplies favicon.ico, icon.png, apple-icon.png and manifest.ts.
 };
 
 export default function RootLayout({

@@ -43,6 +43,7 @@ export async function updateSession(request: NextRequest) {
     '/verify-otp',
     '/forgot-password',
     '/reset-password',
+    '/gallery',
   ]
 
   const isPublicRoute = publicRoutes.some(route =>

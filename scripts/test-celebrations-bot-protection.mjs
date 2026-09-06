@@ -77,7 +77,7 @@ test('production bot configuration fails closed while development may bypass', a
 
 test('final-step widget gates submit and refreshes consumed tokens without resetting form data', async () => {
   const form = await read('src/components/celebrations/CelebrationEnquiryForm.tsx')
-  assert.match(form, /step === 4.*TurnstileChallenge/)
+  assert.match(form, /step === 5.*TurnstileChallenge/)
   assert.match(form, /challengeRequired && !botToken/)
   assert.match(form, /setChallengeVersion\(\(current\) => current \+ 1\)/)
   assert.doesNotMatch(form, /reset\(/)

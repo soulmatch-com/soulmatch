@@ -13,6 +13,7 @@ const publicPages = [
   ['src/app/matrimony/page.tsx', 'https://mythirumanam.in/matrimony'],
   ['src/app/about/page.tsx', 'https://mythirumanam.in/about'],
   ['src/app/gallery/page.tsx', 'https://mythirumanam.in/gallery'],
+  ['src/app/terms/page.tsx', 'https://mythirumanam.in/terms'],
 ]
 
 test('metadata base and concise Celebrations-first homepage title are configured', async () => {

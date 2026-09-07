@@ -35,7 +35,7 @@ export default function Header() {
   const router = useRouter();
   const pathname = usePathname();
   const supabase = createClient();
-  const isCelebrationPublicRoute = pathname === '/' || pathname === '/plan' || pathname === '/about' || pathname === '/gallery' || pathname === '/60th-marriage' || pathname === '/70th-marriage' || pathname === '/80th-marriage';
+  const isCelebrationPublicRoute = pathname === '/' || pathname === '/plan' || pathname === '/about' || pathname === '/gallery' || pathname === '/terms' || pathname === '/60th-marriage' || pathname === '/70th-marriage' || pathname === '/80th-marriage';
 
   const isActive = (path: string) => pathname === path;
 

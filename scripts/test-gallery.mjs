@@ -55,7 +55,7 @@ test('Gallery remains public and indexable with canonical metadata and conservat
   const middleware = await read('src/lib/supabase/middleware.ts')
   assert.match(middleware, /const publicRoutes = \[[\s\S]*?'\/gallery'/)
   assert.deepEqual(sitemap().map(({ url }) => new URL(url).pathname).sort(), [
-    '/', '/60th-marriage', '/70th-marriage', '/80th-marriage', '/about', '/gallery', '/matrimony',
+    '/', '/60th-marriage', '/70th-marriage', '/80th-marriage', '/about', '/gallery', '/matrimony', '/terms',
   ])
 })
 

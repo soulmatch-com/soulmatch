@@ -11,6 +11,7 @@ const guestCountLabels = { 'below-20': 'Below 20', '20-50': '20–50', '51-100':
 function escapeHtml(value: string) { return value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;') }
 function displayDate(value?: string) { return value ? new Intl.DateTimeFormat('en-IN', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' }).format(new Date(`${value}T00:00:00Z`)) : 'Not provided' }
 function optional(value?: string) { return value?.trim() || 'Not provided' }
+function encodeMimeHeader(value: string) { return `=?UTF-8?B?${Buffer.from(value, 'utf8').toString('base64')}?=` }
 
 export function createBookingNotification({ enquiryId, enquiry, services }: { enquiryId: string; enquiry: CelebrationEnquiryApiInput; services: PublicCelebrationService[] }) {
   const selectedServices = services.filter((service) => enquiry.serviceIds.includes(service.id)).map((service) => getCelebrationServicePresentation(service).name)
@@ -43,7 +44,7 @@ export async function sendBookingNotification(input: { enquiryId: string; enquir
   const tokenResult = await tokenResponse.json() as { access_token?: string }
   if (!tokenResult.access_token) throw new Error('Gmail OAuth token refresh returned no access token')
   const boundary = 'mythirumanam-notification'
-  const mime = [`From: ${from}`, `To: ${to}`, `Subject: ${message.subject}`, 'MIME-Version: 1.0', `Content-Type: multipart/alternative; boundary="${boundary}"`, '', `--${boundary}`, 'Content-Type: text/plain; charset=UTF-8', '', message.text, `--${boundary}`, 'Content-Type: text/html; charset=UTF-8', '', message.html, `--${boundary}--`].join('\r\n')
+  const mime = [`From: ${from}`, `To: ${to}`, `Subject: ${encodeMimeHeader(message.subject)}`, 'MIME-Version: 1.0', `Content-Type: multipart/alternative; boundary="${boundary}"`, '', `--${boundary}`, 'Content-Type: text/plain; charset=UTF-8', '', message.text, `--${boundary}`, 'Content-Type: text/html; charset=UTF-8', '', message.html, `--${boundary}--`].join('\r\n')
   const raw = Buffer.from(mime, 'utf8').toString('base64url')
   const response = await fetch('https://gmail.googleapis.com/gmail/v1/users/me/messages/send', { method: 'POST', headers: { Authorization: `Bearer ${tokenResult.access_token}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ raw }) })
   if (!response.ok) throw new Error(`Gmail notification provider failed with status ${response.status}`)

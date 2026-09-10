@@ -144,7 +144,6 @@ export default function Header() {
           <div className="hidden items-center gap-1.5 lg:flex">
             {isCelebrationPublicRoute && celebrationLinks.map(([label, href]) => <Link key={href} href={href} aria-current={isActive(href) ? 'page' : undefined} className={`min-h-10 whitespace-nowrap rounded-md px-2.5 py-2 text-sm font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-700 ${isActive(href) ? 'bg-amber-50 text-amber-900 dark:bg-amber-950 dark:text-amber-200' : 'text-stone-700 hover:bg-amber-50 hover:text-amber-900 dark:text-stone-200 dark:hover:bg-amber-950 dark:hover:text-amber-200'}`}>{label}</Link>)}
             {isCelebrationPublicRoute && <Link href="/plan" className="min-h-10 whitespace-nowrap rounded-md bg-amber-800 px-3.5 py-2 text-sm font-bold text-white shadow-sm hover:bg-amber-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-700">Plan Celebration</Link>}
-            <Link href="/matrimony" aria-current={isActive('/matrimony') ? 'page' : undefined} className={`min-h-10 whitespace-nowrap rounded-md px-2.5 py-2 text-sm font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-700 ${isActive('/matrimony') ? 'bg-amber-50 text-amber-900 dark:bg-amber-950 dark:text-amber-200' : 'text-stone-700 hover:bg-amber-50 hover:text-amber-900 dark:text-stone-200 dark:hover:bg-amber-950 dark:hover:text-amber-200'}`}>Matrimony</Link>
             {!mounted ? (
               isCelebrationPublicRoute ? null : <div className="w-[200px]" />
             ) : user ? (
@@ -266,7 +265,6 @@ export default function Header() {
           <div id="mobile-primary-menu" className="relative z-[60] mt-4 space-y-2 border-t border-slate-200 pt-4 animate-in slide-in-from-top duration-200 dark:border-slate-700 lg:hidden">
             {celebrationLinks.map(([label, href]) => <Link key={href} href={href} onClick={toggleMenu} aria-current={isActive(href) ? 'page' : undefined} className={`block min-h-11 rounded-md px-3 py-3 text-sm font-semibold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-700 ${isActive(href) ? 'bg-amber-50 text-amber-900 dark:bg-amber-950 dark:text-amber-200' : 'text-stone-700 hover:bg-amber-50 hover:text-amber-900 dark:text-stone-200 dark:hover:bg-amber-950'}`}>{label}</Link>)}
             <Link href="/plan" onClick={toggleMenu} className="block min-h-11 rounded-md bg-amber-800 px-3 py-3 text-center font-bold text-white hover:bg-amber-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-700">Plan Celebration</Link>
-            <Link href="/matrimony" onClick={toggleMenu} className="block min-h-11 rounded-md px-2 py-3 font-semibold text-blue-700 hover:bg-blue-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700 dark:text-blue-300 dark:hover:bg-blue-950">Matrimony</Link>
             <div className="flex flex-col gap-2 pt-4 border-t border-slate-200 dark:border-slate-700">
               {!mounted ? (
                 // Render placeholder during SSR

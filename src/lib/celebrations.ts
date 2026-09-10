@@ -14,6 +14,8 @@ export interface CeremonyContent {
   tamilName: string
   summary: string
   significance: string
+  timingGuidance: string
+  timingGuidanceTamil: string
   thirukadaiyur: string
   considerations: string[]
   faqs: CelebrationFaq[]
@@ -53,6 +55,10 @@ export const ceremonies: CeremonyContent[] = [
     summary: "A cherished family occasion marking a major life milestone and the couple's shared journey.",
     significance:
       'Sashtiapthapoorthi is often observed as a time for gratitude, blessings and renewal in the presence of children, grandchildren and loved ones. Its meaning and ceremony format can differ between families and communities.',
+    timingGuidance:
+      'Some families may observe Ugraratha Shanthi around the beginning of the 60th year, while Sashtiapthapoorthi is associated with the completion of 60 years. The exact ceremony and timing may depend on family tradition and Vadhyar or priest guidance.',
+    timingGuidanceTamil:
+      'சில குடும்பங்கள் 60ஆம் வயது தொடக்கத்தில் உக்ரரத சாந்தியை அனுசரிக்கலாம்; 60 ஆண்டுகள் நிறைவுடன் ஷஷ்டியப்தபூர்த்தியை தொடர்புபடுத்தலாம். குடும்ப சம்பிரதாயம் மற்றும் வாத்தியார் / புரோகிதர் வழிகாட்டுதலின் அடிப்படையில் சரியான விழாவும் நேரமும் மாறுபடலாம்.',
     thirukadaiyur:
       "Families may choose Thirukadaiyur for its long association with prayers for wellbeing and longevity. Venue, temple and ceremony arrangements should be planned around local requirements and the family's guidance.",
     considerations: ['Confirm the preferred date with family and priest', 'Choose a home, temple or marriage-hall setting', 'Plan guest meals, travel and accommodation', 'Allow comfortable timing for the celebrating couple'],
@@ -67,6 +73,10 @@ export const ceremonies: CeremonyContent[] = [
     summary: "A meaningful seventieth-year observance centred on family, wellbeing and honouring the couple's life together.",
     significance:
       'Bheemaratha Shanthi brings generations together to honour the elders and seek blessings for peace and wellbeing. Ritual details, timing and terminology may vary according to community and family practice.',
+    timingGuidance:
+      'The ceremony and timing for a 70th milestone observance may vary according to family tradition, community practice and Vadhyar or priest guidance.',
+    timingGuidanceTamil:
+      '70ஆம் வயது தொடர்பான விழாவின் வழிமுறையும் நேரமும் குடும்ப சம்பிரதாயம், சமூக வழக்கம் மற்றும் வாத்தியார் / புரோகிதர் வழிகாட்டுதலின் அடிப்படையில் மாறுபடலாம்.',
     thirukadaiyur:
       'Thirukadaiyur offers a traditional setting for families who wish to combine the milestone with temple-focused arrangements. Early coordination is useful when guests need travel, stay or venue support.',
     considerations: ['Discuss the ceremony format with the chosen Vadhyar', 'Plan around the comfort and mobility of elders', 'Coordinate temple or venue timings in advance', 'Keep family travel and hospitality in one clear schedule'],
@@ -81,6 +91,10 @@ export const ceremonies: CeremonyContent[] = [
     summary: "A deeply valued later-life milestone celebrating the couple's wisdom, togetherness and place within the family.",
     significance:
       'Sathabhishekam is traditionally associated with a remarkable life milestone and a gathering of several generations. Exact age, timing and ritual expectations are best determined with the family’s priest and tradition.',
+    timingGuidance:
+      'The ceremony and timing for an 80th milestone observance may vary according to family tradition, community practice and Vadhyar or priest guidance.',
+    timingGuidanceTamil:
+      '80ஆம் வயது தொடர்பான விழாவின் வழிமுறையும் நேரமும் குடும்ப சம்பிரதாயம், சமூக வழக்கம் மற்றும் வாத்தியார் / புரோகிதர் வழிகாட்டுதலின் அடிப்படையில் மாறுபடலாம்.',
     thirukadaiyur:
       'For families gathering at Thirukadaiyur, an elder-friendly plan can bring the ceremony, temple coordination, meals and guest arrangements together without rushing the occasion.',
     considerations: ['Prioritise an elder-friendly pace and accessible venue', 'Confirm customs and auspicious timing with trusted guidance', 'Plan seating, meals and rest periods for guests', 'Coordinate photography without interrupting rituals'],

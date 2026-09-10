@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { persistCelebrationEnquiry, type CelebrationRpcClient } from '@/lib/celebrations/enquiry-submission'
+import { sendBookingNotification } from '@/lib/celebrations/email/booking-notification'
+import type { PublicCelebrationService } from '@/lib/celebrations/service-query'
 import { checkCelebrationEnquiryRateLimit } from '@/lib/celebrations/rate-limit'
 import { verifyCelebrationBotChallenge } from '@/lib/celebrations/bot-verification'
 import { CELEBRATION_BOT_TOKEN_HEADER } from '@/lib/celebrations/bot-verification-core'
@@ -59,11 +61,18 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const client = createAdminClient() as unknown as CelebrationRpcClient
-    const result = await persistCelebrationEnquiry(client, validation.data)
+    const client = createAdminClient()
+    const result = await persistCelebrationEnquiry(client as unknown as CelebrationRpcClient, validation.data)
     if (!result.success) {
       console.error('Celebration enquiry RPC failed', { code: result.errorCode ?? 'unknown' })
       return NextResponse.json({ success: false, message: 'Unable to submit the enquiry right now' }, { status: 500 })
+    }
+
+    try {
+      const { data } = await client.from('celebration_services').select('id, code, name, description, icon, display_order').in('id', validation.data.serviceIds)
+      await sendBookingNotification({ enquiryId: result.enquiryId, enquiry: validation.data, services: (data ?? []) as PublicCelebrationService[] })
+    } catch (error) {
+      console.error('Celebration notification failed', { enquiryId: result.enquiryId, type: error instanceof Error ? error.name : 'UnknownError' })
     }
 
     return NextResponse.json({ success: true, enquiryId: result.enquiryId }, { status: 201 })

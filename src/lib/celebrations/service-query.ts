@@ -4,6 +4,17 @@ import type { Database } from '@/types/database.types'
 type ServiceRow = Database['public']['Tables']['celebration_services']['Row']
 export type PublicCelebrationService = Pick<ServiceRow, 'id' | 'code' | 'name' | 'description' | 'icon' | 'display_order'>
 
+export function getCelebrationServicePresentation(service: PublicCelebrationService) {
+  if (service.code === 'temple_coordination') {
+    return {
+      name: 'Temple-related Planning Assistance',
+      description: 'Request help planning temple-related arrangements, subject to the respective temple authorities.',
+    }
+  }
+
+  return { name: service.name, description: service.description }
+}
+
 const SERVICE_FIELDS = 'id, code, name, description, icon, display_order' as const
 
 export async function queryActiveCelebrationServices(

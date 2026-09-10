@@ -96,7 +96,7 @@ export const ceremonies: CeremonyContent[] = [
     timingGuidanceTamil:
       '80ஆம் வயது தொடர்பான விழாவின் வழிமுறையும் நேரமும் குடும்ப சம்பிரதாயம், சமூக வழக்கம் மற்றும் வாத்தியார் / புரோகிதர் வழிகாட்டுதலின் அடிப்படையில் மாறுபடலாம்.',
     thirukadaiyur:
-      'For families gathering at Thirukadaiyur, an elder-friendly plan can bring the ceremony, temple coordination, meals and guest arrangements together without rushing the occasion.',
+      'For families gathering at Thirukadaiyur, an elder-friendly plan can bring ceremony planning, temple-related planning assistance, meals and guest arrangements together without rushing the occasion.',
     considerations: ['Prioritise an elder-friendly pace and accessible venue', 'Confirm customs and auspicious timing with trusted guidance', 'Plan seating, meals and rest periods for guests', 'Coordinate photography without interrupting rituals'],
     faqs: sharedFaqs,
   },

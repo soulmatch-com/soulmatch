@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { CelebrationBreadcrumbs } from '@/components/celebrations/CelebrationBreadcrumbs'
 import { JsonLd } from '@/components/seo/JsonLd'
+import { IndependentServiceNotice } from '@/components/celebrations/IndependentServiceNotice'
 
 const url = 'https://mythirumanam.in/terms'
 const title = 'Terms & Conditions | MyThirumanam'
@@ -71,6 +72,11 @@ export default function TermsPage() {
           <CelebrationBreadcrumbs items={[{ label: 'Home', href: '/' }, { label: 'Terms & Conditions' }]} />
         </div>
 
+        <section className="mx-auto max-w-4xl px-4 pt-4 sm:px-6">
+          <h2 className="text-xl font-semibold text-stone-900">Temple Independence</h2>
+          <div className="mt-4 space-y-3"><IndependentServiceNotice variant="full" /><IndependentServiceNotice locale="ta" variant="full" /></div>
+        </section>
+
         <section className="mx-auto max-w-4xl px-4 pb-16 pt-4 sm:px-6 sm:pb-20">
           <div className="rounded-3xl border border-amber-200 bg-white px-5 py-8 shadow-sm sm:px-8 sm:py-10">
             <p className="text-sm font-bold uppercase tracking-[0.2em] text-amber-800">Legal information</p>
@@ -84,6 +90,7 @@ export default function TermsPage() {
             <p className="mt-4 max-w-3xl text-base leading-7 text-stone-700">
               Any confirmed booking will follow the agreed service arrangement, availability review and written confirmation issued by MyThirumanam.
             </p>
+            <p className="mt-4 max-w-3xl text-base leading-7 text-stone-700">Read our <Link href="/privacy" className="font-semibold text-amber-800 underline">Privacy Policy</Link> to understand how celebration information is handled.</p>
           </div>
 
           <section aria-labelledby="terms-section-heading" className="mt-10">

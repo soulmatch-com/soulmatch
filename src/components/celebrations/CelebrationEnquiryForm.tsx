@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { getCelebrationServiceIcon } from './CelebrationServices'
-import type { PublicCelebrationService } from '@/lib/celebrations/services'
+import { getCelebrationServicePresentation, type PublicCelebrationService } from '@/lib/celebrations/service-query'
 import type { CeremonySlug } from '@/lib/celebrations'
 import { submitCelebrationEnquiry } from '@/lib/celebrations/client-submission'
 import { groupCelebrationServices } from '@/lib/celebrations/service-presentation'
@@ -17,6 +17,7 @@ import { getAlternativeDateConflictMessage, getCelebrationDateBounds } from '@/l
 import { ceremonySelectionOptions } from '@/lib/celebrations'
 import { EnquiryReview, EnquiryConfirmation } from './EnquirySummary'
 import { TurnstileChallenge } from './TurnstileChallenge'
+import { IndependentServiceNotice } from './IndependentServiceNotice'
 import {
   celebrationTypes,
   celebrationEnquiryApiSchema,
@@ -47,6 +48,9 @@ export function CelebrationEnquiryForm({
   const [step, setStep] = useState(0)
   const [editing, setEditing] = useState(false)
   const [astrologyOpen, setAstrologyOpen] = useState(false)
+  const [legalAcknowledged, setLegalAcknowledged] = useState(false)
+  const [legalAcknowledgementError, setLegalAcknowledgementError] = useState<string>()
+  const legalAcknowledgementRef = useRef<HTMLInputElement>(null)
   const submittingRef = useRef(false)
   const navigationRef = useRef(false)
   const [submitMessage, setSubmitMessage] = useState<string>()
@@ -121,6 +125,12 @@ export function CelebrationEnquiryForm({
 
   const goNext = async () => {
     setSubmitMessage(undefined)
+
+    if (step === 4 && !legalAcknowledged) {
+      setLegalAcknowledgementError('Please agree to the Terms & Conditions and acknowledge the Privacy Policy before continuing.')
+      legalAcknowledgementRef.current?.focus()
+      return
+    }
 
     if (step === 0) {
       if (!celebrationTypes.includes(getValues('celebrationType') as (typeof celebrationTypes)[number])) {
@@ -378,6 +388,7 @@ export function CelebrationEnquiryForm({
             <fieldset>
               <legend className="text-2xl font-bold">Services required</legend>
               <p className="mt-2 leading-7 text-stone-600">Select the services you would like to request. Availability is confirmed separately.</p>
+              <div className="mt-5 space-y-3 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-stone-700"><IndependentServiceNotice variant="planning" /><IndependentServiceNotice locale="ta" variant="planning" /></div>
               {!servicesAvailable && (
                 <p role="alert" className="mt-5 rounded-xl border border-amber-300 bg-amber-50 p-4 text-stone-700">
                   Services could not be loaded right now. You may continue only by choosing <strong>Need Guidance</strong>, or return later to select services.
@@ -392,13 +403,14 @@ export function CelebrationEnquiryForm({
                   <div className="mt-3 grid gap-4 sm:grid-cols-2">
                     {group.services.map((service) => {
                       const Icon = getCelebrationServiceIcon(service.icon)
+                      const presentation = getCelebrationServicePresentation(service)
                       return (
                         <label key={service.id} className="relative flex min-h-24 cursor-pointer items-start gap-4 rounded-2xl border border-amber-200 p-5 has-[:checked]:border-amber-700 has-[:checked]:bg-amber-50">
                           <input type="checkbox" value={service.id} {...register('serviceIds')} aria-describedby={describedBy('serviceIds')} className="peer mt-1 h-5 w-5 shrink-0 accent-amber-700" />
                           <Icon aria-hidden="true" className="mt-0.5 h-6 w-6 shrink-0 text-amber-800" />
                           <span className="min-w-0">
-                            <span className="block break-words font-bold">{service.name}</span>
-                            {service.description && <span className="mt-1 block break-words text-sm leading-6 text-stone-600">{service.description}</span>}
+                            <span className="block break-words font-bold">{presentation.name}</span>
+                            {presentation.description && <span className="mt-1 block break-words text-sm leading-6 text-stone-600">{presentation.description}</span>}
                           </span>
                           <Check aria-hidden="true" className="absolute right-3 top-3 hidden h-5 w-5 text-amber-800 peer-checked:block" />
                         </label>
@@ -460,10 +472,17 @@ export function CelebrationEnquiryForm({
                   </Field>
                 </div>
               </div>
-              <p className="mt-6 flex items-start gap-3 rounded-xl bg-amber-50 p-4 text-sm leading-6 text-stone-700">
+              <div className="mt-6 rounded-xl bg-amber-50 p-4 text-sm leading-6 text-stone-700">
+                <p className="flex items-start gap-3">
                 <ShieldCheck aria-hidden="true" className="mt-0.5 h-5 w-5 shrink-0 text-amber-800" />
                 No matrimonial login or profile is required for this enquiry.
-              </p>
+                </p>
+                <label className="mt-4 flex cursor-pointer items-start gap-3 text-stone-800">
+                  <input ref={legalAcknowledgementRef} type="checkbox" checked={legalAcknowledged} onChange={(event) => { setLegalAcknowledged(event.target.checked); if (event.target.checked) setLegalAcknowledgementError(undefined) }} aria-invalid={!!legalAcknowledgementError} aria-describedby={legalAcknowledgementError ? 'legal-acknowledgement-error' : undefined} className="mt-1 h-5 w-5 shrink-0 accent-amber-700" />
+                  <span>I have read and agree to the <a href="/terms" target="_blank" rel="noopener noreferrer" className="font-semibold text-amber-800 underline">Terms &amp; Conditions</a> and acknowledge the <a href="/privacy" target="_blank" rel="noopener noreferrer" className="font-semibold text-amber-800 underline">Privacy Policy</a>.</span>
+                </label>
+                {legalAcknowledgementError && <p id="legal-acknowledgement-error" role="alert" className="mt-3 font-medium text-red-700">{legalAcknowledgementError}</p>}
+              </div>
             </section>
           )}
 

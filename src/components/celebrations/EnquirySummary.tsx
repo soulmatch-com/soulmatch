@@ -4,7 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import type { CelebrationEnquiryFormValues } from '@/lib/validations/celebration-enquiry-api.schema'
-import type { PublicCelebrationService } from '@/lib/celebrations/service-query'
+import { getCelebrationServicePresentation, type PublicCelebrationService } from '@/lib/celebrations/service-query'
 
 const guestLabels = { 'below-20': 'Below 20', '20-50': '20–50', '51-100': '51–100', '100-plus': '100+' }
 const arrangementLabels = { 'ceremony-only': 'Ceremony Only', 'ceremony-food': 'Ceremony + Food', 'ceremony-stay': 'Ceremony + Stay', 'complete-arrangement': 'Complete Arrangement', 'need-guidance': 'Need Guidance' }
@@ -35,7 +35,7 @@ export function EnquiryReview({ values, services, ceremony, onEdit, disabled }: 
       ['Number of Guests', guestLabels[values.guestCountRange]], ['Travelling From', values.travellingFrom],
       ['Arrangement Preference', arrangementLabels[values.arrangementPreference]],
     ]} /> },
-    { title: 'Services', content: <><p className="mt-4 font-medium">{selected.length} {selected.length === 1 ? 'service' : 'services'} selected</p>{selected.length > 0 ? <ul className="mt-3 list-disc space-y-2 pl-5">{selected.map((service) => <li key={service.id}>{service.name}</li>)}</ul> : <p className="mt-2 text-stone-600">Guidance requested for service selection.</p>}{values.otherServiceDetails?.trim() && <SummaryRows rows={[[ 'Additional service requirement', values.otherServiceDetails ]]} />}</> },
+    { title: 'Services', content: <><p className="mt-4 font-medium">{selected.length} {selected.length === 1 ? 'service' : 'services'} selected</p>{selected.length > 0 ? <ul className="mt-3 list-disc space-y-2 pl-5">{selected.map((service) => <li key={service.id}>{getCelebrationServicePresentation(service).name}</li>)}</ul> : <p className="mt-2 text-stone-600">Guidance requested for service selection.</p>}{values.otherServiceDetails?.trim() && <SummaryRows rows={[[ 'Additional service requirement', values.otherServiceDetails ]]} />}</> },
     { title: 'Contact', content: <SummaryRows rows={[
       ['Contact Person Name', values.contactName], ['Mobile Number', values.mobile],
       ...(values.email?.trim() ? [['Email', values.email] as [string, string]] : []),

@@ -21,7 +21,7 @@ export function GalleryGrid({ items }: { items: readonly CelebrationGalleryItem[
                   ? '(max-width: 415px) calc(100vw - 32px), 384px'
                   : '(max-width: 639px) calc(100vw - 32px), (max-width: 1023px) calc((100vw - 72px) / 2), 368px'}
                 loading="lazy"
-                className={`h-full w-full ${item.kind === 'brand-art' ? 'object-contain p-6' : 'object-cover'}`}
+                className={`h-full w-full ${item.publicationType === 'brand-artwork' ? 'object-contain p-6' : 'object-cover'}`}
               />
             </div>
             <figcaption className="border-t border-amber-100 p-6">

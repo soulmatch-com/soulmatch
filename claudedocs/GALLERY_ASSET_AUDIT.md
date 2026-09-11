@@ -1,23 +1,24 @@
 # Gallery asset audit
 
-Audited for the Gallery phase on 2026-09-06. Scope: public/, src/assets/ (not present), src/components/, the existing Celebrations pages, application icons, and repository image files outside generated/build/dependency folders.
+Audited for the Gallery phase on 2026-09-11. Scope: public/, assets/, src/app application icons, the existing Celebrations pages, and repository image files outside generated/build/dependency folders.
 
 ## A. Approved real event photos: 0
 
 No local, verified Thirukadaiyur ceremony/customer photographs or accompanying public-use approvals were found. No customer database content was retrieved or repurposed.
 
-## B. Approved owned decorative/brand assets: 4 files (2 designs)
+## B. Approved owned decorative/brand assets: 5 files
 
 | Path | Dimensions | Evidence and Gallery use |
 | --- | --- | --- |
-| public/mythirumanam-logo.png | 1120 x 330 | Existing MyThirumanam logo and tagline, already used by the shared Header and SiteFooter. Reused unchanged through site chrome. |
-| public/mythiru-favicon.png | 500 x 500 | Existing MyThirumanam emblem, visually inspected. Same bytes as the site's icon.png. The sole Gallery item and Open Graph image, explicitly labelled Brand artwork. |
-| src/app/icon.png | 500 x 500 | Identical SHA-256 to public/mythiru-favicon.png; existing application icon. Not duplicated as a Gallery card. |
-| src/app/apple-icon.png | 180 x 180 | Visually inspected small variant of the existing emblem. Remains an application icon, not a Gallery card. |
+| assets/brand/839F3D1B-38F3-439C-9C7F-1CA730683B61.png | 1774 x 887 | Existing source brand artwork. Not published as event photography. |
+| public/brand/mythirumanam-logo.png | 1690 x 859 | Existing MyThirumanam logo artwork, already used by shared site chrome. Reused unchanged through site chrome. |
+| public/brand/mythirumanam-icon-192.png | 192 x 192 | Existing MyThirumanam app icon. Remains an application/brand asset. |
+| src/app/icon.png | 512 x 512 | Existing application icon. The sole public Gallery visual and Open Graph image, explicitly labelled Brand artwork. |
+| src/app/apple-icon.png | 180 x 180 | Existing Apple touch icon variant of the emblem. Remains an application icon, not a Gallery event photo. |
 
 Approval basis is the existing public site brand identity and this phase's authorization to reuse owned brand assets. No separate customer or event attribution is inferred from brand artwork. The logo and tagline have not been edited.
 
-## C. Generic product assets: 6 files, not Gallery content
+## C. Existing application UI assets: 6 files, not Gallery content
 
 - public/file.svg
 - public/globe.svg
@@ -28,7 +29,7 @@ Approval basis is the existing public site brand identity and this phase's autho
 
 The SVGs are starter/product graphics. The ICO is an existing application favicon; its preview does not provide ceremony imagery. Existing application metadata is unchanged. None is used as Gallery imagery or a new Open Graph image.
 
-## D. Unsuitable/unverified for Gallery publication: 2 files, not published in Gallery
+## D. Images whose ownership/publication permission cannot be established: 2 files, excluded
 
 - claudedocs/screenshots/homepage-success-stories-empty.png
 - claudedocs/screenshots/admin-login-with-success-stories-menu.png
@@ -37,14 +38,20 @@ Both were visually inspected. They are documentation screenshots of older produc
 
 No identifiable people were found in the inspected local image assets. There are consequently no local customer photographs to publish or anonymize. Any future identifiable-person photograph with no approval evidence must be marked **Requires publication approval** and kept out of the public collection.
 
+## E. Test/demo/placeholder images excluded: 0 Gallery images
+
+No Gallery-specific placeholder/customer/demo photographs were found or published.
+
 ## Current page content
 
-- Gallery collection: one entry, public/mythiru-favicon.png.
-- Kind: brand-art. Visible category: Brand artwork.
+- Approved event photo collection: empty.
+- Gallery brand artwork collection: one entry, src/app/icon.png.
+- Publication type: brand-artwork. Visible category: Brand Artwork.
 - Caption: MyThirumanam brand artwork, not a photograph of a customer or ceremony.
-- No category filter, empty category, lightbox, grey placeholder, generated customer image, or remote image source.
+- No category filter, empty category, lightbox, grey placeholder, generated customer image, fake testimonial, or remote image source.
 - Ceremony discovery reuses CeremonyGrid and its existing configuration.
-- The typed collection lives in src/lib/celebrations/gallery.ts. New images must be local project-owned files with documented publication approval, descriptive alt text, verified dimensions, truthful captions and the correct kind.
+- The typed collection lives in src/lib/celebrations/gallery.ts. New images must be local project-owned files with documented publication approval, descriptive alt text, verified dimensions, truthful captions and the correct publicationType.
+- Homepage Gallery preview is hidden while the approved event photo collection is empty.
 - The grid is a server component using Next Image with responsive sizes, explicit dimensions and lazy loading. A single item stays in a restrained card; multiple approved items can use the one/two/three-column layout.
 
 ## Remaining requirement

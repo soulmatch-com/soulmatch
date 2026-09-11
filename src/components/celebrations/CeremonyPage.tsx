@@ -6,6 +6,7 @@ import { CelebrationBreadcrumbs } from './CelebrationBreadcrumbs'
 import { CelebrationServices } from './CelebrationServices'
 import { PlanningSteps } from './PlanningSteps'
 import { CelebrationCTA } from './CelebrationCTA'
+import { CelebrationContactActions } from './CelebrationContactActions'
 import { JsonLd } from '@/components/seo/JsonLd'
 
 export function CeremonyPage({ ceremony, services, servicesFailed }: { ceremony: CeremonyContent; services: PublicCelebrationService[]; servicesFailed: boolean }) {
@@ -31,5 +32,5 @@ export function CeremonyPage({ ceremony, services, servicesFailed }: { ceremony:
     <section className="border-y border-amber-200 bg-white py-16"><div className="mx-auto max-w-6xl px-4 sm:px-6"><h2 className="text-3xl font-bold">How planning works</h2><div className="mt-9"><PlanningSteps /></div></div></section>
     <section className="mx-auto max-w-4xl px-4 py-16 sm:px-6"><h2 className="text-3xl font-bold">Frequently asked questions</h2><div className="mt-8 divide-y divide-amber-200 rounded-2xl border border-amber-200 bg-white px-5 sm:px-7">{ceremony.faqs.map((faq) => <details key={faq.question} className="py-5"><summary className="cursor-pointer font-bold focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-amber-700">{faq.question}</summary><p className="mt-3 leading-7 text-stone-600">{faq.answer}</p></details>)}</div></section>
     <CelebrationCTA title={`Plan your ${ceremony.title} at Thirukadaiyur`} href={`/plan?ceremony=${ceremony.slug}`} label={`Plan ${ceremony.years}th Marriage`} />
-  </main></>
+  </main><CelebrationContactActions variant="mobile-sticky" /></>
 }

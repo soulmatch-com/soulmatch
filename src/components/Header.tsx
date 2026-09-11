@@ -26,6 +26,7 @@ const celebrationLinks = [
   ["70th Marriage", "/70th-marriage"],
   ["80th Marriage", "/80th-marriage"],
   ["Gallery", "/gallery"],
+  ["Blog", "/blog"],
 ] as const;
 
 export default function Header() {
@@ -35,7 +36,7 @@ export default function Header() {
   const router = useRouter();
   const pathname = usePathname();
   const supabase = createClient();
-  const isCelebrationPublicRoute = pathname === '/' || pathname === '/plan' || pathname === '/about' || pathname === '/gallery' || pathname === '/terms' || pathname === '/privacy' || pathname === '/contact' || pathname === '/60th-marriage' || pathname === '/70th-marriage' || pathname === '/80th-marriage';
+  const isCelebrationPublicRoute = pathname === '/' || pathname === '/plan' || pathname === '/about' || pathname === '/gallery' || pathname === '/terms' || pathname === '/privacy' || pathname === '/contact' || pathname === '/60th-marriage' || pathname === '/70th-marriage' || pathname === '/80th-marriage' || pathname === '/blog' || pathname.startsWith('/blog/') || pathname === '/ta/blog' || pathname.startsWith('/ta/blog/');
 
   const isActive = (path: string) => pathname === path;
 

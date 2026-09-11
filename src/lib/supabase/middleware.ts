@@ -44,6 +44,8 @@ export async function updateSession(request: NextRequest) {
     '/forgot-password',
     '/reset-password',
     '/gallery',
+    '/blog',
+    '/ta/blog',
   ]
 
   const isPublicRoute = publicRoutes.some(route =>

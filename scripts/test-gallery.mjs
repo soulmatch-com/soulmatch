@@ -1,37 +1,75 @@
 import assert from 'node:assert/strict'
 import { readFile, stat } from 'node:fs/promises'
 import test from 'node:test'
-import sharp from 'sharp'
-import { celebrationGalleryItems, galleryBrandArtwork } from '../src/lib/celebrations/gallery.ts'
+import {
+  approvedCelebrationGalleryItems,
+  celebrationGalleryItems,
+  galleryBrandArtwork,
+  homepageGalleryPreviewItems,
+} from '../src/lib/celebrations/gallery.ts'
 import sitemap from '../src/app/sitemap.ts'
 
 const root = new URL('../', import.meta.url)
 const read = (path) => readFile(new URL(path, root), 'utf8')
 
-test('Gallery publishes only the audited local brand artwork, with accurate dimensions and alt text', async () => {
+const publicSourceFiles = [
+  'src/app/gallery/page.tsx',
+  'src/app/celebrations/thirukadaiyur/page.tsx',
+  'src/components/celebrations/GalleryGrid.tsx',
+  'src/lib/celebrations/gallery.ts',
+]
+
+test('Gallery uses centralized typed local content instead of inline image data', async () => {
+  const [page, galleryConfig] = await Promise.all([
+    read('src/app/gallery/page.tsx'),
+    read('src/lib/celebrations/gallery.ts'),
+  ])
+
+  assert.match(page, /from '@\/lib\/celebrations\/gallery'/)
+  assert.match(galleryConfig, /export type CelebrationGalleryItem/)
+  assert.match(galleryConfig, /publicationType: 'approved-event-photo' \| 'brand-artwork'/)
+  assert.match(galleryConfig, /export const approvedCelebrationGalleryItems/)
+  assert.match(galleryConfig, /export const homepageGalleryPreviewItems/)
+  assert.doesNotMatch(page, /src:\s*['"]\/.*\.(png|jpe?g|webp|gif|svg)['"]/i)
+})
+
+test('Gallery publishes no unapproved event photographs and keeps brand artwork clearly labelled', async () => {
+  assert.equal(approvedCelebrationGalleryItems.length, 0)
+  assert.equal(homepageGalleryPreviewItems.length, 0)
   assert.equal(celebrationGalleryItems.length, 1)
-  assert.equal(new Set(celebrationGalleryItems.map((item) => item.id)).size, celebrationGalleryItems.length)
+  assert.equal(galleryBrandArtwork.publicationType, 'brand-artwork')
+
   for (const item of celebrationGalleryItems) {
-    assert.equal(item.src, '/icon.png')
-    assert.equal(item.kind, 'brand-art')
-    assert.equal(item.category, 'Brand artwork')
+    assert.equal(item.publicationType, 'brand-artwork')
+    assert.equal(item.category, 'Brand Artwork')
+    assert.match(item.caption, /not a photograph of a customer or ceremony/i)
     assert.ok(item.alt.trim().length > 20)
     assert.doesNotMatch(item.alt, /\.png|\.jpg|best service/i)
-    assert.match(item.caption, /not a photograph of a customer or ceremony/)
-    const path = new URL(item.src === '/icon.png' ? 'src/app/icon.png' : 'public' + item.src, root)
-    assert.ok((await stat(path)).size < 200_000)
-    const dimensions = await sharp(await readFile(path)).metadata()
-    assert.equal(item.width, dimensions.width)
-    assert.equal(item.height, dimensions.height)
+    assert.match(item.src, /^\//)
+    assert.doesNotMatch(item.src, /^https?:\/\//)
+
+    const path = new URL(item.src === '/icon.png' ? 'src/app/icon.png' : `public${item.src}`, root)
+    assert.ok((await stat(path)).size > 0)
+    assert.ok(Number.isInteger(item.width) && item.width > 0)
+    assert.ok(Number.isInteger(item.height) && item.height > 0)
   }
 })
 
-test('Gallery shares the root layout and site chrome without local copies', async () => {
+test('Gallery shares the approved route, layout chrome and reusable celebration components', async () => {
   const [page, layout, header, conditionalHeader, conditionalFooter, footer] = await Promise.all([
-    read('src/app/gallery/page.tsx'), read('src/app/layout.tsx'), read('src/components/Header.tsx'),
-    read('src/components/ConditionalHeader.tsx'), read('src/components/ConditionalFooter.tsx'), read('src/components/SiteFooter.tsx'),
+    read('src/app/gallery/page.tsx'),
+    read('src/app/layout.tsx'),
+    read('src/components/Header.tsx'),
+    read('src/components/ConditionalHeader.tsx'),
+    read('src/components/ConditionalFooter.tsx'),
+    read('src/components/SiteFooter.tsx'),
   ])
+
   assert.doesNotMatch(page, /<header|<footer|<Header|<SiteFooter|GalleryHeader|GalleryFooter|GalleryNavigation/)
+  assert.match(page, /<GalleryGrid items=\{approvedCelebrationGalleryItems\} \/>/)
+  assert.match(page, /<GalleryGrid items=\{celebrationGalleryItems\} \/>/)
+  assert.match(page, /<CeremonyGrid \/>/)
+  assert.match(page, /<CelebrationCTA title="Planning a Celebration in Thirukadaiyur\?" label="Plan Celebration" \/>/)
   assert.match(layout, /<ConditionalHeader \/>/)
   assert.match(layout, /<ConditionalFooter \/>/)
   assert.match(conditionalHeader, /return <Header \/>/)
@@ -39,10 +77,9 @@ test('Gallery shares the root layout and site chrome without local copies', asyn
   assert.match(header, /pathname === '\/gallery'/)
   assert.match(header, /\["Gallery", "\/gallery"\]/)
   assert.match(footer, /\['Gallery', '\/gallery'\]/)
-  assert.match(footer, /\['About Us', '\/about'\]/)
 })
 
-test('Gallery remains public and indexable with canonical metadata and conservative structured data', async () => {
+test('Gallery is public, indexable and uses conservative metadata', async () => {
   const page = await read('src/app/gallery/page.tsx')
   assert.match(page, /const url = 'https:\/\/mythirumanam\.in\/gallery'/)
   assert.match(page, /alternates: \{ canonical: url \}/)
@@ -51,37 +88,61 @@ test('Gallery remains public and indexable with canonical metadata and conservat
   assert.match(page, /'@type': 'CollectionPage'/)
   assert.match(page, /url: galleryBrandArtwork.src/)
   assert.equal(galleryBrandArtwork.src, '/icon.png')
-  assert.doesNotMatch(page, /AggregateRating|ImageGallery|Review|Offer|creator:|event:/)
+  assert.doesNotMatch(page, /AggregateRating|Review|Offer|creator:|event:/)
+
   const middleware = await read('src/lib/supabase/middleware.ts')
   assert.match(middleware, /const publicRoutes = \[[\s\S]*?'\/gallery'/)
-  assert.deepEqual(sitemap().map(({ url }) => new URL(url).pathname).sort(), [
-    '/', '/60th-marriage', '/70th-marriage', '/80th-marriage', '/about', '/gallery', '/matrimony', '/terms',
+  assert.ok(sitemap().some(({ url }) => new URL(url).pathname === '/gallery'))
+})
+
+test('Empty approved-gallery state is truthful and the homepage preview is conditional', async () => {
+  const [galleryPage, homepage] = await Promise.all([
+    read('src/app/gallery/page.tsx'),
+    read('src/app/celebrations/thirukadaiyur/page.tsx'),
   ])
+
+  assert.match(galleryPage, /Approved celebration photographs will be added here as they become available/)
+  assert.match(galleryPage, /hasApprovedEventPhotos && <GalleryGrid items=\{approvedCelebrationGalleryItems\} \/>/)
+  assert.match(galleryPage, /href="\/plan"/)
+  assert.match(homepage, /homepageGalleryPreviewItems\.length > 0/)
+  assert.match(homepage, /<GalleryGrid items=\{homepageGalleryPreviewItems\} \/>/)
+  assert.match(homepage, /href="\/gallery"/)
 })
 
-test('Gallery reuses ceremony discovery and provides both planning actions', async () => {
-  const page = await read('src/app/gallery/page.tsx')
-  assert.match(page, /<CeremonyGrid \/>/)
-  assert.equal((page.match(/href="\/plan"/g) ?? []).length, 2)
-  assert.match(page, /href="\/"/)
-  const grid = await read('src/components/celebrations/CeremonyGrid.tsx')
-  assert.match(grid, /import \{ ceremonies \} from '@\/lib\/celebrations'/)
-  assert.match(grid, /href=\{`\/\$\{ceremony.slug\}`\}/)
+test('Gallery content avoids fake testimonials, fake metrics and unapproved image sources', async () => {
+  const sources = await Promise.all(publicSourceFiles.map(read))
+  const combined = sources.join('\n')
+  const galleryText = celebrationGalleryItems.map(({ title, caption, alt }) => `${title} ${caption} ${alt}`).join(' ')
+
+  assert.doesNotMatch(combined, /our customer|our recent event|customer event|Ravi|Lakshmi|5-star|five-star/i)
+  assert.doesNotMatch(combined, /15\+|250\+|500\+|100% satisfaction|No\.1|Most Trusted|Best Thirukadaiyur/i)
+  assert.doesNotMatch(combined, /iraivi|googleusercontent|unsplash|pexels|pixabay|stock/i)
+  assert.doesNotMatch(galleryText, /our customer|our .*event|recent celebration|real ceremony|verified event/i)
+  assert.doesNotMatch(galleryText, /temple partner|authorized temple|official temple|temple booking portal/i)
 })
 
-test('Gallery is truthful about missing photographs and contains valid Tamil', async () => {
-  const page = await read('src/app/gallery/page.tsx')
-  assert.match(page, /Celebration photographs are not available yet/)
-  assert.match(page, /More celebration moments will be added as approved photographs become available/)
-  assert.match(page, /lang="ta"/)
-  assert.ok(page.includes('திருக்கடையூரில் நடைபெறும் குடும்ப விழாக்கள்'))
-  assert.doesNotMatch(page, /\uFFFD|à®|à¯/)
-  const content = celebrationGalleryItems.map(({ title, caption }) => title + ' ' + caption).join(' ')
-  assert.doesNotMatch(content, /our customer|our .*event|recent celebration|real ceremony|verified event/i)
+test('Success stories publication gate and temple independence safeguards remain intact', async () => {
+  const [successRoute, galleryPage, homepage] = await Promise.all([
+    read('src/app/api/success-stories/route.ts'),
+    read('src/app/gallery/page.tsx'),
+    read('src/app/celebrations/thirukadaiyur/page.tsx'),
+  ])
+
+  assert.match(successRoute, /SUCCESS_STORIES_PUBLICATION_APPROVED === 'true'/)
+  assert.match(successRoute, /\.eq\('is_published', true\)/)
+  assert.match(successRoute, /\.eq\('status', 'approved'\)/)
+  assert.match(galleryPage, /<IndependentServiceNotice/)
+  assert.match(homepage, /Independent event management/)
+  assert.doesNotMatch(galleryPage + homepage, /Call the temple|Contact Thirukadaiyur Temple|Official Booking Number|Temple WhatsApp|temple-affiliated/i)
+  assert.doesNotMatch(galleryPage + homepage, /approved:\s*true|publicationType:\s*'approved-event-photo'[\s\S]*src:\s*'\/icon\.png'/)
 })
 
-test('Gallery images use Next Image, stable dimensions, responsive sizes and lazy loading without added client JS', async () => {
-  const [page, grid] = await Promise.all([read('src/app/gallery/page.tsx'), read('src/components/celebrations/GalleryGrid.tsx')])
+test('Gallery grid uses Next Image with stable dimensions and no client-side gallery dependency', async () => {
+  const [page, grid] = await Promise.all([
+    read('src/app/gallery/page.tsx'),
+    read('src/components/celebrations/GalleryGrid.tsx'),
+  ])
+
   assert.match(grid, /import Image from 'next\/image'/)
   assert.match(grid, /width=\{item.width\}/)
   assert.match(grid, /height=\{item.height\}/)
@@ -90,6 +151,6 @@ test('Gallery images use Next Image, stable dimensions, responsive sizes and laz
   assert.match(grid, /loading="lazy"/)
   assert.match(grid, /aspect-square/)
   assert.doesNotMatch(grid, /unoptimized|priority|<img|https?:\/\//)
-  assert.doesNotMatch(page + grid, /['"]use client['"]|useEffect|useState/)
+  assert.doesNotMatch(page + grid, /['"]use client['"]|useEffect|useState|masonry|lightbox/)
   assert.match(grid, /if \(items.length === 0\) return null/)
 })

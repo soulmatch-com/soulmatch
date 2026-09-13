@@ -144,7 +144,7 @@ echo "  - Featured: $FEATURED_COUNT"
 echo ""
 
 if [ "$STORY_COUNT" -eq 0 ]; then
-  warn "No stories in database. Run seed script:"
+  warn "No stories in database. Optional development/test-only seed (never production):"
   echo "     database/test_data/seed_success_stories.sql"
 else
   pass "Success stories feature is working!"

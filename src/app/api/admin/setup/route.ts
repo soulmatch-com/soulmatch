@@ -1,9 +1,16 @@
-// ONE-TIME SETUP ENDPOINT - Remove after creating first admin
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { hashPassword } from '@/lib/utils/password'
 
-export async function POST(request: NextRequest) {
+export async function POST() {
+  if (process.env.NODE_ENV === 'production') {
+    return NextResponse.json({ message: 'Admin setup is disabled in production' }, { status: 404 })
+  }
+
+  if (process.env.ADMIN_SETUP_ENABLED !== 'true') {
+    return NextResponse.json({ message: 'Admin setup is disabled' }, { status: 403 })
+  }
+
   try {
     // Get Supabase client
     const supabase = await createClient()
@@ -28,12 +35,14 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Create first super admin
-    const email = 'admin@soulmatch.com'
-    const password = 'admin123'
+    const email = process.env.ADMIN_SETUP_EMAIL
+    const password = process.env.ADMIN_SETUP_PASSWORD
+    if (!email || !password || password.length < 12) {
+      return NextResponse.json({ message: 'Admin setup credentials are not configured safely' }, { status: 400 })
+    }
     const passwordHash = await hashPassword(password)
 
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from('admins')
       .insert({
         email,
@@ -55,11 +64,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       {
         message: 'First admin created successfully!',
-        credentials: {
-          email,
-          password,
-          note: '⚠️ Change this password immediately after logging in!',
-        },
       },
       { status: 201 }
     )

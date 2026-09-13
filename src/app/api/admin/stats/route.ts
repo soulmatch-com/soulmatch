@@ -1,9 +1,13 @@
 // Admin API - Get dashboard statistics
 import { NextResponse } from 'next/server'
+import { requireActiveAdmin } from '@/lib/admin-auth'
 import { createAdminClient } from '@/lib/supabase/admin'
 
 export async function GET() {
   try {
+    const authorization = await requireActiveAdmin()
+    if ('response' in authorization) return authorization.response
+
     // Use admin client to bypass RLS for admin dashboard stats
     const supabase = createAdminClient()
 

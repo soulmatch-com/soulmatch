@@ -1,5 +1,6 @@
 import { type ClassValue, clsx } from 'clsx'
 import { twMerge } from 'tailwind-merge'
+import { calculateAgeFromDateOnly, localDateToDateOnly } from '@/lib/celebrations/date'
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -15,16 +16,13 @@ export function formatDate(date: Date | string): string {
 }
 
 export function calculateAge(dateOfBirth: Date | string): number {
-  const dob = typeof dateOfBirth === 'string' ? new Date(dateOfBirth) : dateOfBirth
-  const today = new Date()
-  let age = today.getFullYear() - dob.getFullYear()
-  const monthDiff = today.getMonth() - dob.getMonth()
+  const dob = typeof dateOfBirth === 'string'
+    ? dateOfBirth.length >= 10 && /^\d{4}-\d{2}-\d{2}$/.test(dateOfBirth)
+      ? dateOfBirth.slice(0, 10)
+      : localDateToDateOnly(new Date(dateOfBirth))
+    : localDateToDateOnly(dateOfBirth)
 
-  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
-    age--
-  }
-
-  return age
+  return calculateAgeFromDateOnly(dob)
 }
 
 export function formatHeight(heightInCm: number): string {

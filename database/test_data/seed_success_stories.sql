@@ -3,7 +3,8 @@
 
 -- Note: Run this in Supabase SQL Editor after the main migration
 
--- Insert 6 featured success stories for homepage
+-- Insert sample stories as unpublished test data. Publish manually only in an
+-- explicitly approved development/test environment; never use as production testimonials.
 INSERT INTO public.success_stories (
   couple_names,
   location,
@@ -20,7 +21,7 @@ INSERT INTO public.success_stories (
     'Mumbai, Maharashtra',
     'Our families connected through MyThirumanam.in and we celebrated our wedding last month. The platform''s verification process and cultural matching helped our families trust the alliance. We are forever grateful for bringing our families together!',
     true,
-    true,
+    false,
     10,
     'admin',
     'approved',
@@ -31,7 +32,7 @@ INSERT INTO public.success_stories (
     'Delhi, NCR',
     'After careful consideration, both families found the perfect match. The detailed family information and professional approach made the process smooth. Highly recommended by both families! Our journey from profiles to wedding was seamless.',
     true,
-    true,
+    false,
     9,
     'admin',
     'approved',
@@ -42,7 +43,7 @@ INSERT INTO public.success_stories (
     'Bangalore, Karnataka',
     'MyThirumanam.in helped our families discover not just compatibility, but shared values and traditions. We''re now happily married with our parents'' complete blessings and support. The platform exceeded all our expectations!',
     true,
-    true,
+    false,
     8,
     'admin',
     'approved',
@@ -53,7 +54,7 @@ INSERT INTO public.success_stories (
     'Chennai, Tamil Nadu',
     'Finding a compatible partner through MyThirumanam.in was a blessing for both our families. The verification process gave us confidence, and the detailed profiles helped us make an informed decision. We couldn''t be happier!',
     true,
-    true,
+    false,
     7,
     'admin',
     'approved',
@@ -64,7 +65,7 @@ INSERT INTO public.success_stories (
     'Pune, Maharashtra',
     'Our success story began with a simple profile match on MyThirumanam.in. The platform''s family-centric approach and cultural values matching made it easy for our parents to trust the process. We celebrated our wedding with both families'' joy!',
     true,
-    true,
+    false,
     6,
     'admin',
     'approved',
@@ -75,7 +76,7 @@ INSERT INTO public.success_stories (
     'Hyderabad, Telangana',
     'We are grateful to MyThirumanam.in for helping us find each other. The detailed family background information and professional profiles gave our families the confidence to move forward. Our alliance is a testament to the platform''s effectiveness!',
     true,
-    true,
+    false,
     5,
     'admin',
     'approved',

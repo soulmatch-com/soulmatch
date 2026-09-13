@@ -1,9 +1,13 @@
 // Admin API - Get all users
 import { NextRequest, NextResponse } from 'next/server'
+import { requireActiveAdmin } from '@/lib/admin-auth'
 import { createAdminClient } from '@/lib/supabase/admin'
 
 export async function GET(request: NextRequest) {
   try {
+    const authorization = await requireActiveAdmin()
+    if ('response' in authorization) return authorization.response
+
     const supabase = createAdminClient()
 
     // Get query parameters

@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 
+const PUBLIC_SUCCESS_STORIES_ENABLED = process.env.SUCCESS_STORIES_PUBLICATION_APPROVED === 'true'
+
 /**
  * GET /api/success-stories
  *
@@ -20,7 +22,6 @@ import { createClient } from '@/lib/supabase/server'
  */
 export async function GET(request: NextRequest) {
   try {
-    const supabase = await createClient()
     const searchParams = request.nextUrl.searchParams
 
     // Parse query parameters
@@ -28,6 +29,17 @@ export async function GET(request: NextRequest) {
     const limit = limitParam ? Math.min(parseInt(limitParam), 50) : 6
     const offset = parseInt(searchParams.get('offset') || '0')
     const featuredOnly = searchParams.get('featured_only') === 'true'
+
+    // Fail closed until an authorized content owner has reviewed the records in
+    // the target environment. Admin management remains available independently.
+    if (!PUBLIC_SUCCESS_STORIES_ENABLED) {
+      return NextResponse.json(
+        { stories: [], total: 0, pagination: { limit, offset, hasMore: false } },
+        { headers: { 'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600' } }
+      )
+    }
+
+    const supabase = await createClient()
 
     // Build query for published stories only
     let query = supabase

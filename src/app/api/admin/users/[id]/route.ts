@@ -1,5 +1,6 @@
 // Admin API - Get, Update, or Delete specific user
 import { NextRequest, NextResponse } from 'next/server'
+import { requireActiveAdmin } from '@/lib/admin-auth'
 import { createAdminClient } from '@/lib/supabase/admin'
 
 // GET single user
@@ -8,6 +9,9 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const authorization = await requireActiveAdmin()
+    if ('response' in authorization) return authorization.response
+
     const supabase = createAdminClient()
     const { id: userId } = await params
 
@@ -51,6 +55,9 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const authorization = await requireActiveAdmin()
+    if ('response' in authorization) return authorization.response
+
     const supabase = createAdminClient()
     const { id: userId } = await params
     const body = await request.json()
@@ -102,6 +109,9 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const authorization = await requireActiveAdmin()
+    if ('response' in authorization) return authorization.response
+
     const supabase = createAdminClient()
     const { id: userId } = await params
 

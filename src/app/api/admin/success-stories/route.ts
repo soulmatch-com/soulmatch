@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { requireActiveAdmin } from '@/lib/admin-auth'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { successStorySchema } from '@/lib/validations/success-story.schema'
-import { z } from 'zod'
 
 /**
  * GET /api/admin/success-stories
@@ -17,6 +17,9 @@ import { z } from 'zod'
  */
 export async function GET(request: NextRequest) {
   try {
+    const authorization = await requireActiveAdmin()
+    if ('response' in authorization) return authorization.response
+
     const supabase = createAdminClient()
     const searchParams = request.nextUrl.searchParams
 
@@ -82,6 +85,9 @@ export async function GET(request: NextRequest) {
  */
 export async function POST(request: NextRequest) {
   try {
+    const authorization = await requireActiveAdmin()
+    if ('response' in authorization) return authorization.response
+
     const supabase = createAdminClient()
     const body = await request.json()
 

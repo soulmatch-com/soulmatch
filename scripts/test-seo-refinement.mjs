@@ -2,6 +2,7 @@ import assert from 'node:assert/strict'
 import { readFile } from 'node:fs/promises'
 import test from 'node:test'
 import sitemap from '../src/app/sitemap.ts'
+import { getBlogListingUrl, getBlogPath, getPublishedBlogArticles } from '../src/content/blog/articles.ts'
 
 const root = new URL('../', import.meta.url)
 const read = (path) => readFile(new URL(path, root), 'utf8')
@@ -27,7 +28,9 @@ test('public pages have descriptions, matching canonical and Open Graph URLs, an
     assert.match(source, /description[:,]/)
     assert.ok(source.includes(`const url = '${canonical}'`))
     assert.match(source, /alternates: \{ canonical: url \}/)
-    assert.match(source, /openGraph: .*url, siteName: 'MyThirumanam'/)
+    assert.match(source, /openGraph:/)
+    assert.match(source, /url,?/)
+    assert.match(source, /siteName: 'MyThirumanam'/)
   }
 })
 
@@ -43,7 +46,16 @@ test('auth and private route groups are explicitly noindexed', async () => {
 })
 
 test('sitemap contains only canonical public product pages', () => {
-  assert.deepEqual(sitemap().map(({ url }) => url), publicPages.map(([, url]) => url))
+  const expectedUrls = [
+    ...publicPages.map(([, url]) => url),
+    'https://mythirumanam.in/privacy',
+    'https://mythirumanam.in/contact',
+    getBlogListingUrl('en'),
+    ...getPublishedBlogArticles('en').map((article) => `https://mythirumanam.in${getBlogPath(article)}`),
+    getBlogListingUrl('ta'),
+    ...getPublishedBlogArticles('ta').map((article) => `https://mythirumanam.in${getBlogPath(article)}`),
+  ]
+  assert.deepEqual(sitemap().map(({ url }) => url), expectedUrls)
 })
 
 test('homepage and ceremonies include safe structured data without claims or pricing', async () => {

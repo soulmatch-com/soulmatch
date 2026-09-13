@@ -1,5 +1,5 @@
 import type { MetadataRoute } from 'next'
-import { getBlogPath, getBlogListingPath, getPublishedBlogArticles } from '@/content/blog/articles'
+import { getBlogPath, getBlogListingPath, getPublishedBlogArticles } from '../content/blog/articles.ts'
 
 const origin = 'https://mythirumanam.in'
 export default function sitemap(): MetadataRoute.Sitemap {

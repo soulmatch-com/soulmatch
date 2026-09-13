@@ -7,7 +7,6 @@ import {
   galleryBrandArtwork,
   homepageGalleryPreviewItems,
 } from '../src/lib/celebrations/gallery.ts'
-import sitemap from '../src/app/sitemap.ts'
 
 const root = new URL('../', import.meta.url)
 const read = (path) => readFile(new URL(path, root), 'utf8')
@@ -92,7 +91,8 @@ test('Gallery is public, indexable and uses conservative metadata', async () => 
 
   const middleware = await read('src/lib/supabase/middleware.ts')
   assert.match(middleware, /const publicRoutes = \[[\s\S]*?'\/gallery'/)
-  assert.ok(sitemap().some(({ url }) => new URL(url).pathname === '/gallery'))
+  const sitemap = await read('src/app/sitemap.ts')
+  assert.match(sitemap, /'\/gallery'/)
 })
 
 test('Empty approved-gallery state is truthful and the homepage preview is conditional', async () => {

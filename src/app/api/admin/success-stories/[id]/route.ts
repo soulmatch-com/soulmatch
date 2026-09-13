@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { requireActiveAdmin } from '@/lib/admin-auth'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { adminSuccessStoryUpdateSchema } from '@/lib/validations/success-story.schema'
 
@@ -12,6 +13,9 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const authorization = await requireActiveAdmin()
+    if ('response' in authorization) return authorization.response
+
     const { id } = await params
     const supabase = createAdminClient()
 
@@ -45,6 +49,9 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const authorization = await requireActiveAdmin()
+    if ('response' in authorization) return authorization.response
+
     const { id } = await params
     const supabase = createAdminClient()
     const body = await request.json()
@@ -96,6 +103,9 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const authorization = await requireActiveAdmin()
+    if ('response' in authorization) return authorization.response
+
     const { id } = await params
     const supabase = createAdminClient()
 

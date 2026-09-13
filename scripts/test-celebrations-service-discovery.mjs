@@ -108,8 +108,8 @@ test('Complete Arrangement is presented as broader support without selecting all
 
 test('homepage service CTA points to the existing plan form', async () => {
   const home = await read('src/app/celebrations/thirukadaiyur/page.tsx')
-  assert.match(home, /Need help choosing\?/)
-  assert.match(home, /Tell us what your family needs and select the services that suit your celebration\./)
+  assert.match(home, /Need help planning\?/)
+  assert.match(home, /Tell us about your celebration through the planning form, or contact our team directly\./)
   assert.match(home, /href="\/plan"/)
 })
 

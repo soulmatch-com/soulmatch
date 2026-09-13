@@ -183,12 +183,8 @@ export default async function ThirukadaiyurPage() {
         <section className="border-t border-amber-200 bg-white py-16">
           <div className="mx-auto max-w-6xl px-4 text-center sm:px-6">
             <p className="text-sm font-bold uppercase tracking-[0.2em] text-blue-700">Matrimony</p>
-            <h2 className="mt-3 text-3xl font-bold">Looking for a life partner?</h2>
-            <p className="mx-auto mt-4 max-w-2xl leading-7 text-stone-600">Explore MyThirumanam Matrimony for family-focused matching, profile creation and member access.</p>
-            <div className="mt-7 flex flex-col justify-center gap-3 sm:flex-row">
-              <Link href="/matrimony" className="inline-flex min-h-12 items-center justify-center rounded-xl bg-blue-700 px-6 py-3 font-bold text-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-blue-700">Explore Matrimony</Link>
-              <Link href="/signup" className="inline-flex min-h-12 items-center justify-center rounded-xl border border-blue-700 px-6 py-3 font-bold text-blue-700 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-blue-700">Create Profile</Link>
-            </div>
+            <span className="mt-3 inline-flex rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-sm font-bold text-blue-800">Coming Soon</span>
+            <h2 className="mt-4 text-3xl font-bold">Matrimony services are being prepared</h2>
           </div>
         </section>
 

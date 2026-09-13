@@ -68,14 +68,24 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: false, message: 'Unable to submit the enquiry right now' }, { status: 500 })
     }
 
+    const { data: enquiry, error: enquiryLookupError } = await client
+      .from('celebration_enquiries')
+      .select('enquiry_reference')
+      .eq('id', result.enquiryId)
+      .maybeSingle()
+    if (enquiryLookupError || !enquiry?.enquiry_reference) {
+      console.error('Celebration enquiry reference lookup failed', { enquiryId: result.enquiryId, type: enquiryLookupError?.name ?? 'MissingReference' })
+      return NextResponse.json({ success: false, message: 'Unable to submit the enquiry right now' }, { status: 500 })
+    }
+
     try {
       const { data } = await client.from('celebration_services').select('id, code, name, description, icon, display_order').in('id', validation.data.serviceIds)
-      await sendBookingNotification({ enquiryId: result.enquiryId, enquiry: validation.data, services: (data ?? []) as PublicCelebrationService[] })
+      await sendBookingNotification({ enquiryId: result.enquiryId, enquiryReference: enquiry.enquiry_reference, enquiry: validation.data, services: (data ?? []) as PublicCelebrationService[] })
     } catch (error) {
       console.error('Celebration notification failed', { enquiryId: result.enquiryId, type: error instanceof Error ? error.name : 'UnknownError' })
     }
 
-    return NextResponse.json({ success: true, enquiryId: result.enquiryId }, { status: 201 })
+    return NextResponse.json({ success: true, enquiryId: result.enquiryId, enquiryReference: enquiry.enquiry_reference }, { status: 201 })
   } catch (error) {
     console.error('Unexpected celebration enquiry failure', {
       type: error instanceof Error ? error.name : 'UnknownError',

@@ -54,7 +54,7 @@ export function CelebrationEnquiryForm({
   const submittingRef = useRef(false)
   const navigationRef = useRef(false)
   const [submitMessage, setSubmitMessage] = useState<string>()
-  const [enquiryId, setEnquiryId] = useState<string>()
+  const [enquiryReference, setEnquiryReference] = useState<string>()
   const [botToken, setBotToken] = useState<string>()
   const [challengeVersion, setChallengeVersion] = useState(0)
   const turnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY
@@ -114,14 +114,14 @@ export function CelebrationEnquiryForm({
   }
 
   useEffect(() => {
-    if (!enquiryId) return
+    if (!enquiryReference) return
     const frame = requestAnimationFrame(() => {
       const heading = document.getElementById('enquiry-success-title')
       heading?.scrollIntoView({ block: 'start', behavior: 'instant' })
       heading?.focus()
     })
     return () => cancelAnimationFrame(frame)
-  }, [enquiryId])
+  }, [enquiryReference])
 
   const goNext = async () => {
     setSubmitMessage(undefined)
@@ -217,10 +217,10 @@ export function CelebrationEnquiryForm({
       }
       return
     }
-    setEnquiryId(result.enquiryId)
+    setEnquiryReference(result.enquiryReference)
   }
 
-  if (enquiryId) return <EnquiryConfirmation enquiryId={enquiryId} values={getValues()} ceremony={ceremony} />
+  if (enquiryReference) return <EnquiryConfirmation enquiryReference={enquiryReference} values={getValues()} ceremony={ceremony} />
 
   const describedBy = (name: keyof CelebrationEnquiryFormValues) => (errors[name] ? `${name}-error` : undefined)
 

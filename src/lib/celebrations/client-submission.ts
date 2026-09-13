@@ -1,8 +1,8 @@
-import type { CelebrationEnquiryApiInput } from '@/lib/validations/celebration-enquiry-api.schema'
+import type { CelebrationEnquiryApiInput } from '../validations/celebration-enquiry-api.schema.ts'
 
-interface ApiResponse { success?: boolean; enquiryId?: string; message?: string; errors?: Record<string, string[]> }
+interface ApiResponse { success?: boolean; enquiryId?: string; enquiryReference?: string; message?: string; errors?: Record<string, string[]> }
 export type EnquirySubmissionResult =
-  | { ok: true; enquiryId: string }
+  | { ok: true; enquiryId: string; enquiryReference: string }
   | { ok: false; kind: 'validation'; errors: Record<string, string[]> }
   | { ok: false; kind: 'too-large' | 'rate-limited' | 'challenge' | 'verification-unavailable' | 'server' | 'network' | 'invalid-response' }
 
@@ -20,8 +20,8 @@ export async function submitCelebrationEnquiry(values: CelebrationEnquiryApiInpu
     if (response.status === 403) return { ok: false, kind: 'challenge' }
     if (response.status === 503) return { ok: false, kind: 'verification-unavailable' }
     if (!response.ok) return { ok: false, kind: 'server' }
-    if (!result.success || !result.enquiryId) return { ok: false, kind: 'invalid-response' }
-    return { ok: true, enquiryId: result.enquiryId }
+    if (!result.success || !result.enquiryId || !result.enquiryReference) return { ok: false, kind: 'invalid-response' }
+    return { ok: true, enquiryId: result.enquiryId, enquiryReference: result.enquiryReference }
   } catch {
     return { ok: false, kind: 'network' }
   }

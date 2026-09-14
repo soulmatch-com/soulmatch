@@ -1,5 +1,5 @@
-import type { Database } from '@/types/database.types'
-import type { CelebrationEnquiryApiInput } from '@/lib/validations/celebration-enquiry-api.schema'
+import type { Database } from '../../types/database.types.ts'
+import type { CelebrationEnquiryApiInput } from '../validations/celebration-enquiry-api.schema.ts'
 
 export const THIRUKADAIYUR_LOCATION = 'thirukadaiyur' as const
 
@@ -37,6 +37,11 @@ export function toCelebrationRpcArgs(input: CelebrationEnquiryApiInput): RpcArgs
     p_relationship: input.relationship ?? null,
     p_other_service_details: input.otherServiceDetails ?? null,
     p_notes: input.notes ?? null,
+    p_expected_guest_count: input.expectedGuestCount ?? null,
+    p_plan_type: input.planType ?? null,
+    p_plan_version: input.planVersion ?? null,
+    p_special_requirements: input.specialRequirements ?? null,
+    p_ceremony_duration: input.ceremonyDuration ?? null,
   }
 }
 

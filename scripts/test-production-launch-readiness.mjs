@@ -73,7 +73,7 @@ test('celebration enquiry API follows release-critical server flow', async () =>
   assert.match(source, /persistCelebrationEnquiry/)
   assert.match(source, /await sendBookingNotification/)
   assert.ok(source.indexOf('persistCelebrationEnquiry') < source.indexOf('sendBookingNotification'))
-  assert.match(source, /return NextResponse\.json\(\{ success: true, enquiryId: result\.enquiryId \}/)
+  assert.match(source, /enquiryReference: enquiry\.enquiry_reference/)
   assert.doesNotMatch(source, /service_role|SUPABASE_SERVICE_ROLE_KEY|request\.json\(\)[\s\S]*console\.log/)
 })
 

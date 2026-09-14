@@ -12,6 +12,7 @@ export interface Database {
       celebration_services: {
         Row: {
           id: string
+          enquiry_reference: string | null
           code: string
           name: string
           description: string | null
@@ -24,6 +25,7 @@ export interface Database {
         }
         Insert: {
           id?: string
+          enquiry_reference?: string | null
           code: string
           name: string
           description?: string | null
@@ -36,6 +38,7 @@ export interface Database {
         }
         Update: {
           id?: string
+          enquiry_reference?: string | null
           code?: string
           name?: string
           description?: string | null
@@ -65,6 +68,11 @@ export interface Database {
           guest_count_range: 'below-20' | '20-50' | '51-100' | '100-plus'
           travelling_from: string | null
           arrangement_preference: 'ceremony-only' | 'ceremony-food' | 'ceremony-stay' | 'complete-arrangement' | 'need-guidance'
+          expected_guest_count: number | null
+          plan_type: 'basic' | 'premium' | null
+          plan_version: number | null
+          special_requirements: string | null
+          ceremony_duration: 'one_session' | 'two_sessions' | null
           contact_name: string
           mobile: string
           email: string | null
@@ -93,6 +101,11 @@ export interface Database {
           guest_count_range: 'below-20' | '20-50' | '51-100' | '100-plus'
           travelling_from?: string | null
           arrangement_preference: 'ceremony-only' | 'ceremony-food' | 'ceremony-stay' | 'complete-arrangement' | 'need-guidance'
+          expected_guest_count?: number | null
+          plan_type?: 'basic' | 'premium' | null
+          plan_version?: number | null
+          special_requirements?: string | null
+          ceremony_duration?: 'one_session' | 'two_sessions' | null
           contact_name: string
           mobile: string
           email?: string | null
@@ -121,6 +134,11 @@ export interface Database {
           guest_count_range?: 'below-20' | '20-50' | '51-100' | '100-plus'
           travelling_from?: string | null
           arrangement_preference?: 'ceremony-only' | 'ceremony-food' | 'ceremony-stay' | 'complete-arrangement' | 'need-guidance'
+          expected_guest_count?: number | null
+          plan_type?: 'basic' | 'premium' | null
+          plan_version?: number | null
+          special_requirements?: string | null
+          ceremony_duration?: 'one_session' | 'two_sessions' | null
           contact_name?: string
           mobile?: string
           email?: string | null
@@ -467,6 +485,11 @@ export interface Database {
           p_relationship?: string | null
           p_other_service_details?: string | null
           p_notes?: string | null
+          p_expected_guest_count?: number | null
+          p_plan_type?: string | null
+          p_plan_version?: number | null
+          p_special_requirements?: string | null
+          p_ceremony_duration?: string | null
         }
         Returns: string
       }

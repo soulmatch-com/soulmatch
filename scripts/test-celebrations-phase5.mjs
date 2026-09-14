@@ -26,9 +26,9 @@ test('valid email contact passes', () => assert.equal(parse({ preferredContactMe
 
 test('submission sends normalized JSON to the route handler', async () => {
   let captured
-  const request = async (url, init) => { captured = { url, init }; return new Response(JSON.stringify({ success: true, enquiryId: 'abc' }), { status: 201 }) }
+  const request = async (url, init) => { captured = { url, init }; return new Response(JSON.stringify({ success: true, enquiryId: 'abc', enquiryReference: 'MYT-13092026-00001' }), { status: 201 }) }
   const result = await submitCelebrationEnquiry(celebrationEnquiryApiSchema.parse(valid()), request)
-  assert.deepEqual(result, { ok: true, enquiryId: 'abc' }); assert.equal(captured.url, '/api/celebrations/enquiries'); assert.equal(captured.init.method, 'POST')
+  assert.deepEqual(result, { ok: true, enquiryId: 'abc', enquiryReference: 'MYT-13092026-00001' }); assert.equal(captured.url, '/api/celebrations/enquiries'); assert.equal(captured.init.method, 'POST')
   const body = JSON.parse(captured.init.body); assert.deepEqual(body.serviceIds, [serviceId]); assert.equal('location' in body, false); assert.equal('status' in body, false)
 })
 test('400 response preserves safe field errors', async () => { const result = await submitCelebrationEnquiry(celebrationEnquiryApiSchema.parse(valid()), async () => new Response(JSON.stringify({ errors: { mobile: ['Enter a valid mobile number'] } }), { status: 400 })); assert.deepEqual(result, { ok: false, kind: 'validation', errors: { mobile: ['Enter a valid mobile number'] } }) })
@@ -41,5 +41,5 @@ test('form renders only service props and submits UUID values', async () => { co
 test('preselected ceremony remains user-changeable', async () => { const source = await read('src/components/celebrations/CelebrationEnquiryForm.tsx'); assert.match(source, /celebrationType: initialCeremony/); assert.match(source, /type="radio"/); assert.match(source, /register\('celebrationType'\)/) })
 test('complete arrangement has no automatic service-selection logic', async () => { const source = await read('src/components/celebrations/CelebrationEnquiryForm.tsx'); assert.match(source, /value="complete-arrangement"/); assert.doesNotMatch(source, /selectAll|setValue\('serviceIds'/) })
 test('failed submission retains values and double submit is disabled', async () => { const source = await read('src/components/celebrations/CelebrationEnquiryForm.tsx'); assert.doesNotMatch(source, /reset\(/); assert.match(source, /disabled=\{isSubmitting\}/); assert.match(source, /Submitting…/) })
-test('success uses the real returned enquiry ID', async () => { const source = await read('src/components/celebrations/CelebrationEnquiryForm.tsx'); assert.match(source, /setEnquiryId\(result\.enquiryId\)/); assert.match(source, /\{enquiryId\}/) })
+test('success uses the real returned enquiry reference', async () => { const source = await read('src/components/celebrations/CelebrationEnquiryForm.tsx'); assert.match(source, /setEnquiryReference\(result\.enquiryReference\)/); assert.match(source, /\{enquiryReference\}/) })
 test('obsolete production service identifiers are absent', async () => { const files = ['src/components/celebrations/CelebrationEnquiryForm.tsx', 'src/lib/celebrations.ts']; for (const file of files) assert.doesNotMatch(await read(file), /complete_package|priest_vadhyar|venue_preference|not_sure/) })

@@ -1,5 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
-import type { Database } from '@/types/database.types'
+import type { Database } from '../../types/database.types.ts'
 
 type ServiceRow = Database['public']['Tables']['celebration_services']['Row']
 export type PublicCelebrationService = Pick<ServiceRow, 'id' | 'code' | 'name' | 'description' | 'icon' | 'display_order'>

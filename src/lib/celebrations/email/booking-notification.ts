@@ -4,7 +4,6 @@ import type { CelebrationEnquiryApiInput } from '@/lib/validations/celebration-e
 import { getCelebrationServicePresentation, type PublicCelebrationService } from '@/lib/celebrations/service-query'
 
 const ceremonyLabels = { '60th-marriage': '60th Marriage — Sashtiapthapoorthi', '70th-marriage': '70th Marriage — Bheemaratha Shanthi', '80th-marriage': '80th Marriage — Sathabhishekam', 'not-sure': 'Need Guidance' }
-const arrangementLabels = { 'ceremony-only': 'Ceremony Only', 'ceremony-food': 'Ceremony + Food', 'ceremony-stay': 'Ceremony + Stay', 'complete-arrangement': 'Complete Arrangement', 'need-guidance': 'Need Guidance' }
 const contactMethodLabels = { phone: 'Phone', whatsapp: 'WhatsApp', email: 'Email' }
 const guestCountLabels = { 'below-20': 'Below 20', '20-50': '20–50', '51-100': '51–100', '100-plus': '100+' }
 const planTypeLabels = { basic: 'Basic Plan', premium: 'Premium Plan' }
@@ -15,16 +14,16 @@ function displayDate(value?: string) { return value ? new Intl.DateTimeFormat('e
 function optional(value?: string) { return value?.trim() || 'Not provided' }
 function encodeMimeHeader(value: string) { return `=?UTF-8?B?${Buffer.from(value, 'utf8').toString('base64')}?=` }
 
-export function createBookingNotification({ enquiryId, enquiryReference, enquiry, services }: { enquiryId: string; enquiryReference: string; enquiry: CelebrationEnquiryApiInput; services: PublicCelebrationService[] }) {
+export function createBookingNotification({ enquiryReference, enquiry, services }: { enquiryId: string; enquiryReference: string; enquiry: CelebrationEnquiryApiInput; services: PublicCelebrationService[] }) {
   const selectedServices = services.filter((service) => enquiry.serviceIds.includes(service.id)).map((service) => getCelebrationServicePresentation(service).name)
   const selectedAddons = services
     .filter((service) => enquiry.serviceIds.includes(service.id) && ['transportation', 'return_gifts'].includes(service.code))
     .map((service) => getCelebrationServicePresentation(service).name)
   const subject = `New ${ceremonyLabels[enquiry.celebrationType]} Enquiry — ${enquiryReference}`
   const sections = [
-    ['Enquiry Reference', enquiryReference], ['Internal Enquiry ID', enquiryId], ['Ceremony', ceremonyLabels[enquiry.celebrationType]], ['Preferred Date', displayDate(enquiry.preferredDate)], ['Alternative Date', displayDate(enquiry.alternativeDate)], ['Guest Count', guestCountLabels[enquiry.guestCountRange]], ['Travelling From', optional(enquiry.travellingFrom)], ['Arrangement Preference', arrangementLabels[enquiry.arrangementPreference]],
+    ['Enquiry Reference', enquiryReference], ['Ceremony', ceremonyLabels[enquiry.celebrationType]], ['Preferred Date', displayDate(enquiry.preferredDate)], ['Alternative Date', displayDate(enquiry.alternativeDate)], ['Guest Count', guestCountLabels[enquiry.guestCountRange]], ['Travelling From', optional(enquiry.travellingFrom)],
     ['Plan', enquiry.planType ? planTypeLabels[enquiry.planType] : 'Not provided'], ['Plan Version', enquiry.planVersion ? String(enquiry.planVersion) : 'Not provided'], ['Expected Guests', enquiry.expectedGuestCount ? String(enquiry.expectedGuestCount) : 'Not provided'], ['Session', enquiry.ceremonyDuration ? ceremonyDurationLabels[enquiry.ceremonyDuration] : 'Not provided'], ['Optional Add-ons', selectedAddons.length ? selectedAddons.join('\n') : 'None selected'],
-    ['Selected Services', selectedServices.length ? selectedServices.join('\n') : 'No services selected'], ['Selected Service Count', String(selectedServices.length)],
+    ['Selected Services', selectedServices.length ? selectedServices.join('\n') : 'No services selected'],
     ['Contact Name', enquiry.contactName], ['Mobile', enquiry.mobile], ['Email', optional(enquiry.email)], ['Relationship', enquiry.relationship], ['Preferred Contact Method', contactMethodLabels[enquiry.preferredContactMethod]],
     ['Other Requirements', optional(enquiry.otherServiceDetails)], ['Special Requirements', optional(enquiry.specialRequirements)], ['Additional Notes', optional(enquiry.notes)],
   ] as const

@@ -13,6 +13,12 @@ import { loadCelebrationServices } from '@/lib/celebrations/page-data'
 import { homepageGalleryPreviewItems } from '@/lib/celebrations/gallery'
 
 const url = 'https://mythirumanam.in/'
+const socialImage = {
+  url: '/brand/mythirumanam-logo.png',
+  width: 1690,
+  height: 859,
+  alt: 'MyThirumanam',
+}
 
 export const metadata: Metadata = {
   title: 'Thirukadaiyur 60th, 70th & 80th Marriage | MyThirumanam',
@@ -24,6 +30,11 @@ export const metadata: Metadata = {
     url,
     siteName: 'MyThirumanam',
     type: 'website',
+    images: [socialImage],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    images: [socialImage],
   },
 }
 

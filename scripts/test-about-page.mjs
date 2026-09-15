@@ -7,27 +7,27 @@ const root = new URL('../', import.meta.url)
 const read = (path) => readFile(new URL(path, root), 'utf8')
 
 test('About route renders the expected primary content', async () => {
-  const source = await read('src/app/about/page.tsx')
+  const source = await read('src/app/(en)/about/page.tsx')
   assert.match(source, /<h1[^>]*>About MyThirumanam<\/h1>/)
   assert.match(source, /Celebrations Made Meaningful/)
   assert.match(source, /A Special Place for Marriage Milestones/)
 })
 
 test('About reuses canonical ceremony configuration and links', async () => {
-  const source = await read('src/app/about/page.tsx')
+  const source = await read('src/app/(en)/about/page.tsx')
   assert.match(source, /<CeremonyGrid \/>/)
   const grid = await read('src/components/celebrations/CeremonyGrid.tsx')
   assert.match(grid, /href=\{`\/\$\{ceremony\.slug\}`\}/)
 })
 
 test('About planning actions use canonical routes', async () => {
-  const source = await read('src/app/about/page.tsx')
+  const source = await read('src/app/(en)/about/page.tsx')
   assert.match(source, /href="\/plan"/)
   assert.match(source, /href="\/"/)
 })
 
 test('About services use the server loader and no hard-coded fallback', async () => {
-  const source = await read('src/app/about/page.tsx')
+  const source = await read('src/app/(en)/about/page.tsx')
   assert.match(source, /await loadCelebrationServices\(\)/)
   assert.match(source, /<CelebrationServices services=\{services\} \/>/)
   assert.match(source, /Available services could not be loaded right now/)
@@ -35,7 +35,7 @@ test('About services use the server loader and no hard-coded fallback', async ()
 })
 
 test('About metadata and AboutPage JSON-LD are canonical', async () => {
-  const source = await read('src/app/about/page.tsx')
+  const source = await read('src/app/(en)/about/page.tsx')
   assert.match(source, /const url = 'https:\/\/mythirumanam\.in\/about'/)
   assert.match(source, /alternates: \{ canonical: url \}/)
   assert.match(source, /siteName: 'MyThirumanam'/)
@@ -49,7 +49,7 @@ test('About is present in sitemap and plan remains excluded', () => {
 })
 
 test('About contains Tamil language semantics and no unsupported claims', async () => {
-  const source = await read('src/app/about/page.tsx')
+  const source = await read('src/app/(en)/about/page.tsx')
   assert.ok((source.match(/lang="ta"/g) ?? []).length >= 6)
   assert.doesNotMatch(source, /No\.1|Most Trusted|100% Guaranteed|100% Verified|Thousands of Ceremonies|Years of Experience/i)
 })
@@ -62,8 +62,8 @@ test('footer provides the About Us navigation entry', async () => {
 
 test('About receives the shared header and footer without local duplicates', async () => {
   const [page, layout, header, conditionalHeader, conditionalFooter] = await Promise.all([
-    read('src/app/about/page.tsx'),
-    read('src/app/layout.tsx'),
+    read('src/app/(en)/about/page.tsx'),
+    read('src/app/(en)/layout.tsx'),
     read('src/components/Header.tsx'),
     read('src/components/ConditionalHeader.tsx'),
     read('src/components/ConditionalFooter.tsx'),
@@ -79,7 +79,7 @@ test('About receives the shared header and footer without local duplicates', asy
 
 test('About reuses existing Celebration icon renderers', async () => {
   const [page, services, planning] = await Promise.all([
-    read('src/app/about/page.tsx'),
+    read('src/app/(en)/about/page.tsx'),
     read('src/components/celebrations/CelebrationServices.tsx'),
     read('src/components/celebrations/PlanningSteps.tsx'),
   ])

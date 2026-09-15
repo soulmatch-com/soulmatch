@@ -13,6 +13,32 @@ function escapeHtml(value: string) { return value.replace(/&/g, '&amp;').replace
 function displayDate(value?: string) { return value ? new Intl.DateTimeFormat('en-IN', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' }).format(new Date(`${value}T00:00:00Z`)) : 'Not provided' }
 function optional(value?: string) { return value?.trim() || 'Not provided' }
 function encodeMimeHeader(value: string) { return `=?UTF-8?B?${Buffer.from(value, 'utf8').toString('base64')}?=` }
+function stripWrappingQuotes(value: string) {
+  const trimmed = value.trim()
+  if ((trimmed.startsWith('"') && trimmed.endsWith('"')) || (trimmed.startsWith("'") && trimmed.endsWith("'"))) {
+    return trimmed.slice(1, -1).trim()
+  }
+  return trimmed
+}
+
+function formatSenderAddress(value: string, fallbackName = 'MyThirumanam') {
+  const normalized = stripWrappingQuotes(value)
+  const namedMatch = normalized.match(/^(.*?)\s*<([^<>@\s]+@[^<>@\s]+\.[^<>@\s]+)>$/)
+  if (namedMatch) {
+    const displayName = stripWrappingQuotes(namedMatch[1]).trim() || fallbackName
+    return `${encodeMimeHeader(displayName)} <${namedMatch[2].trim()}>`
+  }
+  if (/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(normalized)) {
+    return `${encodeMimeHeader(fallbackName)} <${normalized}>`
+  }
+  throw new Error('Celebration email sender configuration is invalid')
+}
+
+function extractEmailAddress(value: string) {
+  const normalized = stripWrappingQuotes(value)
+  const namedMatch = normalized.match(/<([^<>@\s]+@[^<>@\s]+\.[^<>@\s]+)>$/)
+  return namedMatch?.[1] ?? normalized
+}
 
 export function createBookingNotification({ enquiryReference, enquiry, services }: { enquiryId: string; enquiryReference: string; enquiry: CelebrationEnquiryApiInput; services: PublicCelebrationService[] }) {
   const selectedServices = services.filter((service) => enquiry.serviceIds.includes(service.id)).map((service) => getCelebrationServicePresentation(service).name)
@@ -49,7 +75,10 @@ export async function sendBookingNotification(input: { enquiryId: string; enquir
   const tokenResult = await tokenResponse.json() as { access_token?: string }
   if (!tokenResult.access_token) throw new Error('Gmail OAuth token refresh returned no access token')
   const boundary = 'mythirumanam-notification'
-  const mime = [`From: ${from}`, `To: ${to}`, `Subject: ${encodeMimeHeader(message.subject)}`, 'MIME-Version: 1.0', `Content-Type: multipart/alternative; boundary="${boundary}"`, '', `--${boundary}`, 'Content-Type: text/plain; charset=UTF-8', '', message.text, `--${boundary}`, 'Content-Type: text/html; charset=UTF-8', '', message.html, `--${boundary}--`].join('\r\n')
+  const fromHeader = formatSenderAddress(from)
+  const fromEmail = extractEmailAddress(from)
+  const messageId = `<celebration-${input.enquiryId}@mythirumanam.in>`
+  const mime = [`From: ${fromHeader}`, `Sender: ${fromEmail}`, `Reply-To: ${fromHeader}`, `To: ${to}`, `Date: ${new Date().toUTCString()}`, `Message-ID: ${messageId}`, `Subject: ${encodeMimeHeader(message.subject)}`, 'MIME-Version: 1.0', `Content-Type: multipart/alternative; boundary="${boundary}"`, '', `--${boundary}`, 'Content-Type: text/plain; charset=UTF-8', '', message.text, `--${boundary}`, 'Content-Type: text/html; charset=UTF-8', '', message.html, `--${boundary}--`].join('\r\n')
   const raw = Buffer.from(mime, 'utf8').toString('base64url')
   const response = await fetch('https://gmail.googleapis.com/gmail/v1/users/me/messages/send', { method: 'POST', headers: { Authorization: `Bearer ${tokenResult.access_token}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ raw }) })
   if (!response.ok) throw new Error(`Gmail notification provider failed with status ${response.status}`)

@@ -14,7 +14,7 @@ test('public API fails closed until environment content approval is explicit', a
 })
 
 test('homepage omits the complete section when no approved stories are returned', async () => {
-  const source = await read('src/app/page.tsx')
+  const source = await read('src/app/(en)/page.tsx')
   assert.doesNotMatch(source, /successStories|Success Stories/)
   assert.doesNotMatch(source, /No success stories available yet/)
   assert.doesNotMatch(source, /fallback stor|sample testimonial|demo testimonial/i)
@@ -45,8 +45,8 @@ test('admin workflow retains explicit publish and unpublish control', async () =
 })
 
 test('public stories contain no fixed ratings or review structured data', async () => {
-  const homepage = await read('src/app/page.tsx')
-  const layout = await read('src/app/layout.tsx')
+  const homepage = await read('src/app/(en)/page.tsx')
+  const layout = await read('src/app/(en)/layout.tsx')
   for (const source of [homepage, layout]) {
     assert.doesNotMatch(source, /aggregateRating|reviewRating|ratingValue|Review/i)
     assert.doesNotMatch(source, /<Star[^>]*fill/i)
@@ -54,7 +54,7 @@ test('public stories contain no fixed ratings or review structured data', async 
 })
 
 test('celebrations homepage integration remains independent', async () => {
-  const homepage = await read('src/app/celebrations/thirukadaiyur/page.tsx')
+  const homepage = await read('src/app/(en)/celebrations/thirukadaiyur/page.tsx')
   assert.match(homepage, /Celebrate Life&apos;s Sacred Milestones at Thirukadaiyur/)
   assert.match(await read('src/components/celebrations/CelebrationCTA.tsx'), /'\/plan'/)
 })

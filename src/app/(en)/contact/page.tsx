@@ -3,7 +3,9 @@ import { CelebrationBreadcrumbs } from '@/components/celebrations/CelebrationBre
 import { CelebrationContactActions } from '@/components/celebrations/CelebrationContactActions'
 import { businessContact, businessContactLinks } from '@/lib/business-contact'
 
-export const metadata: Metadata = { title: 'Contact & Grievance Support | MyThirumanam', description: 'Contact MyThirumanam about celebration services, privacy requests, corrections, deletion requests or grievances.', robots: { index: true, follow: true } }
+const url = 'https://mythirumanam.in/contact'
+
+export const metadata: Metadata = { title: 'Contact & Grievance Support | MyThirumanam', description: 'Contact MyThirumanam about celebration services, privacy requests, corrections, deletion requests or grievances.', alternates: { canonical: url }, robots: { index: true, follow: true } }
 
 export default function ContactPage() {
   const hasContactDetails = businessContact.bookingsEmail || businessContactLinks.callHref || businessContactLinks.whatsappHref

@@ -12,15 +12,15 @@ const root = new URL('../', import.meta.url)
 const read = (path) => readFile(new URL(path, root), 'utf8')
 
 const publicSourceFiles = [
-  'src/app/gallery/page.tsx',
-  'src/app/celebrations/thirukadaiyur/page.tsx',
+  'src/app/(en)/gallery/page.tsx',
+  'src/app/(en)/celebrations/thirukadaiyur/page.tsx',
   'src/components/celebrations/GalleryGrid.tsx',
   'src/lib/celebrations/gallery.ts',
 ]
 
 test('Gallery uses centralized typed local content instead of inline image data', async () => {
   const [page, galleryConfig] = await Promise.all([
-    read('src/app/gallery/page.tsx'),
+    read('src/app/(en)/gallery/page.tsx'),
     read('src/lib/celebrations/gallery.ts'),
   ])
 
@@ -56,8 +56,8 @@ test('Gallery publishes no unapproved event photographs and keeps brand artwork 
 
 test('Gallery shares the approved route, layout chrome and reusable celebration components', async () => {
   const [page, layout, header, conditionalHeader, conditionalFooter, footer] = await Promise.all([
-    read('src/app/gallery/page.tsx'),
-    read('src/app/layout.tsx'),
+    read('src/app/(en)/gallery/page.tsx'),
+    read('src/app/(en)/layout.tsx'),
     read('src/components/Header.tsx'),
     read('src/components/ConditionalHeader.tsx'),
     read('src/components/ConditionalFooter.tsx'),
@@ -79,7 +79,7 @@ test('Gallery shares the approved route, layout chrome and reusable celebration 
 })
 
 test('Gallery is public, indexable and uses conservative metadata', async () => {
-  const page = await read('src/app/gallery/page.tsx')
+  const page = await read('src/app/(en)/gallery/page.tsx')
   assert.match(page, /const url = 'https:\/\/mythirumanam\.in\/gallery'/)
   assert.match(page, /alternates: \{ canonical: url \}/)
   assert.match(page, /robots: \{ index: true, follow: true \}/)
@@ -97,8 +97,8 @@ test('Gallery is public, indexable and uses conservative metadata', async () => 
 
 test('Empty approved-gallery state is truthful and the homepage preview is conditional', async () => {
   const [galleryPage, homepage] = await Promise.all([
-    read('src/app/gallery/page.tsx'),
-    read('src/app/celebrations/thirukadaiyur/page.tsx'),
+    read('src/app/(en)/gallery/page.tsx'),
+    read('src/app/(en)/celebrations/thirukadaiyur/page.tsx'),
   ])
 
   assert.match(galleryPage, /Approved celebration photographs will be added here as they become available/)
@@ -124,8 +124,8 @@ test('Gallery content avoids fake testimonials, fake metrics and unapproved imag
 test('Success stories publication gate and temple independence safeguards remain intact', async () => {
   const [successRoute, galleryPage, homepage] = await Promise.all([
     read('src/app/api/success-stories/route.ts'),
-    read('src/app/gallery/page.tsx'),
-    read('src/app/celebrations/thirukadaiyur/page.tsx'),
+    read('src/app/(en)/gallery/page.tsx'),
+    read('src/app/(en)/celebrations/thirukadaiyur/page.tsx'),
   ])
 
   assert.match(successRoute, /SUCCESS_STORIES_PUBLICATION_APPROVED === 'true'/)
@@ -139,7 +139,7 @@ test('Success stories publication gate and temple independence safeguards remain
 
 test('Gallery grid uses Next Image with stable dimensions and no client-side gallery dependency', async () => {
   const [page, grid] = await Promise.all([
-    read('src/app/gallery/page.tsx'),
+    read('src/app/(en)/gallery/page.tsx'),
     read('src/components/celebrations/GalleryGrid.tsx'),
   ])
 

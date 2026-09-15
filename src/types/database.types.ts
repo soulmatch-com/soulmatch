@@ -77,13 +77,16 @@ export interface Database {
           mobile: string
           email: string | null
           relationship: string | null
-          preferred_contact_method: 'phone' | 'whatsapp' | 'email'
-          other_service_details: string | null
-          notes: string | null
-          status: 'new' | 'contacted' | 'planning' | 'confirmed' | 'completed' | 'cancelled'
-          created_at: string
-          updated_at: string
-        }
+	          preferred_contact_method: 'phone' | 'whatsapp' | 'email'
+	          other_service_details: string | null
+	          notes: string | null
+	          legacy_status: 'new' | 'contacted' | 'planning' | 'confirmed' | 'completed' | 'cancelled' | null
+	          status: 'pending' | 'contacted' | 'confirmed' | 'cancelled' | null
+	          status_updated_at: string | null
+	          status_updated_by: string | null
+	          created_at: string
+	          updated_at: string
+	        }
         Insert: {
           id?: string
           location: string
@@ -110,13 +113,16 @@ export interface Database {
           mobile: string
           email?: string | null
           relationship?: string | null
-          preferred_contact_method: 'phone' | 'whatsapp' | 'email'
-          other_service_details?: string | null
-          notes?: string | null
-          status?: 'new' | 'contacted' | 'planning' | 'confirmed' | 'completed' | 'cancelled'
-          created_at?: string
-          updated_at?: string
-        }
+	          preferred_contact_method: 'phone' | 'whatsapp' | 'email'
+	          other_service_details?: string | null
+	          notes?: string | null
+	          legacy_status?: 'new' | 'contacted' | 'planning' | 'confirmed' | 'completed' | 'cancelled' | null
+	          status?: 'pending' | 'contacted' | 'confirmed' | 'cancelled' | null
+	          status_updated_at?: string | null
+	          status_updated_by?: string | null
+	          created_at?: string
+	          updated_at?: string
+	        }
         Update: {
           id?: string
           location?: string
@@ -143,15 +149,47 @@ export interface Database {
           mobile?: string
           email?: string | null
           relationship?: string | null
-          preferred_contact_method?: 'phone' | 'whatsapp' | 'email'
-          other_service_details?: string | null
-          notes?: string | null
-          status?: 'new' | 'contacted' | 'planning' | 'confirmed' | 'completed' | 'cancelled'
-          created_at?: string
-          updated_at?: string
-        }
-      }
-      celebration_enquiry_services: {
+	          preferred_contact_method?: 'phone' | 'whatsapp' | 'email'
+	          other_service_details?: string | null
+	          notes?: string | null
+	          legacy_status?: 'new' | 'contacted' | 'planning' | 'confirmed' | 'completed' | 'cancelled' | null
+	          status?: 'pending' | 'contacted' | 'confirmed' | 'cancelled' | null
+	          status_updated_at?: string | null
+	          status_updated_by?: string | null
+	          created_at?: string
+	          updated_at?: string
+	        }
+	      }
+	      celebration_enquiry_status_history: {
+	        Row: {
+	          id: string
+	          enquiry_id: string
+	          from_status: 'pending' | 'contacted' | 'confirmed' | 'cancelled' | null
+	          to_status: 'pending' | 'contacted' | 'confirmed' | 'cancelled'
+	          remarks: string
+	          changed_by: string | null
+	          changed_at: string
+	        }
+	        Insert: {
+	          id?: string
+	          enquiry_id: string
+	          from_status?: 'pending' | 'contacted' | 'confirmed' | 'cancelled' | null
+	          to_status: 'pending' | 'contacted' | 'confirmed' | 'cancelled'
+	          remarks: string
+	          changed_by?: string | null
+	          changed_at?: string
+	        }
+	        Update: {
+	          id?: string
+	          enquiry_id?: string
+	          from_status?: 'pending' | 'contacted' | 'confirmed' | 'cancelled' | null
+	          to_status?: 'pending' | 'contacted' | 'confirmed' | 'cancelled'
+	          remarks?: string
+	          changed_by?: string | null
+	          changed_at?: string
+	        }
+	      }
+	      celebration_enquiry_services: {
         Row: {
           enquiry_id: string
           service_id: string
@@ -460,8 +498,8 @@ export interface Database {
       [_ in never]: never
     }
     Functions: {
-      create_celebration_enquiry: {
-        Args: {
+	      create_celebration_enquiry: {
+	        Args: {
           p_location: string
           p_celebration_type: string
           p_husband_name: string
@@ -490,10 +528,24 @@ export interface Database {
           p_plan_version?: number | null
           p_special_requirements?: string | null
           p_ceremony_duration?: string | null
-        }
-        Returns: string
-      }
-    }
+	        }
+	        Returns: string
+	      }
+	      update_celebration_enquiry_status: {
+	        Args: {
+	          p_enquiry_id: string
+	          p_new_status: string
+	          p_remarks: string
+	          p_changed_by: string
+	        }
+	        Returns: {
+	          enquiry_id: string
+	          status: 'pending' | 'contacted' | 'confirmed' | 'cancelled'
+	          status_updated_at: string
+	          history_id: string
+	        }[]
+	      }
+	    }
     Enums: {
       [_ in never]: never
     }

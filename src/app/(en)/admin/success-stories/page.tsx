@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { useAdminStore } from '@/store/adminStore'
+import { useAdminStore } from '@/modules/admin'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -46,7 +46,7 @@ interface FormData {
 }
 
 export default function SuccessStoriesPage() {
-  const { admin, isAuthenticated } = useAdminStore()
+  const { clearAdmin } = useAdminStore()
   const router = useRouter()
   const [stories, setStories] = useState<SuccessStory[]>([])
   const [filteredStories, setFilteredStories] = useState<SuccessStory[]>([])
@@ -74,16 +74,8 @@ export default function SuccessStoriesPage() {
   const [uploading, setUploading] = useState(false)
 
   useEffect(() => {
-    if (!isAuthenticated()) {
-      router.push('/admin/login')
-    }
-  }, [isAuthenticated, router])
-
-  useEffect(() => {
-    if (admin) {
-      fetchStories()
-    }
-  }, [admin])
+    fetchStories()
+  }, [])
 
   useEffect(() => {
     filterStories()
@@ -95,6 +87,9 @@ export default function SuccessStoriesPage() {
       if (response.ok) {
         const data = await response.json()
         setStories(data.stories || [])
+      } else if (response.status === 401 || response.status === 403) {
+        clearAdmin()
+        router.replace('/admin/login')
       } else {
         toast.error('Failed to fetch success stories')
       }
@@ -298,8 +293,7 @@ export default function SuccessStoriesPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           status: 'approved',
-          is_published: true,
-          approved_by: admin?.id
+          is_published: true
         })
       })
 

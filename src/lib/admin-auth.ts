@@ -1,17 +1,15 @@
 import 'server-only'
 
 import { NextResponse } from 'next/server'
+import { cookies } from 'next/headers'
+import { ADMIN_SESSION_COOKIE, verifyAdminSessionToken } from '@/lib/admin-session'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { createClient } from '@/lib/supabase/server'
 
 export async function requireActiveAdmin() {
-  const sessionClient = await createClient()
-  const {
-    data: { user },
-    error: userError,
-  } = await sessionClient.auth.getUser()
+  const cookieStore = await cookies()
+  const session = await verifyAdminSessionToken(cookieStore.get(ADMIN_SESSION_COOKIE)?.value)
 
-  if (userError || !user?.email) {
+  if (!session) {
     return { response: NextResponse.json({ message: 'Unauthorized' }, { status: 401 }) }
   }
 
@@ -19,7 +17,8 @@ export async function requireActiveAdmin() {
   const { data: admin, error } = await adminClient
     .from('admins')
     .select('id, email, role, is_active')
-    .eq('email', user.email.toLowerCase())
+    .eq('id', session.adminId)
+    .eq('email', session.email.toLowerCase())
     .eq('is_active', true)
     .single()
 

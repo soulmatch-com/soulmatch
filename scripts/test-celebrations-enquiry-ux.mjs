@@ -38,7 +38,7 @@ test('all seeded services appear once in presentation groups and retain DB conte
   const codes = [...sql.matchAll(/\('thirukadaiyur', '([^']+)'/g)].map((match) => match[1])
   const services = codes.map((code, index) => ({ id: `id-${index}`, code, name: `DB name ${index}`, description: `DB description ${index}`, icon: 'db-icon', display_order: index }))
   const grouped = groupCelebrationServices(services)
-  assert.deepEqual(grouped.map(({ name, services }) => [name, services.length]), [['Ceremony', 5], ['Food & Celebration', 4], ['Stay & Travel', 2], ['Additional Support', 3]])
+  assert.deepEqual(grouped.map(({ name, services }) => [name, services.length]), [['Ceremony Support', 5], ['Food & Celebration', 4], ['Stay & Travel', 2], ['Additional Arrangements', 3]])
   const flattened = grouped.flatMap(({ services }) => services)
   assert.equal(flattened.length, 14)
   for (const service of services) assert.equal(flattened.find(({ id }) => id === service.id), service)

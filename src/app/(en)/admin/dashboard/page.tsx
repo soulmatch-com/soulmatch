@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { useAdminStore } from '@/store/adminStore'
+import { useAdminStore } from '@/modules/admin'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Users, UserCheck, Heart, MessageSquare } from 'lucide-react'
 
@@ -34,31 +34,16 @@ interface PendingProfile {
 }
 
 export default function AdminDashboardPage() {
-  const { admin, isAuthenticated } = useAdminStore()
+  const { admin, clearAdmin } = useAdminStore()
   const router = useRouter()
   const [stats, setStats] = useState<DashboardStats | null>(null)
   const [latestUsers, setLatestUsers] = useState<LatestUser[]>([])
   const [pendingProfiles, setPendingProfiles] = useState<PendingProfile[]>([])
   const [loading, setLoading] = useState(true)
-  const [authChecked, setAuthChecked] = useState(false)
 
   useEffect(() => {
-    // Give store time to rehydrate from localStorage
-    const timer = setTimeout(() => {
-      setAuthChecked(true)
-      if (!isAuthenticated()) {
-        router.push('/admin/login')
-      }
-    }, 100)
-
-    return () => clearTimeout(timer)
-  }, [isAuthenticated, router])
-
-  useEffect(() => {
-    if (admin) {
-      fetchDashboardData()
-    }
-  }, [admin])
+    fetchDashboardData()
+  }, [])
 
   const fetchDashboardData = async () => {
     try {
@@ -68,26 +53,15 @@ export default function AdminDashboardPage() {
         setStats(data.stats)
         setLatestUsers(data.latestUsers)
         setPendingProfiles(data.pendingProfiles || [])
+      } else if (response.status === 401 || response.status === 403) {
+        clearAdmin()
+        router.replace('/admin/login')
       }
     } catch (error) {
       console.error('Failed to fetch dashboard data:', error)
     } finally {
       setLoading(false)
     }
-  }
-
-  // Show loading while checking auth
-  if (!authChecked || !admin) {
-    return (
-      <div className="container mx-auto py-10 px-4">
-        <div className="max-w-7xl mx-auto">
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-slate-900">Admin Dashboard</h1>
-            <p className="text-slate-600 mt-2">Verifying authentication...</p>
-          </div>
-        </div>
-      </div>
-    )
   }
 
   const statsCards = stats ? [
@@ -154,7 +128,7 @@ export default function AdminDashboardPage() {
       <div className="max-w-7xl mx-auto">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-slate-900">Admin Dashboard</h1>
-          <p className="text-slate-600 mt-2">Welcome back, {admin.name || admin.email}</p>
+          <p className="text-slate-600 mt-2">Welcome back, {admin?.name || admin?.email || 'Admin'}</p>
         </div>
 
         {/* Stats Grid */}

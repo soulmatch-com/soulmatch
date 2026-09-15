@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { createAdminSessionToken, setAdminSessionCookie } from '@/lib/admin-session'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { comparePassword } from '@/lib/utils/password'
 
@@ -71,13 +72,22 @@ export async function POST(request: NextRequest) {
     // Return admin data (excluding password_hash)
     const { password_hash: _, ...adminData } = admin
 
-    return NextResponse.json(
+    const token = await createAdminSessionToken({
+      adminId: admin.id,
+      email: admin.email,
+      role: admin.role,
+    })
+
+    const response = NextResponse.json(
       {
         admin: adminData,
         message: 'Login successful',
       },
       { status: 200 }
     )
+    setAdminSessionCookie(response, token)
+
+    return response
   } catch (error) {
     console.error('Admin login error:', error)
     return NextResponse.json(

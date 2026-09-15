@@ -8,12 +8,20 @@
 
 import { createClient } from '@supabase/supabase-js'
 import { hashPassword } from '../src/lib/utils/password'
-import { readFileSync } from 'fs'
+import { existsSync, readFileSync } from 'fs'
 import { resolve } from 'path'
 
-// Load environment variables from .env.local manually
+// Load environment variables from .env.local or .env manually
 try {
-  const envContent = readFileSync(resolve(process.cwd(), '.env.local'), 'utf-8')
+  const envPath = ['.env.local', '.env']
+    .map(file => resolve(process.cwd(), file))
+    .find(file => existsSync(file))
+
+  if (!envPath) {
+    throw new Error('No .env.local or .env file found')
+  }
+
+  const envContent = readFileSync(envPath, 'utf-8')
   envContent.split('\n').forEach(line => {
     const match = line.match(/^([^#=]+)=(.*)$/)
     if (match) {
@@ -23,7 +31,7 @@ try {
     }
   })
 } catch (error) {
-  console.error('❌ Could not read .env.local file')
+  console.error('❌ Could not read .env.local or .env file')
   process.exit(1)
 }
 

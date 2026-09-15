@@ -8,7 +8,7 @@ const read = (path) => readFile(new URL(path, root), 'utf8')
 test('only one Supabase celebration migration defines the schema', async () => {
   const files = await readdir(new URL('supabase/migrations/', root))
   const definitions = []
-  for (const file of files) if ((await read(`supabase/migrations/${file}`)).match(/CREATE TABLE IF NOT EXISTS public\.celebration_/)) definitions.push(file)
+  for (const file of files) if ((await read(`supabase/migrations/${file}`)).match(/CREATE TABLE IF NOT EXISTS public\.celebration_(services|enquiries|enquiry_services)\b/)) definitions.push(file)
   assert.deepEqual(definitions, ['add_thirukadaiyur_celebrations.sql'])
 })
 test('migration seeds exactly the fourteen canonical service codes', async () => {

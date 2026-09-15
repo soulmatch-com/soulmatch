@@ -72,7 +72,7 @@ test('shared header and footer use the sole horizontal logo with correct intrins
 })
 
 test('file metadata replaces legacy explicit icon links and app manifest uses local approved derivatives', async () => {
-  const layout = (await read('src/app/layout.tsx')).toString()
+  const layout = (await read('src/app/(en)/layout.tsx')).toString()
   assert.doesNotMatch(layout, /icons:\s*\{|favicon\.ico\?v=2|500x500/)
   assert.deepEqual(manifest().icons.map(({ src, sizes }) => [src, sizes]), [['/brand/mythirumanam-icon-192.png', '192x192'], ['/icon.png', '512x512']])
   await assert.rejects(read('public/mythiru-favicon.png'), { code: 'ENOENT' })

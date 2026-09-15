@@ -7,18 +7,18 @@ import { getBlogListingUrl, getBlogPath, getPublishedBlogArticles } from '../src
 const root = new URL('../', import.meta.url)
 const read = (path) => readFile(new URL(path, root), 'utf8')
 const publicPages = [
-  ['src/app/celebrations/thirukadaiyur/page.tsx', 'https://mythirumanam.in/'],
-  ['src/app/celebrations/thirukadaiyur/60th-marriage/page.tsx', 'https://mythirumanam.in/60th-marriage'],
-  ['src/app/celebrations/thirukadaiyur/70th-marriage/page.tsx', 'https://mythirumanam.in/70th-marriage'],
-  ['src/app/celebrations/thirukadaiyur/80th-marriage/page.tsx', 'https://mythirumanam.in/80th-marriage'],
-  ['src/app/matrimony/page.tsx', 'https://mythirumanam.in/matrimony'],
-  ['src/app/about/page.tsx', 'https://mythirumanam.in/about'],
-  ['src/app/gallery/page.tsx', 'https://mythirumanam.in/gallery'],
-  ['src/app/terms/page.tsx', 'https://mythirumanam.in/terms'],
+  ['src/app/(en)/celebrations/thirukadaiyur/page.tsx', 'https://mythirumanam.in/'],
+  ['src/app/(en)/celebrations/thirukadaiyur/60th-marriage/page.tsx', 'https://mythirumanam.in/60th-marriage'],
+  ['src/app/(en)/celebrations/thirukadaiyur/70th-marriage/page.tsx', 'https://mythirumanam.in/70th-marriage'],
+  ['src/app/(en)/celebrations/thirukadaiyur/80th-marriage/page.tsx', 'https://mythirumanam.in/80th-marriage'],
+  ['src/app/(en)/matrimony/page.tsx', 'https://mythirumanam.in/matrimony'],
+  ['src/app/(en)/about/page.tsx', 'https://mythirumanam.in/about'],
+  ['src/app/(en)/gallery/page.tsx', 'https://mythirumanam.in/gallery'],
+  ['src/app/(en)/terms/page.tsx', 'https://mythirumanam.in/terms'],
 ]
 
 test('metadata base and concise Celebrations-first homepage title are configured', async () => {
-  assert.match(await read('src/app/layout.tsx'), /metadataBase: new URL\("https:\/\/mythirumanam\.in"\)/)
+  assert.match(await read('src/app/root-metadata.ts'), /metadataBase: new URL\('https:\/\/mythirumanam\.in'\)/)
   assert.match(await read(publicPages[0][0]), /Thirukadaiyur 60th, 70th & 80th Marriage \| MyThirumanam/)
 })
 
@@ -35,14 +35,14 @@ test('public pages have descriptions, matching canonical and Open Graph URLs, an
 })
 
 test('plan remains noindex follow and is excluded from sitemap', async () => {
-  const plan = await read('src/app/celebrations/thirukadaiyur/plan/page.tsx')
+  const plan = await read('src/app/(en)/celebrations/thirukadaiyur/plan/page.tsx')
   assert.match(plan, /robots: \{ index: false, follow: true \}/)
   assert.equal(sitemap().some(({ url }) => url.endsWith('/plan')), false)
 })
 
 test('auth and private route groups are explicitly noindexed', async () => {
-  assert.match(await read('src/app/(auth)/layout.tsx'), /robots: \{ index: false, follow: true \}/)
-  assert.match(await read('src/app/(dashboard)/layout.tsx'), /robots: \{ index: false, follow: false, nocache: true \}/)
+  assert.match(await read('src/app/(en)/(auth)/layout.tsx'), /robots: \{ index: false, follow: true \}/)
+  assert.match(await read('src/app/(en)/(dashboard)/layout.tsx'), /robots: \{ index: false, follow: false, nocache: true \}/)
 })
 
 test('sitemap contains only canonical public product pages', () => {

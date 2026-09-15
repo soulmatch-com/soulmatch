@@ -416,3 +416,19 @@ export function getBlogUrl(article: Pick<BlogArticle, 'locale' | 'slug'>) {
 export function getBlogListingUrl(locale: BlogLocale) {
   return `https://mythirumanam.in${getBlogListingPath(locale)}`
 }
+
+export function getBlogArticleAlternates(article: BlogArticle) {
+  const url = getBlogUrl(article)
+  const englishArticle = getBlogArticleByTranslationKey('en', article.translationKey)
+  const tamilArticle = getBlogArticleByTranslationKey('ta', article.translationKey)
+  const englishUrl = englishArticle ? getBlogUrl(englishArticle) : url
+
+  return {
+    canonical: url,
+    languages: {
+      ...(englishArticle ? { en: englishUrl } : {}),
+      ...(tamilArticle ? { ta: getBlogUrl(tamilArticle) } : {}),
+      'x-default': englishUrl,
+    },
+  }
+}

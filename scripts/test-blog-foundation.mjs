@@ -4,6 +4,7 @@ import test from 'node:test'
 import {
   blogArticles,
   getBlogArticleByTranslationKey,
+  getBlogArticleAlternates,
   getBlogListingPath,
   getBlogPath,
   getBlogUrl,
@@ -46,9 +47,9 @@ test('English and Tamil article pair shares translationKey and language switch t
 
 test('listing and article routes have self-canonicals, reciprocal hreflang and x-default', async () => {
   const [englishList, tamilList, englishArticle, tamilArticle] = await Promise.all([
-    read('src/app/blog/page.tsx'),
+    read('src/app/(en)/blog/page.tsx'),
     read('src/app/ta/blog/page.tsx'),
-    read('src/app/blog/[slug]/page.tsx'),
+    read('src/app/(en)/blog/[slug]/page.tsx'),
     read('src/app/ta/blog/[slug]/page.tsx'),
   ])
 
@@ -56,19 +57,27 @@ test('listing and article routes have self-canonicals, reciprocal hreflang and x
   assert.match(tamilList, /const url = getBlogListingUrl\('ta'\)/)
   assert.match(englishList, /languages: \{ en: url, ta: tamilUrl, 'x-default': url \}/)
   assert.match(tamilList, /languages: \{ en: englishUrl, ta: url, 'x-default': englishUrl \}/)
-  assert.match(englishArticle, /canonical: url/)
-  assert.match(tamilArticle, /canonical: url/)
-  assert.match(englishArticle, /en: url/)
-  assert.match(englishArticle, /ta: getBlogUrl\(tamilArticle\)/)
-  assert.match(englishArticle, /'x-default': url/)
-  assert.match(tamilArticle, /en: englishUrl/)
-  assert.match(tamilArticle, /ta: url/)
-  assert.match(tamilArticle, /'x-default': englishUrl/)
+  assert.match(englishArticle, /alternates: getBlogArticleAlternates\(article\)/)
+  assert.match(tamilArticle, /alternates: getBlogArticleAlternates\(article\)/)
+
+  const english = getPublishedBlogArticle('en', slug)
+  const tamil = getPublishedBlogArticle('ta', slug)
+  assert.ok(english)
+  assert.ok(tamil)
+  assert.deepEqual(getBlogArticleAlternates(english), {
+    canonical: 'https://mythirumanam.in/blog/60th-marriage-thirukadaiyur',
+    languages: {
+      en: 'https://mythirumanam.in/blog/60th-marriage-thirukadaiyur',
+      ta: 'https://mythirumanam.in/ta/blog/60th-marriage-thirukadaiyur',
+      'x-default': 'https://mythirumanam.in/blog/60th-marriage-thirukadaiyur',
+    },
+  })
+  assert.deepEqual(getBlogArticleAlternates(tamil).languages, getBlogArticleAlternates(english).languages)
 })
 
 test('Article and BreadcrumbList structured data are language and URL accurate', async () => {
   const [englishArticle, tamilArticle] = await Promise.all([
-    read('src/app/blog/[slug]/page.tsx'),
+    read('src/app/(en)/blog/[slug]/page.tsx'),
     read('src/app/ta/blog/[slug]/page.tsx'),
   ])
 
@@ -111,9 +120,9 @@ test('religious content is careful and preserves family and Vadhyar variation', 
 test('blog content avoids unsupported packages, pricing, trust claims, external images and unsafe temple wording', async () => {
   const files = [
     'src/content/blog/articles.ts',
-    'src/app/blog/page.tsx',
+    'src/app/(en)/blog/page.tsx',
     'src/app/ta/blog/page.tsx',
-    'src/app/blog/[slug]/page.tsx',
+    'src/app/(en)/blog/[slug]/page.tsx',
     'src/app/ta/blog/[slug]/page.tsx',
     'src/components/blog/BlogArticlePage.tsx',
     'src/components/blog/BlogListing.tsx',

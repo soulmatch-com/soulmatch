@@ -119,9 +119,9 @@ test('contact and gallery launch gates remain truthful without approved assets o
 
 test('public celebration content avoids unsafe temple authority wording', async () => {
   const files = [
-    'src/app/celebrations/thirukadaiyur/page.tsx',
+    'src/app/(en)/celebrations/thirukadaiyur/page.tsx',
     'src/components/celebrations/CeremonyPage.tsx',
-    'src/app/gallery/page.tsx',
+    'src/app/(en)/gallery/page.tsx',
     'src/content/blog/articles.ts',
     'src/components/celebrations/CelebrationServices.tsx',
     'src/lib/celebrations/service-query.ts',

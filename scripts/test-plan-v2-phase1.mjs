@@ -8,7 +8,7 @@ const read = (path) => readFile(new URL(path, root), 'utf8')
 test('V2 remains disabled by default and legacy plan remains available', async () => {
   const [config, page] = await Promise.all([
     read('src/lib/celebrations/plan-v2.ts'),
-    read('src/app/celebrations/thirukadaiyur/plan/page.tsx'),
+    read('src/app/(en)/celebrations/thirukadaiyur/plan/page.tsx'),
   ])
   assert.match(config, /process\.env\.CELEBRATION_PLAN_V2_ENABLED === 'true'/)
   assert.match(page, /celebrationPlanV2Enabled \? <PlanV2Flow/)

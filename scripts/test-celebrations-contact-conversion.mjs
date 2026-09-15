@@ -28,8 +28,8 @@ async function loadContactConfig(env = {}) {
 
 test('contact details come from central public-safe configuration', async () => {
   const [home, contactPage, footer, cta, config] = await Promise.all([
-    read('src/app/celebrations/thirukadaiyur/page.tsx'),
-    read('src/app/contact/page.tsx'),
+    read('src/app/(en)/celebrations/thirukadaiyur/page.tsx'),
+    read('src/app/(en)/contact/page.tsx'),
     read('src/components/SiteFooter.tsx'),
     read('src/components/celebrations/CelebrationCTA.tsx'),
     read('src/lib/business-contact.ts'),
@@ -81,7 +81,7 @@ test('Call link uses canonical configured E.164 number', async () => {
 
 test('shared contact component is reused on public celebration pages', async () => {
   const [home, ceremony] = await Promise.all([
-    read('src/app/celebrations/thirukadaiyur/page.tsx'),
+    read('src/app/(en)/celebrations/thirukadaiyur/page.tsx'),
     read('src/components/celebrations/CeremonyPage.tsx'),
   ])
 
@@ -91,7 +91,7 @@ test('shared contact component is reused on public celebration pages', async () 
 })
 
 test('/plan does not receive a conflicting mobile sticky contact bar', async () => {
-  const planPage = await read('src/app/celebrations/thirukadaiyur/plan/page.tsx')
+  const planPage = await read('src/app/(en)/celebrations/thirukadaiyur/plan/page.tsx')
   assert.doesNotMatch(planPage, /CelebrationContactActions/)
   assert.doesNotMatch(planPage, /mobile-sticky/)
 })
@@ -100,7 +100,7 @@ test('no WhatsApp API credentials, automation, or automatic sending are introduc
   const source = await Promise.all([
     read('src/lib/business-contact.ts'),
     read('src/components/celebrations/CelebrationContactActions.tsx'),
-    read('src/app/celebrations/thirukadaiyur/page.tsx'),
+    read('src/app/(en)/celebrations/thirukadaiyur/page.tsx'),
     read('src/components/celebrations/CeremonyPage.tsx'),
   ]).then((parts) => parts.join('\n'))
 
@@ -112,7 +112,7 @@ test('contact copy avoids temple-authority wording and exposes accessibility lab
   const source = await Promise.all([
     read('src/components/celebrations/CelebrationContactActions.tsx'),
     read('src/components/celebrations/CelebrationCTA.tsx'),
-    read('src/app/celebrations/thirukadaiyur/page.tsx'),
+    read('src/app/(en)/celebrations/thirukadaiyur/page.tsx'),
   ]).then((parts) => parts.join('\n'))
 
   assert.doesNotMatch(source, /Call the temple|Contact Thirukadaiyur Temple|Temple WhatsApp|Official Booking Number|Temple Booking Helpdesk/i)

@@ -15,7 +15,7 @@ export async function updateSession(request: NextRequest) {
           return request.cookies.getAll()
         },
         setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) => request.cookies.set(name, value))
+          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
           supabaseResponse = NextResponse.next({
             request,
           })
@@ -38,12 +38,21 @@ export async function updateSession(request: NextRequest) {
   // Allow public routes without authentication
   const publicRoutes = [
     '/',
+    '/60th-marriage',
+    '/70th-marriage',
+    '/80th-marriage',
+    '/about',
+    '/contact',
+    '/gallery',
     '/login',
+    '/matrimony',
+    '/plan',
+    '/privacy',
     '/signup',
+    '/terms',
     '/verify-otp',
     '/forgot-password',
     '/reset-password',
-    '/gallery',
     '/blog',
     '/ta/blog',
   ]

@@ -22,11 +22,11 @@ const socialImage = {
 
 export const metadata: Metadata = {
   title: 'Thirukadaiyur 60th, 70th & 80th Marriage | MyThirumanam',
-  description: 'Plan 60th, 70th and 80th marriage celebrations in Thirukadaiyur with ceremony guidance, service selection and family-focused planning support.',
+  description: 'Plan 60th, 70th and 80th marriage celebrations in Thirukadaiyur with support for ceremony arrangements, food, stay, travel and family requirements.',
   alternates: { canonical: url },
   openGraph: {
     title: 'Thirukadaiyur 60th, 70th & 80th Marriage | MyThirumanam',
-    description: 'Plan 60th, 70th and 80th marriage celebrations in Thirukadaiyur with ceremony guidance, service selection and family-focused planning support.',
+    description: 'Plan 60th, 70th and 80th marriage celebrations in Thirukadaiyur with support for ceremony arrangements, food, stay, travel and family requirements.',
     url,
     siteName: 'MyThirumanam',
     type: 'website',
@@ -80,8 +80,9 @@ export default async function ThirukadaiyurPage() {
           <div className="relative mx-auto max-w-6xl px-4 py-16 sm:px-6 md:py-24">
             <p className="text-sm font-bold uppercase tracking-[0.18em] text-amber-100">Thirukadaiyur Celebrations</p>
             <p lang="ta" className="mt-3 text-lg font-semibold text-amber-200">{tamilContent.heroEyebrow}</p>
-            <h1 className="mt-4 max-w-4xl text-4xl font-bold leading-tight sm:text-5xl md:text-6xl">Celebrate Life&apos;s Meaningful Marriage Milestones</h1>
-            <p className="mt-6 max-w-3xl text-lg leading-8 text-amber-50">Plan 60th, 70th and 80th marriage celebrations in Thirukadaiyur with flexible support for your family&apos;s ceremony and event requirements.</p>
+            <h1 className="mt-4 max-w-4xl text-4xl font-bold leading-tight sm:text-5xl md:text-6xl">Thirukadaiyur 60th, 70th &amp; 80th Marriage Celebrations</h1>
+            <p className="mt-6 max-w-3xl text-xl font-semibold leading-8 text-amber-50">Celebrate Life&apos;s Meaningful Marriage Milestones</p>
+            <p className="mt-3 max-w-3xl text-lg leading-8 text-amber-50">Plan 60th, 70th and 80th marriage celebrations in Thirukadaiyur with flexible support for your family&apos;s ceremony and event requirements.</p>
             <div lang="ta" className="mt-4 max-w-3xl text-base leading-8 text-amber-100">
               <p className="font-semibold">{tamilContent.heroHeading}</p>
               <p className="mt-2">{tamilContent.heroDescription}</p>

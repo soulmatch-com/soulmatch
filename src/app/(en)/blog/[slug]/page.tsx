@@ -4,6 +4,7 @@ import { BlogArticlePage } from '@/components/blog/BlogArticlePage'
 import { JsonLd } from '@/components/seo/JsonLd'
 import {
   getBlogArticleByTranslationKey,
+  getBlogArticleAlternates,
   getBlogUrl,
   getPublishedBlogArticle,
   getPublishedBlogArticles,
@@ -17,20 +18,12 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params
   const article = getPublishedBlogArticle('en', slug)
   if (!article) return {}
-  const tamilArticle = getBlogArticleByTranslationKey('ta', article.translationKey)
   const url = getBlogUrl(article)
 
   return {
     title: '60th Marriage in Thirukadaiyur: Planning Guide',
     description: article.description,
-    alternates: {
-      canonical: url,
-      languages: {
-        en: url,
-        ...(tamilArticle ? { ta: getBlogUrl(tamilArticle) } : {}),
-        'x-default': url,
-      },
-    },
+    alternates: getBlogArticleAlternates(article),
     openGraph: { title: article.title, description: article.description, url, siteName: 'MyThirumanam', type: 'article' },
   }
 }

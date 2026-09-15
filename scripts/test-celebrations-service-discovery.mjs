@@ -21,7 +21,7 @@ function service(code, displayOrder = 1) {
 
 test('services still originate from the Supabase helper path', async () => {
   const [home, pageData, services, query] = await Promise.all([
-    read('src/app/celebrations/thirukadaiyur/page.tsx'),
+    read('src/app/(en)/celebrations/thirukadaiyur/page.tsx'),
     read('src/lib/celebrations/page-data.ts'),
     read('src/lib/celebrations/services.ts'),
     read('src/lib/celebrations/service-query.ts'),
@@ -37,7 +37,7 @@ test('services still originate from the Supabase helper path', async () => {
 
 test('public service presentation does not introduce a hard-coded catalogue or UUID list', async () => {
   const [home, component, grouping] = await Promise.all([
-    read('src/app/celebrations/thirukadaiyur/page.tsx'),
+    read('src/app/(en)/celebrations/thirukadaiyur/page.tsx'),
     read('src/components/celebrations/CelebrationServices.tsx'),
     read('src/lib/celebrations/service-presentation.ts'),
   ])
@@ -107,7 +107,7 @@ test('Complete Arrangement is presented as broader support without selecting all
 })
 
 test('homepage service CTA points to the existing plan form', async () => {
-  const home = await read('src/app/celebrations/thirukadaiyur/page.tsx')
+  const home = await read('src/app/(en)/celebrations/thirukadaiyur/page.tsx')
   assert.match(home, /Need help planning\?/)
   assert.match(home, /Tell us about your celebration through the planning form, or contact our team directly\./)
   assert.match(home, /href="\/plan"/)
@@ -115,7 +115,7 @@ test('homepage service CTA points to the existing plan form', async () => {
 
 test('service discovery avoids unsupported claims, pricing, and package terminology', async () => {
   const [home, component, grouping] = await Promise.all([
-    read('src/app/celebrations/thirukadaiyur/page.tsx'),
+    read('src/app/(en)/celebrations/thirukadaiyur/page.tsx'),
     read('src/components/celebrations/CelebrationServices.tsx'),
     read('src/lib/celebrations/service-presentation.ts'),
   ])

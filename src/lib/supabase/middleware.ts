@@ -1,7 +1,40 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
+import { getAdminSessionFromRequest } from '@/lib/admin-session'
 
 export async function updateSession(request: NextRequest) {
+  const pathname = request.nextUrl.pathname
+
+  if (
+    pathname.startsWith('/api/admin/auth/login') ||
+    pathname.startsWith('/api/admin/auth/logout') ||
+    pathname.startsWith('/api/admin/auth/me')
+  ) {
+    return NextResponse.next({ request })
+  }
+
+  if (pathname.startsWith('/admin')) {
+    const session = await getAdminSessionFromRequest(request)
+
+    if (pathname === '/admin/login') {
+      if (session) {
+        const url = request.nextUrl.clone()
+        url.pathname = '/admin/dashboard'
+        return NextResponse.redirect(url)
+      }
+
+      return NextResponse.next({ request })
+    }
+
+    if (!session) {
+      const url = request.nextUrl.clone()
+      url.pathname = '/admin/login'
+      return NextResponse.redirect(url)
+    }
+
+    return NextResponse.next({ request })
+  }
+
   let supabaseResponse = NextResponse.next({
     request,
   })
@@ -61,12 +94,13 @@ export async function updateSession(request: NextRequest) {
     request.nextUrl.pathname === route || request.nextUrl.pathname.startsWith(route + '/')
   )
 
-  const isApiAuthRoute = request.nextUrl.pathname.startsWith('/api/auth')
-  const isCelebrationsRoute = request.nextUrl.pathname.startsWith('/celebrations')
-  const isCelebrationsApiRoute = request.nextUrl.pathname.startsWith('/api/celebrations')
-  const isProfileCreateRoute = request.nextUrl.pathname === '/profile/create'
+  const isApiAuthRoute = pathname.startsWith('/api/auth')
+  const isAdminApiRoute = pathname.startsWith('/api/admin')
+  const isCelebrationsRoute = pathname.startsWith('/celebrations')
+  const isCelebrationsApiRoute = pathname.startsWith('/api/celebrations')
+  const isProfileCreateRoute = pathname === '/profile/create'
 
-  if (!user && !isPublicRoute && !isApiAuthRoute && !isCelebrationsRoute && !isCelebrationsApiRoute) {
+  if (!user && !isPublicRoute && !isApiAuthRoute && !isAdminApiRoute && !isCelebrationsRoute && !isCelebrationsApiRoute) {
     // no user, potentially respond by redirecting the user to the login page
     const url = request.nextUrl.clone()
     url.pathname = '/login'
@@ -74,7 +108,7 @@ export async function updateSession(request: NextRequest) {
   }
 
   // Check if authenticated user has completed their profile
-  if (user && !isPublicRoute && !isApiAuthRoute && !isProfileCreateRoute && !isCelebrationsRoute && !isCelebrationsApiRoute) {
+  if (user && !isPublicRoute && !isApiAuthRoute && !isAdminApiRoute && !isProfileCreateRoute && !isCelebrationsRoute && !isCelebrationsApiRoute) {
     const { data: profile } = await supabase
       .from('profiles')
       .select('id, profile_status')

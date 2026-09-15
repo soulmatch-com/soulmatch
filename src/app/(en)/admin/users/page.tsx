@@ -30,7 +30,7 @@ interface User {
 }
 
 export default function AdminUsersPage() {
-  const { isAuthenticated } = useAdminStore()
+  const { clearAdmin } = useAdminStore()
   const router = useRouter()
   const [users, setUsers] = useState<User[]>([])
   const [loading, setLoading] = useState(true)
@@ -40,17 +40,18 @@ export default function AdminUsersPage() {
   const [actionLoading, setActionLoading] = useState(false)
 
   useEffect(() => {
-    if (!isAuthenticated()) {
-      router.push(ADMIN_CONFIG.ROUTES.LOGIN)
-    } else {
-      fetchUsers()
-    }
-  }, [isAuthenticated, router])
+    fetchUsers()
+  }, [])
 
   const fetchUsers = async () => {
     try {
       setLoading(true)
       const response = await fetch(`/api/admin/users?search=${search}`)
+      if (response.status === 401 || response.status === 403) {
+        clearAdmin()
+        router.replace(ADMIN_CONFIG.ROUTES.LOGIN)
+        return
+      }
       if (!response.ok) throw new Error('Failed to fetch users')
 
       const data = await response.json()
@@ -112,10 +113,6 @@ export default function AdminUsersPage() {
     } finally {
       setActionLoading(false)
     }
-  }
-
-  if (!isAuthenticated()) {
-    return null
   }
 
   const getStatusColor = (status: string) => {

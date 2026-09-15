@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { useAdminStore } from '@/store/adminStore'
+import { useAdminStore } from '@/modules/admin'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -27,18 +27,14 @@ interface Profile {
 }
 
 export default function VerificationQueuePage() {
-  const { isAuthenticated } = useAdminStore()
+  const { clearAdmin } = useAdminStore()
   const router = useRouter()
   const [profiles, setProfiles] = useState<Profile[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    if (!isAuthenticated()) {
-      router.push('/admin/login')
-    } else {
-      fetchPendingProfiles()
-    }
-  }, [isAuthenticated, router])
+    fetchPendingProfiles()
+  }, [])
 
   const fetchPendingProfiles = async () => {
     setIsLoading(true)
@@ -48,6 +44,9 @@ export default function VerificationQueuePage() {
 
       if (response.ok) {
         setProfiles(data.profiles || [])
+      } else if (response.status === 401 || response.status === 403) {
+        clearAdmin()
+        router.replace('/admin/login')
       } else {
         toast.error(data.error || 'Failed to fetch profiles')
       }
@@ -90,10 +89,6 @@ export default function VerificationQueuePage() {
       age--
     }
     return age
-  }
-
-  if (!isAuthenticated()) {
-    return null
   }
 
   return (

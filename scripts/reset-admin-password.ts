@@ -7,13 +7,21 @@
 
 import { createClient } from '@supabase/supabase-js'
 import { hashPassword } from '../src/lib/utils/password'
-import { readFileSync } from 'fs'
+import { existsSync, readFileSync } from 'fs'
 import { resolve } from 'path'
 import * as readline from 'readline'
 
-// Load environment variables from .env.local manually
+// Load environment variables from .env.local or .env manually
 try {
-  const envContent = readFileSync(resolve(process.cwd(), '.env.local'), 'utf-8')
+  const envPath = ['.env.local', '.env']
+    .map(file => resolve(process.cwd(), file))
+    .find(file => existsSync(file))
+
+  if (!envPath) {
+    throw new Error('No .env.local or .env file found')
+  }
+
+  const envContent = readFileSync(envPath, 'utf-8')
   envContent.split('\n').forEach(line => {
     const match = line.match(/^([^#=]+)=(.*)$/)
     if (match) {
@@ -23,7 +31,7 @@ try {
     }
   })
 } catch (error) {
-  console.error('❌ Could not read .env.local file')
+  console.error('❌ Could not read .env.local or .env file')
   process.exit(1)
 }
 
@@ -32,7 +40,7 @@ const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 
 if (!supabaseUrl || !supabaseKey) {
   console.error('❌ Missing Supabase environment variables')
-  console.error('Make sure NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are set in .env.local')
+  console.error('Make sure NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are set in .env.local or .env')
   process.exit(1)
 }
 

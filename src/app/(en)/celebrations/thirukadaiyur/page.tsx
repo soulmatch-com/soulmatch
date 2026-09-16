@@ -22,11 +22,11 @@ const socialImage = {
 
 export const metadata: Metadata = {
   title: 'Thirukadaiyur 60th, 70th & 80th Marriage | MyThirumanam',
-  description: 'Plan 60th, 70th and 80th marriage celebrations in Thirukadaiyur with support for ceremony arrangements, food, stay, travel and family requirements.',
+  description: 'Plan your 60th, 70th or 80th marriage celebration in Thirukadaiyur. Get help with priest, pooja, hall, catering, stay, transport, photography and complete arrangements.',
   alternates: { canonical: url },
   openGraph: {
     title: 'Thirukadaiyur 60th, 70th & 80th Marriage | MyThirumanam',
-    description: 'Plan 60th, 70th and 80th marriage celebrations in Thirukadaiyur with support for ceremony arrangements, food, stay, travel and family requirements.',
+    description: 'Plan your 60th, 70th or 80th marriage celebration in Thirukadaiyur. Get help with priest, pooja, hall, catering, stay, transport, photography and complete arrangements.',
     url,
     siteName: 'MyThirumanam',
     type: 'website',

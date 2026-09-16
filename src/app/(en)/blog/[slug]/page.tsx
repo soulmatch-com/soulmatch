@@ -21,7 +21,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const url = getBlogUrl(article)
 
   return {
-    title: '60th Marriage in Thirukadaiyur: Planning Guide',
+    title: article.seoTitle ?? article.title,
     description: article.description,
     alternates: getBlogArticleAlternates(article),
     openGraph: { title: article.title, description: article.description, url, siteName: 'MyThirumanam', type: 'article' },

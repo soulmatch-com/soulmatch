@@ -64,6 +64,12 @@ test('Review displays plan, inclusions, add-ons and edit actions', async () => {
   assert.doesNotMatch(source, /Edit selected services|Starting Services/)
 })
 
+test('Plan V2 defaults to the 60th ceremony and 50 guests when no ceremony is preselected', async () => {
+  const source = await read('src/components/celebrations/PlanV2Flow.tsx')
+  assert.match(source, /ceremony: initialCeremony \?\? '60th-marriage'/)
+  assert.match(source, /guestPreset: '50'/)
+})
+
 test('guest count maps to actual backend ranges and preserves exact count', () => {
   assert.equal(mapPlanV2GuestCountRange(19), 'below-20')
   assert.equal(mapPlanV2GuestCountRange(50), '20-50')
@@ -129,6 +135,24 @@ test('legacy API payload remains valid and does not require V2 fields', () => {
   assert.equal(legacy.expectedGuestCount, undefined)
   assert.equal(legacy.planType, undefined)
   assert.equal(legacy.planVersion, undefined)
+})
+
+test('Plan V2 and legacy submissions both allow omitted couple details and map them to RPC nulls', () => {
+  const optionalDetails = { ...details, husbandName: '', wifeName: '', husbandDob: '', wifeDob: '' }
+  const v2 = buildPlanV2Submission(selection({ details: optionalDetails }), services)
+  assert.equal(v2.ok, true)
+  if (!v2.ok) return
+  const v2Args = toCelebrationRpcArgs(v2.payload)
+  assert.equal(v2Args.p_husband_name, null)
+  assert.equal(v2Args.p_wife_name, null)
+  assert.equal(v2Args.p_husband_dob, null)
+  assert.equal(v2Args.p_wife_dob, null)
+  const legacy = celebrationEnquiryApiSchema.parse({ ...v2.payload, husbandName: '', wifeName: '', husbandDob: '', wifeDob: '' })
+  const legacyArgs = toCelebrationRpcArgs(legacy)
+  assert.equal(legacyArgs.p_husband_name, null)
+  assert.equal(legacyArgs.p_wife_name, null)
+  assert.equal(legacyArgs.p_husband_dob, null)
+  assert.equal(legacyArgs.p_wife_dob, null)
 })
 
 test('RPC args include optional final V2 fields while legacy values default to null', () => {

@@ -26,8 +26,10 @@ export function EnquiryReview({ values, services, ceremony, onEdit, disabled }: 
   const sections = [
     { title: 'Ceremony', content: <><p className="mt-4 font-medium">{ceremony?.title}</p><p lang="ta" className="mt-2 leading-7 text-stone-600">{ceremony?.tamil}</p></> },
     { title: 'Couple details', content: <SummaryRows rows={[
-      ['Husband Name', values.husbandName], ['Wife Name', values.wifeName],
-      ['Husband Date of Birth', dateLabel(values.husbandDob)], ['Wife Date of Birth', dateLabel(values.wifeDob)],
+      ...(values.husbandName ? [['Husband Name', values.husbandName] as [string, string]] : []),
+      ...(values.wifeName ? [['Wife Name', values.wifeName] as [string, string]] : []),
+      ...(values.husbandDob ? [['Husband Date of Birth', dateLabel(values.husbandDob)] as [string, string]] : []),
+      ...(values.wifeDob ? [['Wife Date of Birth', dateLabel(values.wifeDob)] as [string, string]] : []),
       ...([['Husband Nakshatra', values.husbandNakshatra], ['Wife Nakshatra', values.wifeNakshatra], ['Husband Rasi', values.husbandRasi], ['Wife Rasi', values.wifeRasi]] as Array<[string, string | undefined]>).filter(([, value]) => value?.trim()),
     ]} /> },
     { title: 'Event details', content: <SummaryRows rows={[

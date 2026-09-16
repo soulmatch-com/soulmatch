@@ -124,10 +124,10 @@ export function PlanReviewScreen({
             ...(details?.alternativeDate ? [['Alternative Date', displayDate(details.alternativeDate)] as [string, string]] : []),
             ['Travelling From', details?.travellingFrom ?? 'Not provided'],
             ['Expected Guests', formatPlanGuestCount(selection)],
-            ['Husband Name', details?.husbandName ?? 'Not provided'],
-            ['Wife Name', details?.wifeName ?? 'Not provided'],
-            ['Husband DOB', displayDate(details?.husbandDob)],
-            ['Wife DOB', displayDate(details?.wifeDob)],
+            ...(details?.husbandName ? [['Husband Name', details.husbandName] as [string, string]] : []),
+            ...(details?.wifeName ? [['Wife Name', details.wifeName] as [string, string]] : []),
+            ...(details?.husbandDob ? [['Husband DOB', displayDate(details.husbandDob)] as [string, string]] : []),
+            ...(details?.wifeDob ? [['Wife DOB', displayDate(details.wifeDob)] as [string, string]] : []),
             ...traditionalRows(selection),
           ]} />
         </ReviewCard>

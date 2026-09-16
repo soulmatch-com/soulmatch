@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import type { CeremonySlug } from '@/lib/celebrations'
 import type { PublicCelebrationService } from '@/lib/celebrations/service-query'
@@ -25,12 +25,22 @@ export function PlanV2Flow({
 }) {
   const [view, setView] = useState<CelebrationPlanView>('arrangement')
   const [submittedEnquiryReference, setSubmittedEnquiryReference] = useState<string>()
+  const hasMounted = useRef(false)
   const [selection, setSelection] = useState<CelebrationPlanDraftSelection>({
-    ceremony: initialCeremony,
+    ceremony: initialCeremony ?? '60th-marriage',
+    guestPreset: '50',
     ceremonyDuration: 'one_session',
     planType: null,
     selectedAddonCodes: [],
   })
+
+  useEffect(() => {
+    if (!hasMounted.current) {
+      hasMounted.current = true
+      return
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }, [view])
 
   const confirmSelection = (completeSelection: CelebrationPlanSelection) => {
     setSelection((current) => {
@@ -47,7 +57,7 @@ export function PlanV2Flow({
   const startAnotherEnquiry = () => {
     setSubmittedEnquiryReference(undefined)
     setView('arrangement')
-    setSelection({ ceremony: initialCeremony, ceremonyDuration: 'one_session', planType: null, selectedAddonCodes: [] })
+    setSelection({ ceremony: initialCeremony ?? '60th-marriage', guestPreset: '50', ceremonyDuration: 'one_session', planType: null, selectedAddonCodes: [] })
   }
 
   if (submittedEnquiryReference) {

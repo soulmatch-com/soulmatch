@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { getCelebrationDateBounds } from '@/lib/celebrations/date'
+import { sanitizeIndianMobileInput, sanitizeLocationInput, sanitizePersonNameInput } from '@/lib/celebrations/enquiry-validation'
 import { getCelebrationPlanDefinition } from '@/lib/celebrations/celebration-plans'
 import { createPlanV2DetailsSchema, type CelebrationPlanDetailsDraft } from '@/lib/celebrations/plan-v2-details'
 import {
@@ -86,7 +87,7 @@ export function PlanDetailsScreen({
               <Input id="alternativeDate" type="date" min={today} value={details.alternativeDate ?? ''} onChange={(event) => updateDetails('alternativeDate', event.target.value)} aria-invalid={!!errors.alternativeDate} aria-describedby={errors.alternativeDate ? 'alternativeDate-error' : undefined} className={fieldClass} />
             </Field>
             <Field id="travellingFrom" label="Travelling From" required error={errors.travellingFrom}>
-              <Input id="travellingFrom" placeholder="Chennai, Bengaluru, Coimbatore, Singapore, etc." value={details.travellingFrom ?? ''} onChange={(event) => updateDetails('travellingFrom', event.target.value)} aria-invalid={!!errors.travellingFrom} aria-describedby={errors.travellingFrom ? 'travellingFrom-error' : undefined} className={fieldClass} />
+              <Input id="travellingFrom" maxLength={50} placeholder="Chennai, Bengaluru, Coimbatore, Singapore, etc." value={details.travellingFrom ?? ''} onChange={(event) => updateDetails('travellingFrom', sanitizeLocationInput(event.target.value))} aria-invalid={!!errors.travellingFrom} aria-describedby={errors.travellingFrom ? 'travellingFrom-error' : undefined} className={fieldClass} />
             </Field>
             <div className="sm:col-span-2">
               <Field id="additionalRequirements" label="Additional Requirements" hint="Optional" error={errors.additionalRequirements}>
@@ -109,16 +110,16 @@ export function PlanDetailsScreen({
         <section aria-labelledby="plan-v2-couple-details">
           <h2 id="plan-v2-couple-details" className="text-2xl font-bold text-stone-950">Couple Details</h2>
           <div className="mt-5 grid gap-6 sm:grid-cols-2">
-            <Field id="husbandName" label="Husband Name" required error={errors.husbandName}>
-              <Input id="husbandName" value={details.husbandName ?? ''} onChange={(event) => updateDetails('husbandName', event.target.value)} aria-invalid={!!errors.husbandName} aria-describedby={errors.husbandName ? 'husbandName-error' : undefined} className={fieldClass} />
+            <Field id="husbandName" label="Husband Name" hint="Optional" error={errors.husbandName}>
+              <Input id="husbandName" maxLength={50} value={details.husbandName ?? ''} onChange={(event) => updateDetails('husbandName', sanitizePersonNameInput(event.target.value))} aria-invalid={!!errors.husbandName} aria-describedby={errors.husbandName ? 'husbandName-error' : undefined} className={fieldClass} />
             </Field>
-            <Field id="wifeName" label="Wife Name" required error={errors.wifeName}>
-              <Input id="wifeName" value={details.wifeName ?? ''} onChange={(event) => updateDetails('wifeName', event.target.value)} aria-invalid={!!errors.wifeName} aria-describedby={errors.wifeName ? 'wifeName-error' : undefined} className={fieldClass} />
+            <Field id="wifeName" label="Wife Name" hint="Optional" error={errors.wifeName}>
+              <Input id="wifeName" maxLength={50} value={details.wifeName ?? ''} onChange={(event) => updateDetails('wifeName', sanitizePersonNameInput(event.target.value))} aria-invalid={!!errors.wifeName} aria-describedby={errors.wifeName ? 'wifeName-error' : undefined} className={fieldClass} />
             </Field>
-            <Field id="husbandDob" label="Husband Date of Birth" required error={errors.husbandDob}>
+            <Field id="husbandDob" label="Husband Date of Birth" hint="Optional" error={errors.husbandDob}>
               <Input id="husbandDob" type="date" min={minDateOfBirth} max={maxDateOfBirth} value={details.husbandDob ?? ''} onChange={(event) => updateDetails('husbandDob', event.target.value)} aria-invalid={!!errors.husbandDob} aria-describedby={errors.husbandDob ? 'husbandDob-error' : undefined} className={fieldClass} />
             </Field>
-            <Field id="wifeDob" label="Wife Date of Birth" required error={errors.wifeDob}>
+            <Field id="wifeDob" label="Wife Date of Birth" hint="Optional" error={errors.wifeDob}>
               <Input id="wifeDob" type="date" min={minDateOfBirth} max={maxDateOfBirth} value={details.wifeDob ?? ''} onChange={(event) => updateDetails('wifeDob', event.target.value)} aria-invalid={!!errors.wifeDob} aria-describedby={errors.wifeDob ? 'wifeDob-error' : undefined} className={fieldClass} />
             </Field>
           </div>
@@ -159,10 +160,10 @@ export function PlanDetailsScreen({
           <p className="mt-2 leading-7 text-stone-600">Your details are used only to respond to your celebration enquiry.</p>
           <div className="mt-5 grid gap-6 sm:grid-cols-2">
             <Field id="contactName" label="Your Name" required error={errors.contactName}>
-              <Input id="contactName" autoComplete="name" value={details.contactName ?? ''} onChange={(event) => updateDetails('contactName', event.target.value)} aria-invalid={!!errors.contactName} aria-describedby={errors.contactName ? 'contactName-error' : undefined} className={fieldClass} />
+              <Input id="contactName" maxLength={50} autoComplete="name" value={details.contactName ?? ''} onChange={(event) => updateDetails('contactName', sanitizePersonNameInput(event.target.value))} aria-invalid={!!errors.contactName} aria-describedby={errors.contactName ? 'contactName-error' : undefined} className={fieldClass} />
             </Field>
             <Field id="mobile" label="Mobile Number" required error={errors.mobile}>
-              <Input id="mobile" type="tel" inputMode="tel" autoComplete="tel" placeholder="Include country code if outside India" value={details.mobile ?? ''} onChange={(event) => updateDetails('mobile', event.target.value)} aria-invalid={!!errors.mobile} aria-describedby={errors.mobile ? 'mobile-error' : undefined} className={fieldClass} />
+              <Input id="mobile" maxLength={15} type="tel" inputMode="tel" autoComplete="tel" placeholder="9876543210 or +91 98765 43210" value={details.mobile ?? ''} onChange={(event) => updateDetails('mobile', sanitizeIndianMobileInput(event.target.value))} aria-invalid={!!errors.mobile} aria-describedby={errors.mobile ? 'mobile-error' : undefined} className={fieldClass} />
             </Field>
             <Field id="email" label="Email Address" hint="Required if email is preferred" error={errors.email}>
               <Input id="email" type="email" autoComplete="email" value={details.email ?? ''} onChange={(event) => updateDetails('email', event.target.value)} aria-invalid={!!errors.email} aria-describedby={errors.email ? 'email-error' : undefined} className={fieldClass} />

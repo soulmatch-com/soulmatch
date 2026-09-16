@@ -14,6 +14,7 @@ import type { CeremonySlug } from '@/lib/celebrations'
 import { submitCelebrationEnquiry } from '@/lib/celebrations/client-submission'
 import { groupCelebrationServices } from '@/lib/celebrations/service-presentation'
 import { getAlternativeDateConflictMessage, getCelebrationDateBounds } from '@/lib/celebrations/date'
+import { sanitizeIndianMobileInput, sanitizeLocationInput, sanitizePersonNameInput } from '@/lib/celebrations/enquiry-validation'
 import { ceremonySelectionOptions } from '@/lib/celebrations'
 import { EnquiryReview, EnquiryConfirmation } from './EnquirySummary'
 import { TurnstileChallenge } from './TurnstileChallenge'
@@ -66,7 +67,7 @@ export function CelebrationEnquiryForm({
     resolver: zodResolver(celebrationEnquiryApiSchema),
     mode: 'onTouched',
     shouldFocusError: false,
-    defaultValues: { celebrationType: initialCeremony, serviceIds: [], email: '', otherServiceDetails: '', notes: '' },
+    defaultValues: { celebrationType: initialCeremony, serviceIds: [], email: '', relationship: '', otherServiceDetails: '', notes: '' },
   })
   const {
     register,
@@ -300,16 +301,16 @@ export function CelebrationEnquiryForm({
             <section aria-labelledby="couple-heading">
               <h3 id="couple-heading" className="text-2xl font-bold">Couple details</h3>
               <div className="mt-7 grid gap-6 sm:grid-cols-2">
-                <Field id="husbandName" label="Husband Name" required error={<ErrorText name="husbandName" />}>
-                  <Input id="husbandName" autoComplete="name" {...register('husbandName')} aria-invalid={!!errors.husbandName} aria-describedby={describedBy('husbandName')} className={fieldClass} />
+                <Field id="husbandName" label="Husband Name" hint="Optional" error={<ErrorText name="husbandName" />}>
+                  <Input id="husbandName" maxLength={50} autoComplete="name" {...register('husbandName')} onChange={(event) => setValue('husbandName', sanitizePersonNameInput(event.target.value), { shouldDirty: true, shouldTouch: true, shouldValidate: true })} aria-invalid={!!errors.husbandName} aria-describedby={describedBy('husbandName')} className={fieldClass} />
                 </Field>
-                <Field id="wifeName" label="Wife Name" required error={<ErrorText name="wifeName" />}>
-                  <Input id="wifeName" autoComplete="name" {...register('wifeName')} aria-invalid={!!errors.wifeName} aria-describedby={describedBy('wifeName')} className={fieldClass} />
+                <Field id="wifeName" label="Wife Name" hint="Optional" error={<ErrorText name="wifeName" />}>
+                  <Input id="wifeName" maxLength={50} autoComplete="name" {...register('wifeName')} onChange={(event) => setValue('wifeName', sanitizePersonNameInput(event.target.value), { shouldDirty: true, shouldTouch: true, shouldValidate: true })} aria-invalid={!!errors.wifeName} aria-describedby={describedBy('wifeName')} className={fieldClass} />
                 </Field>
-                <Field id="husbandDob" label="Husband Date of Birth" required error={<ErrorText name="husbandDob" />}>
+                <Field id="husbandDob" label="Husband Date of Birth" hint="Optional" error={<ErrorText name="husbandDob" />}>
                   <Input id="husbandDob" type="date" min={minDateOfBirth} max={maxDateOfBirth} {...register('husbandDob')} aria-invalid={!!errors.husbandDob} aria-describedby={describedBy('husbandDob')} className={fieldClass} />
                 </Field>
-                <Field id="wifeDob" label="Wife Date of Birth" required error={<ErrorText name="wifeDob" />}>
+                <Field id="wifeDob" label="Wife Date of Birth" hint="Optional" error={<ErrorText name="wifeDob" />}>
                   <Input id="wifeDob" type="date" min={minDateOfBirth} max={maxDateOfBirth} {...register('wifeDob')} aria-invalid={!!errors.wifeDob} aria-describedby={describedBy('wifeDob')} className={fieldClass} />
                 </Field>
               </div>
@@ -368,7 +369,7 @@ export function CelebrationEnquiryForm({
                   </select>
                 </Field>
                 <Field id="travellingFrom" label="Travelling From" required error={<ErrorText name="travellingFrom" />}>
-                  <Input id="travellingFrom" placeholder="Chennai, Bengaluru, Coimbatore, Singapore, etc." {...register('travellingFrom')} aria-invalid={!!errors.travellingFrom} aria-describedby={describedBy('travellingFrom')} className={fieldClass} />
+                  <Input id="travellingFrom" maxLength={50} placeholder="Chennai, Bengaluru, Coimbatore, Singapore, etc." {...register('travellingFrom')} onChange={(event) => setValue('travellingFrom', sanitizeLocationInput(event.target.value), { shouldDirty: true, shouldTouch: true, shouldValidate: true })} aria-invalid={!!errors.travellingFrom} aria-describedby={describedBy('travellingFrom')} className={fieldClass} />
                 </Field>
                 <Field id="arrangementPreference" label="Arrangement Preference" required error={<ErrorText name="arrangementPreference" />}>
                   <select id="arrangementPreference" {...register('arrangementPreference')} aria-invalid={!!errors.arrangementPreference} aria-describedby={describedBy('arrangementPreference')} className={selectClass}>
@@ -438,10 +439,10 @@ export function CelebrationEnquiryForm({
               <p className="mt-2 leading-7 text-stone-600">Your details are used only to respond to your celebration enquiry.</p>
               <div className="mt-7 grid gap-6 sm:grid-cols-2">
                 <Field id="contactName" label="Contact Person Name" required error={<ErrorText name="contactName" />}>
-                  <Input id="contactName" autoComplete="name" {...register('contactName')} aria-invalid={!!errors.contactName} aria-describedby={describedBy('contactName')} className={fieldClass} />
+                  <Input id="contactName" maxLength={50} autoComplete="name" {...register('contactName')} onChange={(event) => setValue('contactName', sanitizePersonNameInput(event.target.value), { shouldDirty: true, shouldTouch: true, shouldValidate: true })} aria-invalid={!!errors.contactName} aria-describedby={describedBy('contactName')} className={fieldClass} />
                 </Field>
                 <Field id="mobile" label="Mobile Number" required error={<ErrorText name="mobile" />}>
-                  <Input id="mobile" type="tel" inputMode="tel" autoComplete="tel" placeholder="Include country code if outside India" {...register('mobile')} aria-invalid={!!errors.mobile} aria-describedby={describedBy('mobile')} className={fieldClass} />
+                  <Input id="mobile" maxLength={15} type="tel" inputMode="tel" autoComplete="tel" placeholder="9876543210 or +91 98765 43210" {...register('mobile')} onChange={(event) => setValue('mobile', sanitizeIndianMobileInput(event.target.value), { shouldDirty: true, shouldTouch: true, shouldValidate: true })} aria-invalid={!!errors.mobile} aria-describedby={describedBy('mobile')} className={fieldClass} />
                 </Field>
                 <Field id="email" label="Email" hint="Required if email is preferred" error={<ErrorText name="email" />}>
                   <Input id="email" type="email" autoComplete="email" {...register('email')} aria-invalid={!!errors.email} aria-describedby={describedBy('email')} className={fieldClass} />

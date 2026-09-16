@@ -1,30 +1,14 @@
 import { z } from 'zod'
 import { compareDateOnlyStrings, getAlternativeDateConflictMessage, getCelebrationDateBounds, isValidDateOnly } from './date.ts'
+import { indianMobileSchema, optionalBirthDateSchema, optionalPersonName, requiredLocation, requiredPersonName, requiredRelationship } from './enquiry-validation.ts'
 import { preferredContactMethods } from '../validations/celebration-enquiry-api.schema.ts'
 
-const requiredText = (label: string, max: number) => z.string().trim().min(1, `${label} is required`).max(max, `${label} is too long`)
 const optionalText = (max: number) => z.string().trim().max(max).optional().transform((value) => value || undefined)
 const dateString = z
-  .string()
+  .string({ error: 'Please select a preferred ceremony date.' })
   .regex(/^\d{4}-\d{2}-\d{2}$/, 'Use a valid date in YYYY-MM-DD format')
   .refine((value) => isValidDateOnly(value), 'Use a valid calendar date')
 const optionalDate = dateString.optional().or(z.literal('')).transform((value) => value || undefined)
-
-function buildPlanV2BirthDateSchema(label: 'Husband' | 'Wife', today: string, minDateOfBirth: string, maxDateOfBirth: string) {
-  return dateString.superRefine((value, context) => {
-    if (compareDateOnlyStrings(value, today) >= 0) {
-      context.addIssue({ code: 'custom', message: 'Date of birth cannot be in the future.' })
-      return
-    }
-    if (compareDateOnlyStrings(value, maxDateOfBirth) > 0) {
-      context.addIssue({ code: 'custom', message: `${label} must be at least 18 years old.` })
-      return
-    }
-    if (compareDateOnlyStrings(value, minDateOfBirth) < 0) {
-      context.addIssue({ code: 'custom', message: 'Please enter a valid date of birth.' })
-    }
-  })
-}
 
 export function createPlanV2DetailsSchema(referenceDate = new Date()) {
   const { today, minDateOfBirth, maxDateOfBirth } = getCelebrationDateBounds(referenceDate)
@@ -40,22 +24,20 @@ export function createPlanV2DetailsSchema(referenceDate = new Date()) {
   return z.object({
     preferredDate,
     alternativeDate,
-    travellingFrom: requiredText('Travelling from', 200),
+    travellingFrom: requiredLocation(),
     additionalRequirements: optionalText(1000),
-    husbandName: requiredText('Husband name', 150),
-    wifeName: requiredText('Wife name', 150),
-    husbandDob: buildPlanV2BirthDateSchema('Husband', today, minDateOfBirth, maxDateOfBirth),
-    wifeDob: buildPlanV2BirthDateSchema('Wife', today, minDateOfBirth, maxDateOfBirth),
+    husbandName: optionalPersonName('Husband name'),
+    wifeName: optionalPersonName('Wife name'),
+    husbandDob: optionalBirthDateSchema('Husband', today, minDateOfBirth, maxDateOfBirth),
+    wifeDob: optionalBirthDateSchema('Wife', today, minDateOfBirth, maxDateOfBirth),
     husbandNakshatra: optionalText(100),
     husbandRasi: optionalText(100),
     wifeNakshatra: optionalText(100),
     wifeRasi: optionalText(100),
-    contactName: requiredText('Contact name', 150),
-    mobile: requiredText('Mobile number', 30)
-      .regex(/^\+?[0-9][0-9\s().-]*$/, 'Enter a valid mobile number')
-      .refine((value) => value.replace(/\D/g, '').length >= 7, 'Enter a valid mobile number'),
+    contactName: requiredPersonName('Contact name'),
+    mobile: indianMobileSchema,
     email: z.string().trim().email('Enter a valid email').max(320).optional().or(z.literal('')).transform((value) => value || undefined),
-    relationship: requiredText('Relationship', 100),
+    relationship: requiredRelationship,
     preferredContactMethod: z.enum(preferredContactMethods, { error: 'Please select a preferred contact method.' }),
     termsPrivacyAcknowledged: z.literal(true, { error: 'Please agree to the Terms & Conditions and acknowledge the Privacy Policy before continuing.' }),
   }).strict().superRefine((data, context) => {

@@ -55,10 +55,10 @@ export interface Database {
           id: string
           location: string
           celebration_type: '60th-marriage' | '70th-marriage' | '80th-marriage' | 'not-sure'
-          husband_name: string
-          wife_name: string
-          husband_dob: string
-          wife_dob: string
+          husband_name: string | null
+          wife_name: string | null
+          husband_dob: string | null
+          wife_dob: string | null
           husband_nakshatra: string | null
           wife_nakshatra: string | null
           husband_rasi: string | null
@@ -88,10 +88,10 @@ export interface Database {
           id?: string
           location: string
           celebration_type: '60th-marriage' | '70th-marriage' | '80th-marriage' | 'not-sure'
-          husband_name: string
-          wife_name: string
-          husband_dob: string
-          wife_dob: string
+          husband_name?: string | null
+          wife_name?: string | null
+          husband_dob?: string | null
+          wife_dob?: string | null
           husband_nakshatra?: string | null
           wife_nakshatra?: string | null
           husband_rasi?: string | null
@@ -121,10 +121,10 @@ export interface Database {
           id?: string
           location?: string
           celebration_type?: '60th-marriage' | '70th-marriage' | '80th-marriage' | 'not-sure'
-          husband_name?: string
-          wife_name?: string
-          husband_dob?: string
-          wife_dob?: string
+          husband_name?: string | null
+          wife_name?: string | null
+          husband_dob?: string | null
+          wife_dob?: string | null
           husband_nakshatra?: string | null
           wife_nakshatra?: string | null
           husband_rasi?: string | null
@@ -464,10 +464,10 @@ export interface Database {
         Args: {
           p_location: string
           p_celebration_type: string
-          p_husband_name: string
-          p_wife_name: string
-          p_husband_dob: string
-          p_wife_dob: string
+          p_husband_name: string | null
+          p_wife_name: string | null
+          p_husband_dob: string | null
+          p_wife_dob: string | null
           p_preferred_date: string
           p_guest_count_range: string
           p_arrangement_preference: string

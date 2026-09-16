@@ -15,19 +15,20 @@ import {
 const root = new URL('../', import.meta.url)
 const read = (path) => readFile(new URL(path, root), 'utf8')
 const slug = '60th-marriage-thirukadaiyur'
+const sashtiapthapoorthiSlug = 'sashtiapthapoorthi-in-thirukadaiyur'
 const unsupportedClaims = /15\+|250\+|500\+|100% satisfaction|No\.1|Most Trusted|Best Thirukadaiyur|All-Inclusive Package|Premium Package|Gold Package|Silver Package|₹|\$[0-9]/i
 const unsafeTempleWording = /Book the temple through MyThirumanam|authorized by temple|temple affiliated|direct temple contact|temple booking portal|Official Booking Number/i
 
-test('blog content loader returns only published English and Tamil articles', () => {
+test('blog content loader returns published English and Tamil articles', () => {
   const english = getPublishedBlogArticles('en')
   const tamil = getPublishedBlogArticles('ta')
 
-  assert.equal(english.length, 1)
-  assert.equal(tamil.length, 1)
-  assert.equal(english[0].slug, slug)
-  assert.equal(tamil[0].slug, slug)
-  assert.equal(english[0].status, 'published')
-  assert.equal(tamil[0].status, 'published')
+  assert.equal(english.length, 2)
+  assert.equal(tamil.length, 2)
+  assert.deepEqual(english.map((article) => article.slug), [sashtiapthapoorthiSlug, slug])
+  assert.deepEqual(tamil.map((article) => article.slug), [sashtiapthapoorthiSlug, slug])
+  assert.ok(english.every((article) => article.status === 'published'))
+  assert.ok(tamil.every((article) => article.status === 'published'))
   assert.equal(getPublishedBlogArticle('en', slug)?.title, '60th Marriage in Thirukadaiyur: A Complete Planning Guide')
   assert.equal(getPublishedBlogArticle('ta', slug)?.title, 'திருக்கடையூரில் 60ஆம் திருமணம்: முழுமையான திட்டமிடல் வழிகாட்டி')
 })
@@ -162,7 +163,41 @@ test('only published articles enter sitemap and blog listings', () => {
   }
   assert.equal(getBlogListingPath('en'), '/blog')
   assert.equal(getBlogListingPath('ta'), '/ta/blog')
-  assert.equal(getBlogUrl(getPublishedBlogArticles('en')[0]), 'https://mythirumanam.in/blog/60th-marriage-thirukadaiyur')
+  assert.ok(publishedPaths.includes('/blog/sashtiapthapoorthi-in-thirukadaiyur'))
+  assert.ok(publishedPaths.includes('/ta/blog/sashtiapthapoorthi-in-thirukadaiyur'))
+  assert.equal(getBlogUrl(getPublishedBlogArticle('en', slug)), 'https://mythirumanam.in/blog/60th-marriage-thirukadaiyur')
+})
+
+test('Sashtiapthapoorthi pair has approved SEO, route, product and safety content', () => {
+  const english = getPublishedBlogArticle('en', sashtiapthapoorthiSlug)
+  const tamil = getPublishedBlogArticle('ta', sashtiapthapoorthiSlug)
+  assert.ok(english)
+  assert.ok(tamil)
+  assert.equal(english.title, 'Sashtiapthapoorthi in Thirukadaiyur – What Families Should Know')
+  assert.equal(tamil.title, 'திருக்கடையூரில் சஷ்டியப்தபூர்த்தி – குடும்பங்கள் தெரிந்துகொள்ள வேண்டியவை')
+  assert.equal(english.seoTitle, 'Sashtiapthapoorthi in Thirukadaiyur – Family Planning Guide | MyThirumanam')
+  assert.equal(tamil.seoTitle, 'திருக்கடையூரில் சஷ்டியப்தபூர்த்தி – 60வது திருமண திட்டமிடல் வழிகாட்டி | MyThirumanam')
+  assert.equal(getBlogPath(english), '/blog/sashtiapthapoorthi-in-thirukadaiyur')
+  assert.equal(getBlogPath(tamil), '/ta/blog/sashtiapthapoorthi-in-thirukadaiyur')
+  assert.deepEqual(getBlogArticleAlternates(english), {
+    canonical: 'https://mythirumanam.in/blog/sashtiapthapoorthi-in-thirukadaiyur',
+    languages: {
+      en: 'https://mythirumanam.in/blog/sashtiapthapoorthi-in-thirukadaiyur',
+      ta: 'https://mythirumanam.in/ta/blog/sashtiapthapoorthi-in-thirukadaiyur',
+      'x-default': 'https://mythirumanam.in/blog/sashtiapthapoorthi-in-thirukadaiyur',
+    },
+  })
+  const englishContent = JSON.stringify(english)
+  const tamilContent = JSON.stringify(tamil)
+  for (const text of ['Basic Plan', 'Pooja and Homam with 16 Kalasam', 'common/shared space', 'Premium Plan', 'private space', '1 Session or 2 Sessions', 'Transportation', 'Return Gifts', 'independent event-management and coordination service']) assert.match(englishContent, new RegExp(text))
+  assert.match(tamilContent, /அடிப்படை திட்டம்/)
+  assert.match(tamilContent, /பிரீமியம் திட்டம்/)
+  assert.match(tamilContent, /சுயாதீன விழா ஏற்பாடு மற்றும் ஒருங்கிணைப்பு சேவை/)
+  assert.doesNotMatch(englishContent + tamilContent, /Morning session only|₹|\$[0-9]|official temple website and affiliated/i)
+  assert.deepEqual(english.links.map((link) => link.href), ['/60th-marriage', '/70th-marriage', '/80th-marriage', '/plan', '/blog'])
+  assert.deepEqual(tamil.links.map((link) => link.href), ['/plan', '/ta/blog'])
+  assert.equal(english.cta.href, '/plan')
+  assert.equal(tamil.cta.href, '/plan')
 })
 
 test('sitemap source derives blog URLs from published content helpers', async () => {

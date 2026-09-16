@@ -23,7 +23,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const url = getBlogUrl(article)
 
   return {
-    title: 'திருக்கடையூரில் 60ஆம் திருமணம்: திட்டமிடல் வழிகாட்டி',
+    title: article.seoTitle ?? article.title,
     description: article.description,
     alternates: getBlogArticleAlternates(article),
     openGraph: { title: article.title, description: article.description, url, siteName: 'MyThirumanam', type: 'article' },

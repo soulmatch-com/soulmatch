@@ -22,11 +22,11 @@ const socialImage = {
 
 export const metadata: Metadata = {
   title: 'Thirukadaiyur 60th, 70th & 80th Marriage | MyThirumanam',
-  description: 'Plan 60th, 70th and 80th marriage celebrations in Thirukadaiyur with support for ceremony arrangements, food, stay, travel and family requirements.',
+  description: 'Plan your 60th, 70th or 80th marriage celebration in Thirukadaiyur. Get help with priest, pooja, hall, catering, stay, transport, photography and complete arrangements.',
   alternates: { canonical: url },
   openGraph: {
     title: 'Thirukadaiyur 60th, 70th & 80th Marriage | MyThirumanam',
-    description: 'Plan 60th, 70th and 80th marriage celebrations in Thirukadaiyur with support for ceremony arrangements, food, stay, travel and family requirements.',
+    description: 'Plan your 60th, 70th or 80th marriage celebration in Thirukadaiyur. Get help with priest, pooja, hall, catering, stay, transport, photography and complete arrangements.',
     url,
     siteName: 'MyThirumanam',
     type: 'website',
@@ -113,7 +113,7 @@ export default async function ThirukadaiyurPage() {
             <p lang="ta" className="mt-2 max-w-3xl leading-8 text-stone-700">{tamilContent.stepsIntro}</p>
             <div className="mt-9"><PlanningSteps steps={homepageSteps} variant="card" /></div>
             <div className="mt-10 border-t border-amber-200 pt-8 text-center">
-              <h3 className="text-2xl font-bold text-stone-900">Ready to plan your celebration?</h3>
+              <h3 className="text-2xl font-bold text-stone-900">Start planning your family celebration</h3>
               <p lang="ta" className="mt-2 font-semibold text-amber-900">{tamilContent.stepsCta}</p>
               <Link href="/plan" className="mt-5 inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-amber-800 px-6 py-3 font-bold text-white hover:bg-amber-900 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-amber-700">
                 Plan Celebration <ArrowRight aria-hidden="true" className="h-5 w-5" />

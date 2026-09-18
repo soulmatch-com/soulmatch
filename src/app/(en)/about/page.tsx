@@ -60,6 +60,7 @@ export const metadata: Metadata = {
   title: 'About MyThirumanam | Thirukadaiyur Celebrations',
   description,
   alternates: { canonical: url },
+  robots: { index: true, follow: true },
   openGraph: { title: 'About MyThirumanam | Thirukadaiyur Celebrations', description, url, siteName: 'MyThirumanam', type: 'website' },
 }
 

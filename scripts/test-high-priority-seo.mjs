@@ -87,7 +87,7 @@ test('homepage has the intended single H1 source and preferred metadata', async 
   assert.match(homepage, /Thirukadaiyur 60th, 70th &amp; 80th Marriage Celebrations/)
   assert.match(homepage, /Celebrate Life&apos;s Meaningful Marriage Milestones/)
   assert.match(homepage, /title: 'Thirukadaiyur 60th, 70th & 80th Marriage \| MyThirumanam'/)
-  assert.match(homepage, /Plan 60th, 70th and 80th marriage celebrations in Thirukadaiyur with support for ceremony arrangements, food, stay, travel and family requirements\./)
+  assert.match(homepage, /Plan your 60th, 70th or 80th marriage celebration in Thirukadaiyur\. Get help with priest, pooja, hall, catering, stay, transport, photography and complete arrangements\./)
 })
 
 test('plan noindex, sitemap and robots SEO behavior is preserved', async () => {

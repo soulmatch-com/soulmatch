@@ -64,12 +64,22 @@ export function BlogArticlePage({ article, alternateArticle }: ArticleRenderProp
             <section className="mt-10 rounded-2xl bg-gradient-to-r from-[#681c24] to-[#9a3b2f] p-6 text-white sm:p-8">
               <h2 className="text-2xl font-bold">{article.cta.title}</h2>
               <p className="mt-3 max-w-2xl leading-7 text-amber-50">{article.cta.text}</p>
-              <Link
-                href={article.cta.href}
-                className="mt-6 inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-amber-400 px-6 py-3 font-bold text-stone-950 hover:bg-amber-300 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
-              >
-                {article.cta.label} <ArrowRight aria-hidden="true" className="h-5 w-5" />
-              </Link>
+              <div className="mt-6 flex flex-wrap gap-3">
+                <Link
+                  href={article.cta.href}
+                  className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-amber-400 px-6 py-3 font-bold text-stone-950 hover:bg-amber-300 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
+                >
+                  {article.cta.label} <ArrowRight aria-hidden="true" className="h-5 w-5" />
+                </Link>
+                {article.cta.secondaryLabel && article.cta.secondaryHref ? (
+                  <Link
+                    href={article.cta.secondaryHref}
+                    className="inline-flex min-h-12 items-center justify-center rounded-xl border border-white/50 px-6 py-3 font-bold text-white hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
+                  >
+                    {article.cta.secondaryLabel}
+                  </Link>
+                ) : null}
+              </div>
             </section>
           </div>
 
@@ -117,6 +127,25 @@ function ArticleSection({ section, locale }: { section: BlogSection; locale: Blo
             <li key={item}>{item}</li>
           ))}
         </ul>
+      )
+    case 'comparison':
+      return (
+        <div className="overflow-x-auto rounded-2xl border border-amber-200">
+          <table className="min-w-full border-collapse text-left text-sm leading-6 text-stone-700">
+            <thead className="bg-amber-50 text-stone-950">
+              <tr>{section.headers.map((header) => <th key={header} scope="col" className="p-4 font-bold">{header}</th>)}</tr>
+            </thead>
+            <tbody className="divide-y divide-amber-200 bg-white">
+              {section.rows.map(([area, oneSession, twoSessions]) => (
+                <tr key={area}>
+                  <th scope="row" className="p-4 font-bold text-stone-950">{area}</th>
+                  <td className="p-4">{oneSession}</td>
+                  <td className="p-4">{twoSessions}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )
     case 'faq':
       return (

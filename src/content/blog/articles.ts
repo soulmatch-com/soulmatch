@@ -20,6 +20,7 @@ export type BlogSection =
   | { type: 'paragraph'; text: string }
   | { type: 'heading'; text: string }
   | { type: 'list'; items: readonly string[] }
+  | { type: 'comparison'; headers: readonly [string, string, string]; rows: readonly (readonly [string, string, string])[] }
   | { type: 'note'; text: string }
   | { type: 'faq'; items: readonly { question: string; answer: string }[] }
 
@@ -36,12 +37,124 @@ export type BlogArticle = BlogMetadata & {
     text: string
     label: string
     href: string
+    secondaryLabel?: string
+    secondaryHref?: string
   }
 }
 
 export const blogLocales = ['en', 'ta'] as const satisfies readonly BlogLocale[]
 
 export const blogArticles: readonly BlogArticle[] = [
+  {
+    slug: '1-session-vs-2-sessions-thirukadaiyur-60th-marriage', translationKey: '1-session-vs-2-sessions-thirukadaiyur-60th-marriage', locale: 'en',
+    title: '1 Session vs 2 Sessions for a Thirukadaiyur 60th Marriage – How Families Can Plan',
+    seoTitle: '1 Session vs 2 Sessions for Thirukadaiyur 60th Marriage | MyThirumanam',
+    description: 'Planning a 60th marriage in Thirukadaiyur? Understand how 1 Session and 2 Sessions fit into celebration planning, guest coordination, stay, food and family arrangements.',
+    publishedAt: '2026-09-18', updatedAt: '2026-09-18', category: 'Celebration Planning', ceremony: '60th-marriage', status: 'published',
+    excerpt: 'A practical guide to choosing 1 Session or 2 Sessions for a Thirukadaiyur 60th marriage without tying the choice to guests or plan type.',
+    body: [
+      { type: 'paragraph', text: 'When planning a Sashtiapthapoorthi or 60th marriage in Thirukadaiyur, families may need to choose whether they are planning around 1 Session or 2 Sessions. That choice can help coordinate family travel, accommodation, food timing, guest availability, photography and transportation without automatically changing the Basic or Premium arrangement style.' },
+      { type: 'note', text: 'The exact ceremony schedule may vary depending on family tradition, community practice and guidance from the Vadhyar or priest. Session selection helps communicate a planning preference; the exact religious schedule should be confirmed separately.' },
+      { type: 'heading', text: 'What Does 1 Session or 2 Sessions Mean for Planning?' },
+      { type: 'paragraph', text: 'A session is a planning input that helps communicate how a family expects the celebration schedule to be organised. It is not a universal description of ceremony content. Confirm the exact ceremony content and timing with the family’s Vadhyar or priest and relevant service providers.' },
+      { type: 'heading', text: 'When Might a Family Consider 1 Session?' },
+      { type: 'paragraph', text: 'A family may prefer a more compact schedule when most guests are available in a shorter window, many relatives are travelling only for the main celebration, or the family would like fewer transitions between activities. Depending on travel plans, accommodation and transport coordination may also be simpler.' },
+      { type: 'heading', text: 'When Might a Family Consider 2 Sessions?' },
+      { type: 'paragraph', text: 'A family may consider 2 Sessions when it would be helpful to have more time across the celebration schedule, when relatives arrive at different times, or when hospitality, photography and family coordination need a wider planning window. Accommodation and transport may then need coordination across more timings.' },
+      { type: 'heading', text: 'A Family Planning Comparison' },
+      { type: 'comparison', headers: ['Planning Area', '1 Session', '2 Sessions'], rows: [
+        ['Schedule', 'May suit a more compact family schedule.', 'May spread coordination across a wider planning window.'],
+        ['Guest coordination', 'May suit families whose guests arrive together.', 'May help when arrival and departure timings vary.'],
+        ['Accommodation', 'May involve a shorter stay, depending on travel plans.', 'May need broader stay coordination, depending on family plans.'],
+        ['Food planning', 'Coordinate meals around the selected schedule.', 'May require meal coordination across a wider schedule.'],
+        ['Transportation', 'May be simpler when arrivals and departures are concentrated.', 'May need coordination across multiple timings.'],
+        ['Photography', 'Plan coverage around a compact celebration schedule.', 'May require coverage across a longer schedule.'],
+      ] },
+      { type: 'heading', text: 'Does Guest Count Decide the Number of Sessions?' },
+      { type: 'paragraph', text: 'No. In MyThirumanam planning, guest count and session are separate choices. Families may choose 50 Guests with 1 Session, 50 Guests with 2 Sessions, 100 Guests with 1 Session, 100 Guests with 2 Sessions, or a custom guest count with either option. No combination is presented as better for every family.' },
+      { type: 'heading', text: 'Does Basic or Premium Decide the Session?' },
+      { type: 'paragraph', text: 'No. Basic or Premium defines the arrangement style, while session is selected independently. Basic with 1 Session, Basic with 2 Sessions, Premium with 1 Session and Premium with 2 Sessions are all separate planning combinations, subject to final operational confirmation. See the 60th Marriage page for arrangement information.' },
+      { type: 'heading', text: 'What Should Families Discuss Before Choosing?' },
+      { type: 'list', items: ['Preferred celebration date and family availability', 'Guest arrival times and travel plans', 'Elderly family members and accommodation needs', 'Meal coordination for guests and children', 'Photography requirements and transportation requirements', 'Guidance from the family’s Vadhyar or priest'] },
+      { type: 'heading', text: 'Consider Travel and Accommodation' },
+      { type: 'paragraph', text: 'Families travelling from Chennai, Bengaluru, Coimbatore or other locations can have different arrival and departure schedules. Consider check-in and check-out, rooms for elderly guests, arrival timing and transport between accommodation and the celebration location.' },
+      { type: 'heading', text: 'Plan Food Around Your Family Schedule' },
+      { type: 'paragraph', text: 'Use the approximate guest count and selected schedule to discuss meal timings. Consider elderly guests, children and dietary needs, without assuming a fixed menu or price.' },
+      { type: 'heading', text: 'Optional Support for Family Logistics' },
+      { type: 'list', items: ['Transportation', 'Return Gifts'] },
+      { type: 'paragraph', text: 'Transportation can be useful when guest movements need coordination. These remain optional selections.' },
+      { type: 'heading', text: 'How Can Families Decide Between 1 Session and 2 Sessions?' },
+      { type: 'paragraph', text: 'Choose based on the family schedule, travel, guest availability, accommodation, celebration timing preference, Vadhyar or priest guidance and service availability. Neither option is universally better.' },
+      { type: 'heading', text: 'What to Share When You Enquire' },
+      { type: 'list', items: ['Celebration type', 'Preferred date', 'Guest count', '1 Session or 2 Sessions', 'Basic or Premium preference', 'Travelling-from location', 'Transportation requirement', 'Return Gifts requirement', 'Contact details'] },
+      { type: 'faq', items: [
+        { question: 'Is 2 Sessions required for a 60th marriage?', answer: 'No universal planning rule presented by MyThirumanam requires every family to choose 2 Sessions. Exact ceremony requirements may vary and should be confirmed with the family’s Vadhyar or priest.' },
+        { question: 'Does Premium mean 2 Sessions?', answer: 'No. Premium and session are separate planning selections.' },
+        { question: 'Can we choose Basic with 2 Sessions?', answer: 'Yes. Within MyThirumanam’s planning model, plan type and session are separate selections, subject to final operational confirmation.' },
+        { question: 'Can 100 guests choose 1 Session?', answer: 'Yes. Guest count and session are separate planning choices.' },
+        { question: 'Can we change our session preference later?', answer: 'Families can discuss changes with the planning team before final arrangements are confirmed, subject to availability.' },
+        { question: 'Does MyThirumanam decide the religious ceremony schedule?', answer: 'No. MyThirumanam provides independent event-management and coordination support. Exact religious requirements should be confirmed with the appropriate Vadhyar or priest and relevant authorities or service providers.' },
+        { question: 'Is MyThirumanam an official temple website?', answer: 'MyThirumanam is an independent event-management and coordination service. We are not an official or authorized temple website and are not affiliated with or endorsed by temple authorities. Temple-related ceremonies, timings, permissions, fees and facilities are governed by the respective temple authorities.' },
+      ] },
+    ],
+    links: [{ href: '/60th-marriage', label: '60th Marriage Arrangements' }, { href: '/plan', label: 'Plan Your Celebration' }, { href: '/blog/sashtiapthapoorthi-in-thirukadaiyur', label: 'Sashtiapthapoorthi planning guide' }, { href: '/blog', label: 'Back to guides' }],
+    cta: { title: 'Planning Your 60th Marriage in Thirukadaiyur?', text: 'Share your date, guest count, session choice, Basic or Premium preference, and any optional Transportation or Return Gifts requirement.', label: 'Plan Your Celebration', href: '/plan', secondaryLabel: '60th Marriage Arrangements', secondaryHref: '/60th-marriage' },
+  },
+  {
+    slug: '1-session-vs-2-sessions-thirukadaiyur-60th-marriage', translationKey: '1-session-vs-2-sessions-thirukadaiyur-60th-marriage', locale: 'ta',
+    title: 'திருக்கடையூரில் 60வது திருமணம் – 1 அமர்வு அல்லது 2 அமர்வுகள்: குடும்பங்கள் எப்படி திட்டமிடலாம்?',
+    seoTitle: 'திருக்கடையூர் 60வது திருமணம் – 1 அமர்வு vs 2 அமர்வுகள் | MyThirumanam',
+    description: 'திருக்கடையூரில் 60வது திருமணத்தை திட்டமிடுகிறீர்களா? 1 அமர்வு மற்றும் 2 அமர்வுகள் தேர்வை விருந்தினர், உணவு, தங்குமிடம் மற்றும் குடும்ப ஏற்பாடுகளுடன் எப்படி திட்டமிடுவது என்பதை அறியுங்கள்.',
+    publishedAt: '2026-09-18', updatedAt: '2026-09-18', category: 'விழா திட்டமிடல்', ceremony: '60th-marriage', status: 'published',
+    excerpt: 'விருந்தினர் எண்ணிக்கை அல்லது திட்ட வகையுடன் இணைக்காமல், 1 அமர்வு அல்லது 2 அமர்வுகளை குடும்பங்கள் நடைமுறையாக திட்டமிட உதவும் வழிகாட்டி.',
+    body: [
+      { type: 'paragraph', text: 'திருக்கடையூரில் சஷ்டியப்தபூர்த்தி அல்லது 60வது திருமணத்தை திட்டமிடும்போது, 1 அமர்வா அல்லது 2 அமர்வுகளா என்பதை குடும்பங்கள் தேர்வு செய்ய வேண்டியிருக்கலாம். இந்தத் தேர்வு குடும்பப் பயணம், தங்குமிடம், உணவு நேரம், விருந்தினர் வருகை, புகைப்படம் மற்றும் போக்குவரத்தை ஒருங்கிணைக்க உதவும்; அடிப்படை அல்லது பிரீமியம் திட்டத்தை இது தானாக மாற்றாது.' },
+      { type: 'note', text: 'சரியான சடங்கு அட்டவணை குடும்ப சம்பிரதாயம், சமூக மரபு மற்றும் வாத்தியார் அல்லது புரோகிதரின் வழிகாட்டுதலின்படி மாறுபடலாம். அமர்வு தேர்வு திட்டமிடல் விருப்பத்தை தெரிவிக்க உதவும்; மதச்சடங்கு அட்டவணையை தனியாக உறுதிப்படுத்துங்கள்.' },
+      { type: 'heading', text: 'திட்டமிடலில் 1 அமர்வு அல்லது 2 அமர்வுகள் என்றால் என்ன?' },
+      { type: 'paragraph', text: 'அமர்வு என்பது குடும்பம் விழா அட்டவணையை எப்படி ஒருங்கிணைக்க விரும்புகிறது என்பதை தெரிவிக்கும் திட்டமிடல் தகவல். இது சடங்கு உள்ளடக்கத்திற்கான பொதுவான வரையறை அல்ல. சரியான சடங்கு உள்ளடக்கம் மற்றும் நேரத்தை குடும்பத்தின் வாத்தியார் அல்லது புரோகிதரிடமும் தொடர்புடைய சேவை வழங்குநர்களிடமும் உறுதிப்படுத்துங்கள்.' },
+      { type: 'heading', text: 'குடும்பங்கள் எப்போது 1 அமர்வை கருதலாம்?' },
+      { type: 'paragraph', text: 'பெரும்பாலான விருந்தினர்கள் குறுகிய நேரத்தில் வரக்கூடியபோது, பல உறவினர்கள் முக்கிய விழாவிற்காக மட்டும் பயணம் செய்யும்போது அல்லது நிகழ்வுகளுக்கிடையே குறைவான மாற்றங்களை குடும்பம் விரும்பும்போது, சுருக்கமான அட்டவணையை கருதலாம். பயணத் திட்டத்தைப் பொறுத்து தங்குமிடம் மற்றும் போக்குவரத்து ஒருங்கிணைப்பும் எளிதாக இருக்கலாம்.' },
+      { type: 'heading', text: 'குடும்பங்கள் எப்போது 2 அமர்வுகளை கருதலாம்?' },
+      { type: 'paragraph', text: 'விழா அட்டவணையில் அதிக நேரம் தேவைப்படும்போது, உறவினர்கள் வெவ்வேறு நேரங்களில் வரும்போது அல்லது விருந்தோம்பல், புகைப்படம் மற்றும் குடும்ப ஒருங்கிணைப்புக்கு விரிவான நேரம் உதவும்போது 2 அமர்வுகளை கருதலாம். அப்போது தங்குமிடம் மற்றும் போக்குவரத்தை பல நேரங்களுக்கேற்ப ஒருங்கிணைக்க வேண்டியிருக்கலாம்.' },
+      { type: 'heading', text: 'குடும்பத் திட்டமிடல் ஒப்பீடு' },
+      { type: 'comparison', headers: ['திட்டமிடல் பகுதி', '1 அமர்வு', '2 அமர்வுகள்'], rows: [
+        ['அட்டவணை', 'சுருக்கமான குடும்ப அட்டவணைக்கு ஏற்றதாக இருக்கலாம்.', 'விரிவான திட்டமிடல் நேரத்தில் ஒருங்கிணைக்க உதவலாம்.'],
+        ['விருந்தினர் ஒருங்கிணைப்பு', 'விருந்தினர்கள் ஒன்றாக வரும்போது ஏற்றதாக இருக்கலாம்.', 'வருகை மற்றும் புறப்படும் நேரங்கள் மாறுபடும் போது உதவலாம்.'],
+        ['தங்குமிடம்', 'பயணத் திட்டத்தைப் பொறுத்து குறுகிய தங்குதல் இருக்கலாம்.', 'குடும்பத் திட்டத்தைப் பொறுத்து விரிவான தங்குமிட ஒருங்கிணைப்பு தேவைப்படலாம்.'],
+        ['உணவு ஏற்பாடு', 'தேர்ந்தெடுத்த அட்டவணையைச் சுற்றி உணவை ஒருங்கிணைக்கலாம்.', 'விரிவான அட்டவணையில் உணவை ஒருங்கிணைக்க வேண்டியிருக்கலாம்.'],
+        ['போக்குவரத்து', 'வருகை, புறப்பாடு ஒரே நேரத்தில் இருந்தால் எளிதாக இருக்கலாம்.', 'பல நேரங்களுக்கேற்ப ஒருங்கிணைப்பு தேவைப்படலாம்.'],
+        ['புகைப்படம்', 'சுருக்கமான விழா அட்டவணையைச் சுற்றி பதிவு செய்யலாம்.', 'நீளமான அட்டவணையில் பதிவு தேவைப்படலாம்.'],
+      ] },
+      { type: 'heading', text: 'விருந்தினர் எண்ணிக்கை அமர்வுகளின் எண்ணிக்கையை தீர்மானிக்குமா?' },
+      { type: 'paragraph', text: 'இல்லை. MyThirumanam திட்டமிடலில் விருந்தினர் எண்ணிக்கையும் அமர்வும் தனித்தனி தேர்வுகள். 50 விருந்தினர்கள் + 1 அமர்வு, 50 விருந்தினர்கள் + 2 அமர்வுகள், 100 விருந்தினர்கள் + 1 அமர்வு, 100 விருந்தினர்கள் + 2 அமர்வுகள் அல்லது தனிப்பயன் விருந்தினர் எண்ணிக்கையுடன் எந்த அமர்வையும் குடும்பங்கள் தேர்வு செய்யலாம்.' },
+      { type: 'heading', text: 'அடிப்படை அல்லது பிரீமியம் திட்டம் அமர்வை தீர்மானிக்குமா?' },
+      { type: 'paragraph', text: 'இல்லை. அடிப்படை அல்லது பிரீமியம் திட்டம் ஏற்பாட்டின் வகையை வரையறுக்கிறது; அமர்வு தனியாக தேர்வு செய்யப்படுகிறது. அடிப்படை + 1 அமர்வு, அடிப்படை + 2 அமர்வுகள், பிரீமியம் + 1 அமர்வு, பிரீமியம் + 2 அமர்வுகள் அனைத்தும் இறுதி செயல்பாட்டு உறுதிப்படுத்தலுக்கு உட்பட்ட தனித்தனி தேர்வுகள்.' },
+      { type: 'heading', text: 'தேர்வு செய்வதற்கு முன் குடும்பங்கள் என்ன பேச வேண்டும்?' },
+      { type: 'list', items: ['விருப்பத் தேதி மற்றும் குடும்பத்தினரின் கிடைக்கும் நேரம்', 'விருந்தினர்களின் வருகை நேரம் மற்றும் பயணத் திட்டம்', 'பெரியவர்களின் தேவைகள் மற்றும் தங்குமிடம்', 'உணவு ஒருங்கிணைப்பு, புகைப்படம் மற்றும் போக்குவரத்து தேவை', 'குடும்பத்தின் வாத்தியார் அல்லது புரோகிதரின் வழிகாட்டுதல்'] },
+      { type: 'heading', text: 'பயணம் மற்றும் தங்குமிடத்தை கவனியுங்கள்' },
+      { type: 'paragraph', text: 'சென்னை, பெங்களூரு, கோயம்புத்தூர் அல்லது பிற இடங்களிலிருந்து வரும் குடும்பங்களுக்கு வருகை மற்றும் புறப்படும் நேரம் மாறுபடலாம். செக்-இன், செக்-அவுட், பெரியவர்களுக்கான அறைகள், வருகை நேரம் மற்றும் தங்குமிடத்திலிருந்து விழா இடத்திற்கான போக்குவரத்தை கருத்தில் கொள்ளுங்கள்.' },
+      { type: 'heading', text: 'குடும்ப அட்டவணையைச் சுற்றி உணவை திட்டமிடுங்கள்' },
+      { type: 'paragraph', text: 'விருந்தினர் எண்ணிக்கை மற்றும் தேர்ந்தெடுத்த அட்டவணைக்கு ஏற்ப உணவு நேரங்களை பேசுங்கள். பெரியவர்கள், குழந்தைகள் மற்றும் உணவுக் கட்டுப்பாடுகளை கவனியுங்கள்; நிரந்தர பட்டியல் அல்லது விலை என்று கருத வேண்டாம்.' },
+      { type: 'heading', text: 'குடும்ப ஒருங்கிணைப்புக்கான விருப்ப உதவி' },
+      { type: 'list', items: ['போக்குவரத்து', 'நினைவுப் பரிசுகள்'] },
+      { type: 'paragraph', text: 'விருந்தினர்களின் பயணத்தை ஒருங்கிணைக்க போக்குவரத்து உதவியாக இருக்கலாம். இவை விருப்பத் தேர்வுகளாகவே இருக்கும்.' },
+      { type: 'heading', text: '1 அமர்வு மற்றும் 2 அமர்வுகளுக்கிடையில் குடும்பங்கள் எப்படி முடிவு செய்யலாம்?' },
+      { type: 'paragraph', text: 'குடும்ப அட்டவணை, பயணம், விருந்தினர் கிடைக்கும் நேரம், தங்குமிடம், விழா நேர விருப்பம், வாத்தியார் அல்லது புரோகிதர் வழிகாட்டுதல் மற்றும் சேவை கிடைக்கும் நிலை ஆகியவற்றின் அடிப்படையில் தேர்வு செய்யுங்கள். எந்த ஒரு தேர்வும் எல்லா குடும்பங்களுக்கும் சிறந்தது அல்ல.' },
+      { type: 'heading', text: 'கோரிக்கை அனுப்பும்போது பகிர வேண்டியவை' },
+      { type: 'list', items: ['விழா வகை', 'விருப்பத் தேதி', 'விருந்தினர் எண்ணிக்கை', '1 அமர்வு அல்லது 2 அமர்வுகள்', 'அடிப்படை அல்லது பிரீமியம் விருப்பம்', 'பயணம் செய்யும் இடம்', 'போக்குவரத்து தேவை', 'நினைவுப் பரிசுகள் தேவை', 'தொடர்பு விவரங்கள்'] },
+      { type: 'faq', items: [
+        { question: '60வது திருமணத்திற்கு 2 அமர்வுகள் கட்டாயமா?', answer: 'இல்லை. ஒவ்வொரு குடும்பமும் 2 அமர்வுகளை தேர்வு செய்ய வேண்டும் என்ற பொதுவான விதியை MyThirumanam வழங்கவில்லை. சரியான சடங்கு தேவைகளை குடும்பத்தின் வாத்தியார் அல்லது புரோகிதரிடம் உறுதிப்படுத்துங்கள்.' },
+        { question: 'பிரீமியம் என்றால் 2 அமர்வுகளா?', answer: 'இல்லை. பிரீமியம் திட்டமும் அமர்வும் தனித்தனி திட்டமிடல் தேர்வுகள்.' },
+        { question: 'அடிப்படை திட்டத்துடன் 2 அமர்வுகளை தேர்வு செய்யலாமா?', answer: 'ஆம். MyThirumanam திட்டமிடல் முறையில் திட்ட வகையும் அமர்வும் தனித்தனி தேர்வுகள்; இறுதி செயல்பாட்டு உறுதிப்படுத்தலுக்கு உட்பட்டவை.' },
+        { question: '100 விருந்தினர்களுடன் 1 அமர்வை தேர்வு செய்யலாமா?', answer: 'ஆம். விருந்தினர் எண்ணிக்கையும் அமர்வும் தனித்தனி திட்டமிடல் தேர்வுகள்.' },
+        { question: 'அமர்வு விருப்பத்தை பின்னர் மாற்றலாமா?', answer: 'இறுதி ஏற்பாடுகள் உறுதிப்படுத்தப்படுவதற்கு முன், கிடைக்கும் நிலைக்கு உட்பட்டு திட்டமிடல் குழுவுடன் மாற்றங்களை பேசலாம்.' },
+        { question: 'MyThirumanam மதச்சடங்கு அட்டவணையை தீர்மானிக்குமா?', answer: 'இல்லை. MyThirumanam சுயாதீன விழா ஏற்பாடு மற்றும் ஒருங்கிணைப்பு உதவியை வழங்குகிறது. சரியான மதச்சடங்கு தேவைகளை வாத்தியார் அல்லது புரோகிதரிடமும் தொடர்புடைய நிர்வாகம் அல்லது சேவை வழங்குநர்களிடமும் உறுதிப்படுத்துங்கள்.' },
+        { question: 'MyThirumanam அதிகாரப்பூர்வ கோவில் இணையதளமா?', answer: 'MyThirumanam ஒரு சுயாதீன விழா ஏற்பாடு மற்றும் ஒருங்கிணைப்பு சேவை. இது எந்தக் கோவிலின் அதிகாரப்பூர்வ அல்லது அங்கீகரிக்கப்பட்ட இணையதளமும் அல்ல; கோவில் நிர்வாகத்துடன் இணைந்ததுமல்ல அல்லது அவர்களால் அங்கீகரிக்கப்பட்டதுமல்ல. கோவில் தொடர்பான சடங்குகள், நேரங்கள், அனுமதிகள், கட்டணங்கள் மற்றும் வசதிகள் சம்பந்தப்பட்ட கோவில் நிர்வாகத்தின் விதிமுறைகளுக்கு உட்பட்டவை.' },
+      ] },
+    ],
+    links: [{ href: '/60th-marriage', label: '60வது திருமண ஏற்பாடுகள்' }, { href: '/plan', label: 'விழாவை திட்டமிடுங்கள்' }, { href: '/ta/blog/sashtiapthapoorthi-in-thirukadaiyur', label: 'சஷ்டியப்தபூர்த்தி வழிகாட்டி' }, { href: '/ta/blog', label: 'விழா வழிகாட்டிகளுக்கு திரும்புங்கள்' }],
+    cta: { title: 'திருக்கடையூரில் 60வது திருமணத்தை திட்டமிடுகிறீர்களா?', text: 'தேதி, விருந்தினர் எண்ணிக்கை, அமர்வு தேர்வு, அடிப்படை அல்லது பிரீமியம் விருப்பம், போக்குவரத்து அல்லது நினைவுப் பரிசுகள் தேவை ஆகியவற்றை பகிருங்கள்.', label: 'விழாவை திட்டமிடுங்கள்', href: '/plan', secondaryLabel: '60வது திருமண ஏற்பாடுகள்', secondaryHref: '/60th-marriage' },
+  },
   {
     slug: '60th-marriage-thirukadaiyur',
     translationKey: '60th-marriage-thirukadaiyur',
@@ -390,19 +503,19 @@ export const blogArticles: readonly BlogArticle[] = [
     slug: 'sashtiapthapoorthi-in-thirukadaiyur', translationKey: 'sashtiapthapoorthi-in-thirukadaiyur', locale: 'en',
     title: 'Sashtiapthapoorthi in Thirukadaiyur – What Families Should Know',
     seoTitle: 'Sashtiapthapoorthi in Thirukadaiyur – Family Planning Guide | MyThirumanam',
-    description: 'Planning Sashtiapthapoorthi in Thirukadaiyur? Learn what families should know about the 60th marriage celebration, ceremony planning, guests, food, stay, travel and arrangements.',
-    publishedAt: '2026-09-16', category: 'Celebration Planning', ceremony: '60th-marriage', status: 'published',
+    description: 'Planning Sashtiapthapoorthi in Thirukadaiyur? Learn what families should know about the 60th marriage celebration, guest planning, sessions, food, stay, travel and celebration arrangements.',
+    publishedAt: '2026-09-18', updatedAt: '2026-09-18', category: 'Celebration Planning', ceremony: '60th-marriage', status: 'published',
     excerpt: 'A practical family guide to planning Sashtiapthapoorthi and a 60th marriage celebration in Thirukadaiyur.',
     body: [
-      { type: 'paragraph', text: 'Sashtiapthapoorthi is an important family milestone commonly associated with the completion of 60 years. Thirukadaiyur is a well-known destination for families who wish to bring relatives together for this meaningful 60th marriage celebration while planning the practical arrangements around it.' },
+      { type: 'paragraph', text: 'Sashtiapthapoorthi is an important family milestone commonly associated with the completion of 60 years. Thirukadaiyur is a well-known destination chosen by many families for this meaningful 60th marriage celebration. Good planning helps coordinate ceremony arrangements, guests, food, accommodation, photography and travel without making the day difficult for the celebrating couple or their family.' },
       { type: 'note', text: 'Ceremony practices, timing and sequence may vary by family tradition, community and the guidance of the Vadhyar or priest conducting the function.' },
       { type: 'heading', text: 'What Is Sashtiapthapoorthi?' },
       { type: 'paragraph', text: 'Sashtiapthapoorthi is commonly associated with completion of 60 years and is often marked as a major family milestone. The couple receives blessings from family and friends. The rituals are not identical for every family, so confirm the exact ceremony requirements with the Vadhyar or priest conducting the function.' },
       { type: 'heading', text: 'Why Do Families Choose Thirukadaiyur?' },
       { type: 'paragraph', text: 'Families often consider Thirukadaiyur for milestone celebrations such as a 60th Marriage or Sashtiapthapoorthi, 70th Marriage or Bheemaratha Shanthi, and 80th Marriage or Sathabhishekam. It is useful to plan the ceremony and the family gathering as connected, but separate, requirements.' },
       { type: 'heading', text: 'What Should Families Plan?' },
-      { type: 'heading', text: 'Decide the Celebration Date Early' },
-      { type: 'paragraph', text: 'Discuss a preferred date with your family and priest before confirming travel and arrangements. Keeping an alternative date in mind can make family coordination easier.' },
+      { type: 'heading', text: 'Celebration Date' },
+      { type: 'paragraph', text: 'Discuss a preferred date and an alternative date with your family and priest before confirming travel. Check family availability, accommodation, transportation and service availability around both dates so that a change does not unsettle the wider plan.' },
       { type: 'heading', text: 'Decide Whether You Need 1 Session or 2 Sessions' },
       { type: 'paragraph', text: 'Choose 1 Session or 2 Sessions based on your family’s preferred schedule and the guidance you receive. Session selection is separate from the ceremony, guest count and Basic or Premium plan; it does not change the plan definition.' },
       { type: 'heading', text: 'Estimate Your Guest Count' },
@@ -429,35 +542,37 @@ export const blogArticles: readonly BlogArticle[] = [
       { type: 'heading', text: 'Keep Family Coordination Simple' },
       { type: 'paragraph', text: 'One primary family contact can collect decisions and questions, helping reduce repeated calls and uncertainty as arrangements are discussed.' },
       { type: 'faq', items: [
-        { question: 'Is Sashtiapthapoorthi the same as a 60th marriage celebration?', answer: 'Sashtiapthapoorthi is commonly associated with completion of 60 years and is often discussed alongside a 60th marriage celebration. Exact observance and sequence can vary, so confirm them with your Vadhyar or priest.' },
+        { question: 'What is Sashtiapthapoorthi?', answer: 'Sashtiapthapoorthi is commonly associated with completion of 60 years. The exact observance, timing and ceremony sequence may vary by family tradition, community practice and Vadhyar or priest guidance.' },
+        { question: 'Is Sashtiapthapoorthi commonly called a 60th marriage celebration?', answer: 'Yes. Sashtiapthapoorthi is commonly discussed alongside a 60th marriage celebration, though the exact observance should be confirmed with your family’s Vadhyar or priest.' },
         { question: 'Can we plan Sashtiapthapoorthi in Thirukadaiyur for 100 guests?', answer: 'Yes. Share an approximate count such as 100 guests in your enquiry so practical arrangements can be discussed.' },
-        { question: 'Can we choose between Basic and Premium arrangements?', answer: 'Yes. Basic and Premium are separate arrangement choices; session selection and guest count remain separate planning details.' },
-        { question: 'Are Transportation services available?', answer: 'Transportation can be requested as an optional additional service.' },
+        { question: 'What is the difference between Basic and Premium?', answer: 'Basic uses a common/shared pooja space and an air-conditioned hall with minimal decoration. Premium uses a private pooja space and private hall, with the additional decoration and Mangala Isai inclusions described above. Session selection and guest count remain separate planning details.' },
+        { question: 'Can we choose 1 Session or 2 Sessions?', answer: 'Yes. Choose 1 Session or 2 Sessions according to your family schedule and guidance. This choice is independent of the ceremony, guest count and Basic or Premium plan.' },
+        { question: 'Is Transportation available?', answer: 'Transportation can be requested as an optional additional service.' },
         { question: 'Can Return Gifts be arranged?', answer: 'Return Gifts can be requested as an optional additional service.' },
         { question: 'Are additional rooms available?', answer: 'Rooms are arranged for 10 guests in each plan. Additional rooms may be available at extra cost, subject to confirmation.' },
         { question: 'Does MyThirumanam arrange temple ceremonies directly?', answer: 'MyThirumanam is an independent event-management and coordination service. We are not an official or authorized temple website and are not affiliated with or endorsed by temple authorities. Temple-related ceremonies, timings, permissions, fees and facilities are governed by the respective temple authorities.' },
       ] },
     ],
     links: [{ href: '/60th-marriage', label: '60th Marriage in Thirukadaiyur' }, { href: '/70th-marriage', label: '70th Marriage in Thirukadaiyur' }, { href: '/80th-marriage', label: '80th Marriage in Thirukadaiyur' }, { href: '/plan', label: 'Plan Your Celebration' }, { href: '/blog', label: 'Back to guides' }],
-    cta: { title: 'Planning Your Sashtiapthapoorthi in Thirukadaiyur?', text: 'MyThirumanam can help coordinate practical arrangements around your family celebration.', label: 'Plan Your Celebration', href: '/plan' },
+    cta: { title: 'Planning Your Sashtiapthapoorthi in Thirukadaiyur?', text: 'Share your preferred date, guest count, 1 Session or 2 Sessions, Basic or Premium preference, and any optional Transportation or Return Gifts requirement. MyThirumanam can then review the practical arrangements around your family celebration.', label: 'Plan Your Celebration', href: '/plan', secondaryLabel: '60th Marriage in Thirukadaiyur', secondaryHref: '/60th-marriage' },
   },
   {
     slug: 'sashtiapthapoorthi-in-thirukadaiyur', translationKey: 'sashtiapthapoorthi-in-thirukadaiyur', locale: 'ta',
     title: 'திருக்கடையூரில் சஷ்டியப்தபூர்த்தி – குடும்பங்கள் தெரிந்துகொள்ள வேண்டியவை',
     seoTitle: 'திருக்கடையூரில் சஷ்டியப்தபூர்த்தி – 60வது திருமண திட்டமிடல் வழிகாட்டி | MyThirumanam',
-    description: 'திருக்கடையூரில் சஷ்டியப்தபூர்த்தி அல்லது 60வது திருமணத்தை திட்டமிடுகிறீர்களா? பூஜை, விருந்தினர் எண்ணிக்கை, உணவு, தங்குமிடம், பயணம் மற்றும் விழா ஏற்பாடுகள் குறித்து குடும்பங்கள் தெரிந்துகொள்ள வேண்டியவற்றை அறியுங்கள்.',
-    publishedAt: '2026-09-16', category: 'விழா திட்டமிடல்', ceremony: '60th-marriage', status: 'published',
+    description: 'திருக்கடையூரில் சஷ்டியப்தபூர்த்தி அல்லது 60வது திருமணத்தை திட்டமிடுகிறீர்களா? விருந்தினர் எண்ணிக்கை, அமர்வுகள், உணவு, தங்குமிடம், பயணம் மற்றும் விழா ஏற்பாடுகள் குறித்து குடும்பங்கள் தெரிந்துகொள்ள வேண்டியவற்றை அறியுங்கள்.',
+    publishedAt: '2026-09-18', updatedAt: '2026-09-18', category: 'விழா திட்டமிடல்', ceremony: '60th-marriage', status: 'published',
     excerpt: 'திருக்கடையூரில் சஷ்டியப்தபூர்த்தி அல்லது 60வது திருமணத்தை திட்டமிடும் குடும்பங்களுக்கு நடைமுறை வழிகாட்டி.',
     body: [
-      { type: 'paragraph', text: 'சஷ்டியப்தபூர்த்தி என்பது பொதுவாக 60 ஆண்டுகள் நிறைவுடன் தொடர்புபடுத்தப்படும் முக்கியமான குடும்ப மைல்கல். இந்த அர்த்தமுள்ள 60வது திருமண விழாவிற்கு உறவினர்களை ஒன்றுசேர்க்க விரும்பும் குடும்பங்கள், விழாவுடன் தொடர்புடைய நடைமுறை ஏற்பாடுகளையும் முன்கூட்டியே திட்டமிடுவது உதவும்.' },
+      { type: 'paragraph', text: 'சஷ்டியப்தபூர்த்தி என்பது பொதுவாக 60 ஆண்டுகள் நிறைவுடன் தொடர்புபடுத்தப்படும் முக்கியமான குடும்ப மைல்கல். திருக்கடையூர் போன்ற இடத்தில் இந்த அர்த்தமுள்ள 60வது திருமண விழாவிற்கு உறவினர்களை ஒன்றுசேர்க்கும் போது, சடங்கு ஏற்பாடு, விருந்தினர் ஒருங்கிணைப்பு, உணவு, தங்குமிடம், புகைப்படம் மற்றும் பயணம் ஆகிய நடைமுறை விஷயங்களையும் முன்கூட்டியே திட்டமிடுவது உதவும்.' },
       { type: 'note', text: 'சடங்குகள், நேரம் மற்றும் வரிசை குடும்ப சம்பிரதாயம், சமூக மரபு மற்றும் விழாவை நடத்தும் வாத்தியார் அல்லது புரோகிதரின் வழிகாட்டுதலின்படி மாறுபடலாம்.' },
       { type: 'heading', text: 'சஷ்டியப்தபூர்த்தி என்றால் என்ன?' },
       { type: 'paragraph', text: 'சஷ்டியப்தபூர்த்தி பொதுவாக 60 ஆண்டுகள் நிறைவுடன் தொடர்புடையதாகக் கருதப்படுகிறது. தம்பதியர் குடும்பத்தினரிடமும் நண்பர்களிடமும் ஆசீர்வாதம் பெறும் முக்கிய தருணமாக இது அமையும். ஒவ்வொரு குடும்பத்திற்கும் சடங்கு முறை ஒரே மாதிரியாக இருக்காது; சரியான தேவைகளை விழாவை நடத்தும் வாத்தியார் அல்லது புரோகிதரிடம் உறுதிப்படுத்துங்கள்.' },
       { type: 'heading', text: 'குடும்பங்கள் திருக்கடையூரை ஏன் தேர்வு செய்கிறார்கள்?' },
       { type: 'paragraph', text: '60வது திருமணம் அல்லது சஷ்டியப்தபூர்த்தி, 70வது திருமணம் அல்லது பீமரத சாந்தி, 80வது திருமணம் அல்லது சதாபிஷேகம் போன்ற வாழ்க்கை மைல்கல் விழாக்களுக்கு பல குடும்பங்கள் திருக்கடையூரை கருதுகின்றனர். சடங்கு தேவைகளையும் குடும்பக் கூடல் தேவைகளையும் இணைந்த, ஆனால் தனித்தனி திட்டங்களாக வைத்துக் கொள்வது பயனுள்ளது.' },
       { type: 'heading', text: 'குடும்பங்கள் என்ன திட்டமிட வேண்டும்?' },
-      { type: 'heading', text: 'விழா தேதியை முன்கூட்டியே முடிவு செய்யுங்கள்' },
-      { type: 'paragraph', text: 'குடும்பத்தினருடனும் வாத்தியார் அல்லது புரோகிதருடனும் பேசி விருப்பத் தேதியை தேர்வு செய்யுங்கள். மாற்றுத் தேதி இருந்தால் பயணம் மற்றும் குடும்ப ஒருங்கிணைப்பு எளிதாகும்.' },
+      { type: 'heading', text: 'விழா தேதி' },
+      { type: 'paragraph', text: 'குடும்பத்தினருடனும் வாத்தியார் அல்லது புரோகிதருடனும் பேசி விருப்பத் தேதியையும் மாற்றுத் தேதியையும் தேர்வு செய்யுங்கள். குடும்பத்தினரின் வருகை, பயணம், தங்குமிடம் மற்றும் சேவை கிடைக்கும் நிலை ஆகியவற்றை இரு தேதிகளுக்கும் கருத்தில் கொண்டால் ஒருங்கிணைப்பு எளிதாகும்.' },
       { type: 'heading', text: '1 அமர்வா அல்லது 2 அமர்வுகளா என்பதை முடிவு செய்யுங்கள்' },
       { type: 'paragraph', text: 'குடும்பத்தின் நேர அட்டவணைக்கும் வழிகாட்டுதலுக்கும் ஏற்ப 1 அமர்வு அல்லது 2 அமர்வுகளைத் தேர்வு செய்யலாம். அமர்வு தேர்வு என்பது விழா வகை, விருந்தினர் எண்ணிக்கை மற்றும் அடிப்படை அல்லது பிரீமியம் திட்டத்திலிருந்து தனித்தது; திட்டத்தின் உள்ளடக்கத்தை அது மாற்றாது.' },
       { type: 'heading', text: 'விருந்தினர் எண்ணிக்கையை கணக்கிடுங்கள்' },
@@ -484,24 +599,26 @@ export const blogArticles: readonly BlogArticle[] = [
       { type: 'heading', text: 'குடும்ப ஒருங்கிணைப்பை எளிமையாக வைத்துக்கொள்ளுங்கள்' },
       { type: 'paragraph', text: 'ஒரு முதன்மை குடும்பத் தொடர்பாளர் முடிவுகளையும் கேள்விகளையும் ஒருங்கிணைத்தால், பலரிடையே ஏற்படும் குழப்பத்தை குறைக்கலாம்.' },
       { type: 'faq', items: [
-        { question: 'சஷ்டியப்தபூர்த்தி 60வது திருமண விழாவே தானா?', answer: 'சஷ்டியப்தபூர்த்தி பொதுவாக 60 ஆண்டுகள் நிறைவுடன் தொடர்புடையது; இது 60வது திருமண விழாவுடன் சேர்த்து பேசப்படுகிறது. சரியான நடைமுறையை வாத்தியார் அல்லது புரோகிதரிடம் உறுதிப்படுத்துங்கள்.' },
+        { question: 'சஷ்டியப்தபூர்த்தி என்றால் என்ன?', answer: 'சஷ்டியப்தபூர்த்தி பொதுவாக 60 ஆண்டுகள் நிறைவுடன் தொடர்புடையது. சரியான சடங்கு முறை, நேரம் மற்றும் வரிசை குடும்ப சம்பிரதாயம், சமூக மரபு மற்றும் வாத்தியார் அல்லது புரோகிதரின் வழிகாட்டுதலின்படி மாறுபடலாம்.' },
+        { question: 'சஷ்டியப்தபூர்த்தியை பொதுவாக 60வது திருமண விழா என்று அழைக்கிறார்களா?', answer: 'ஆம். சஷ்டியப்தபூர்த்தி 60வது திருமண விழாவுடன் சேர்த்து பொதுவாக பேசப்படுகிறது. ஆனால் சரியான நடைமுறையை உங்கள் குடும்பத்தின் வாத்தியார் அல்லது புரோகிதரிடம் உறுதிப்படுத்துவது நல்லது.' },
         { question: '100 விருந்தினர்களுக்கு சஷ்டியப்தபூர்த்தியை திட்டமிடலாமா?', answer: 'ஆம். 100 விருந்தினர்கள் போன்ற தோராயமான எண்ணிக்கையை கோரிக்கையில் பகிர்ந்தால் நடைமுறை ஏற்பாடுகளை பேசலாம்.' },
-        { question: 'அடிப்படை மற்றும் பிரீமியம் ஏற்பாடுகளில் தேர்வு செய்யலாமா?', answer: 'ஆம். அடிப்படை மற்றும் பிரீமியம் தனித்தனி ஏற்பாடு தேர்வுகள்; அமர்வு மற்றும் விருந்தினர் எண்ணிக்கை தனிப்பட்ட திட்டமிடல் விவரங்கள்.' },
-        { question: 'போக்குவரத்து சேவை கிடைக்குமா?', answer: 'போக்குவரத்தை விருப்ப கூடுதல் சேவையாக கோரலாம்.' },
+        { question: 'அடிப்படை மற்றும் பிரீமியம் திட்டங்களுக்கு என்ன வித்தியாசம்?', answer: 'அடிப்படை திட்டத்தில் பொதுப் பகிர்வு இடத்தில் பூஜை மற்றும் குறைந்தபட்ச அலங்காரத்துடன் குளிர்சாதன மண்டபம் உள்ளது. பிரீமியம் திட்டத்தில் தனிப்பட்ட ஏற்பாட்டு இடத்தில் பூஜை, தனியார் மண்டபம், கூடுதல் அலங்காரம் மற்றும் மங்கள இசை அம்சங்கள் உள்ளன. அமர்வு மற்றும் விருந்தினர் எண்ணிக்கை தனித்தனி திட்டமிடல் விவரங்கள்.' },
+        { question: '1 அமர்வு அல்லது 2 அமர்வுகளை தேர்வு செய்யலாமா?', answer: 'ஆம். குடும்பத்தின் நேர அட்டவணை மற்றும் வழிகாட்டுதலுக்கு ஏற்ப 1 அமர்வு அல்லது 2 அமர்வுகளை தேர்வு செய்யலாம். இது விழா வகை, விருந்தினர் எண்ணிக்கை மற்றும் அடிப்படை அல்லது பிரீமியம் திட்டத்திலிருந்து தனித்தது.' },
+        { question: 'போக்குவரத்து கிடைக்குமா?', answer: 'போக்குவரத்தை விருப்ப கூடுதல் சேவையாக கோரலாம்.' },
         { question: 'நினைவுப் பரிசுகளை ஏற்பாடு செய்யலாமா?', answer: 'நினைவுப் பரிசுகளை விருப்ப கூடுதல் சேவையாக கோரலாம்.' },
         { question: 'கூடுதல் அறைகள் கிடைக்குமா?', answer: 'ஒவ்வொரு திட்டத்திலும் 10 விருந்தினர்களுக்கு அறைகள் ஏற்பாடு செய்யப்படும். கூடுதல் அறைகள் கூடுதல் கட்டணத்தில் கிடைக்கலாம்; உறுதிப்படுத்தல் அவசியம்.' },
         { question: 'MyThirumanam கோவில் சடங்குகளை நேரடியாக ஏற்பாடு செய்கிறதா?', answer: 'MyThirumanam ஒரு சுயாதீன விழா ஏற்பாடு மற்றும் ஒருங்கிணைப்பு சேவை. இது எந்தக் கோவிலின் அதிகாரப்பூர்வ அல்லது அங்கீகரிக்கப்பட்ட இணையதளமும் அல்ல; கோவில் நிர்வாகத்துடன் இணைந்ததுமல்ல அல்லது அவர்களால் அங்கீகரிக்கப்பட்டதுமல்ல. கோவில் தொடர்பான சடங்குகள், நேரங்கள், அனுமதிகள், கட்டணங்கள் மற்றும் வசதிகள் சம்பந்தப்பட்ட கோவில் நிர்வாகத்தின் விதிமுறைகளுக்கு உட்பட்டவை.' },
       ] },
     ],
     links: [{ href: '/plan', label: 'விழாவை திட்டமிடுங்கள்' }, { href: '/ta/blog', label: 'விழா வழிகாட்டிகளுக்கு திரும்புங்கள்' }],
-    cta: { title: 'திருக்கடையூரில் சஷ்டியப்தபூர்த்தி திட்டமிடுகிறீர்களா?', text: 'உங்கள் குடும்ப விழாவைச் சுற்றிய நடைமுறை ஏற்பாடுகளை ஒருங்கிணைக்க MyThirumanam உதவலாம்.', label: 'விழாவை திட்டமிடுங்கள்', href: '/plan' },
+    cta: { title: 'திருக்கடையூரில் சஷ்டியப்தபூர்த்தி திட்டமிடுகிறீர்களா?', text: 'விருப்பத் தேதி, விருந்தினர் எண்ணிக்கை, 1 அமர்வு அல்லது 2 அமர்வுகள், அடிப்படை அல்லது பிரீமியம் திட்ட விருப்பம், போக்குவரத்து அல்லது நினைவுப் பரிசுகள் தேவை ஆகியவற்றை பகிருங்கள். உங்கள் குடும்ப விழாவைச் சுற்றிய நடைமுறை ஏற்பாடுகளை MyThirumanam பரிசீலிக்க உதவும்.', label: 'விழாவை திட்டமிடுங்கள்', href: '/plan' },
   },
 ]
 
 export function getPublishedBlogArticles(locale: BlogLocale) {
   return blogArticles
     .filter((article) => article.locale === locale && article.status === 'published')
-    .sort((a, b) => b.publishedAt.localeCompare(a.publishedAt))
+    .sort((a, b) => b.publishedAt.localeCompare(a.publishedAt) || a.translationKey.localeCompare(b.translationKey))
 }
 
 export function getPublishedBlogArticle(locale: BlogLocale, slug: string) {

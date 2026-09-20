@@ -12,6 +12,7 @@ export const ADMIN_CONFIG = {
     USERS: '/admin/users',
     PROFILES: '/admin/profiles',
     SUCCESS_STORIES: '/admin/success-stories',
+    BLOGS: '/admin/blogs',
     SETTINGS: '/admin/settings',
   },
 

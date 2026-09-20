@@ -1,7 +1,8 @@
 import type { Metadata } from 'next'
 import { BlogListing } from '@/components/blog/BlogListing'
 import { JsonLd } from '@/components/seo/JsonLd'
-import { getBlogListingUrl, getPublishedBlogArticles } from '@/content/blog/articles'
+import { getBlogListingUrl } from '@/content/blog/articles'
+import { getPublicBlogPosts } from '@/lib/blog/public-blog-source'
 
 const url = getBlogListingUrl('ta')
 const englishUrl = getBlogListingUrl('en')
@@ -19,8 +20,8 @@ export const metadata: Metadata = {
   openGraph: { title, description, url, siteName: 'MyThirumanam', type: 'website' },
 }
 
-export default function TamilBlogPage() {
-  const articles = getPublishedBlogArticles('ta')
+export default async function TamilBlogPage() {
+  const { items: articles } = await getPublicBlogPosts('ta')
 
   return (
     <>

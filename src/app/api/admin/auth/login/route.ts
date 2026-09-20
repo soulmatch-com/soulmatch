@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { comparePassword } from '@/lib/utils/password'
+import { adminSessionCookie, createAdminSession } from '@/lib/admin-session'
 
 export async function POST(request: NextRequest) {
   try {
@@ -71,13 +72,21 @@ export async function POST(request: NextRequest) {
     // Return admin data (excluding password_hash)
     const { password_hash: _, ...adminData } = admin
 
-    return NextResponse.json(
+    const response = NextResponse.json(
       {
         admin: adminData,
         message: 'Login successful',
       },
       { status: 200 }
     )
+    response.cookies.set(adminSessionCookie, createAdminSession(admin), {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 8 * 60 * 60,
+      path: '/',
+    })
+    return response
   } catch (error) {
     console.error('Admin login error:', error)
     return NextResponse.json(

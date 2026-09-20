@@ -248,17 +248,14 @@ test('today’s Sashtiapthapoorthi pair is complete, indexable and publication-r
   assert.match(tamilRoute, /robots: \{ index: true, follow: true \}/)
   assert.match(englishLayout, /RootDocument language="en"/)
   assert.match(tamilLayout, /RootDocument language="ta"/)
-  assert.match(sitemapSource, /getPublishedBlogArticles\('en'\)\.map\(getBlogPath\)/)
-  assert.match(sitemapSource, /getPublishedBlogArticles\('ta'\)\.map\(getBlogPath\)/)
+  assert.match(sitemapSource, /getPublicBlogEntriesForSitemap/)
   assert.doesNotMatch(tamilBody, /\uFFFD|à®|à¯|�/)
 })
 
-test('sitemap source derives blog URLs from published content helpers', async () => {
+test('sitemap source derives blog URLs through the shared public source selector', async () => {
   const source = await read('src/app/sitemap.ts')
-  assert.match(source, /getPublishedBlogArticles\('en'\)\.map\(getBlogPath\)/)
-  assert.match(source, /getPublishedBlogArticles\('ta'\)\.map\(getBlogPath\)/)
-  assert.match(source, /getBlogListingPath\('en'\)/)
-  assert.match(source, /getBlogListingPath\('ta'\)/)
+  assert.match(source, /getPublicBlogEntriesForSitemap/)
+  assert.match(source, /'\/blog', '\/ta\/blog'/)
 })
 
 test('session-planning pair keeps session, guests and plans independent without religious procedure claims', async () => {
@@ -297,6 +294,5 @@ test('session-planning pair keeps session, guests and plans independent without 
   assert.match(englishLayout, /RootDocument language="en"/)
   assert.match(tamilLayout, /RootDocument language="ta"/)
   assert.match(renderer, /case 'comparison'/)
-  assert.match(sitemapSource, /getPublishedBlogArticles\('en'\)\.map\(getBlogPath\)/)
-  assert.match(sitemapSource, /getPublishedBlogArticles\('ta'\)\.map\(getBlogPath\)/)
+  assert.match(sitemapSource, /getPublicBlogEntriesForSitemap/)
 })

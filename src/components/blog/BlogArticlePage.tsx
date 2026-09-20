@@ -4,6 +4,7 @@ import type { BlogArticle, BlogLocale, BlogSection } from '@/content/blog/articl
 import { getBlogPath } from '@/content/blog/articles'
 import { CelebrationBreadcrumbs } from '@/components/celebrations/CelebrationBreadcrumbs'
 import { IndependentServiceNotice } from '@/components/celebrations/IndependentServiceNotice'
+import { formatBlogDate } from '@/lib/blog/format-blog-date'
 
 type ArticleRenderProps = {
   article: BlogArticle
@@ -34,7 +35,7 @@ export function BlogArticlePage({ article, alternateArticle }: ArticleRenderProp
             <h1 className="mt-4 max-w-4xl text-4xl font-bold leading-tight sm:text-5xl">{article.title}</h1>
             <p className="mt-6 max-w-3xl text-lg leading-8 text-amber-50">{article.description}</p>
             <div className="mt-6 flex flex-wrap items-center gap-3 text-sm font-semibold text-amber-100">
-              <time dateTime={article.publishedAt}>{article.publishedAt}</time>
+              <time dateTime={article.publishedAt}>{formatBlogDate(article.publishedAt, article.locale)}</time>
               <span aria-hidden="true">/</span>
               <span>{isTamil ? '60ஆம் திருமணம்' : '60th Marriage'}</span>
             </div>

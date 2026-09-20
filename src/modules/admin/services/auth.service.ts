@@ -29,11 +29,14 @@ export class AdminAuthService {
   }
 
   async logout(): Promise<void> {
-    // Future: Call microservice logout endpoint
-    // await fetch(`${this.baseUrl}/auth/logout`, { method: 'POST' })
+    const response = await fetch(`${this.baseUrl}/auth/logout`, { method: 'POST' })
+    if (!response.ok) {
+      throw new Error('Unable to sign out. Please try again.')
+    }
   }
 
   async verifyToken(token: string): Promise<boolean> {
+    void token
     // Future: Verify token with microservice
     // const response = await fetch(`${this.baseUrl}/auth/verify`, {
     //   headers: { Authorization: `Bearer ${token}` }

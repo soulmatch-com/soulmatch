@@ -2,10 +2,10 @@ import assert from 'node:assert/strict'
 import { readFile } from 'node:fs/promises'
 import test from 'node:test'
 
-const list = await readFile(new URL('../src/app/(en)/admin/blogs/page.tsx', import.meta.url), 'utf8')
-const create = await readFile(new URL('../src/app/(en)/admin/blogs/new/page.tsx', import.meta.url), 'utf8')
+const list = await readFile(new URL('../src/app/(en)/admin/(protected)/blogs/page.tsx', import.meta.url), 'utf8')
+const create = await readFile(new URL('../src/app/(en)/admin/(protected)/blogs/new/page.tsx', import.meta.url), 'utf8')
 const form = await readFile(new URL('../src/components/admin/BlogEditorForm.tsx', import.meta.url), 'utf8')
-const edit = await readFile(new URL('../src/app/(en)/admin/blogs/[id]/edit/page.tsx', import.meta.url), 'utf8')
+const edit = await readFile(new URL('../src/app/(en)/admin/(protected)/blogs/[id]/edit/page.tsx', import.meta.url), 'utf8')
 const createApi = await readFile(new URL('../src/lib/blog/admin-blog-api.ts', import.meta.url), 'utf8')
 
 test('Blog Management is an admin-protected server list using the CMS repository', () => {

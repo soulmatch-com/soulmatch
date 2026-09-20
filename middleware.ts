@@ -34,6 +34,10 @@ function isPublicRequest(pathname: string) {
     '/celebrations',
     '/api/auth',
     '/api/celebrations',
+    // The admin portal has its own signed HttpOnly session and its protected
+    // layout/API handlers enforce that session server-side.
+    '/admin',
+    '/api/admin',
   ]
 
   return publicRoutes.some(route =>

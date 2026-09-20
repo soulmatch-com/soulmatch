@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Shield, Users, Settings, BarChart3, LogOut, Menu, X, Clock, UserCheck, Heart, BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
-import { useAdminStore, ADMIN_CONFIG } from "@/modules/admin";
+import { adminAuthService, useAdminStore, ADMIN_CONFIG } from "@/modules/admin";
 import { toast } from "sonner";
 
 export default function AdminHeader() {
@@ -13,13 +13,17 @@ export default function AdminHeader() {
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
-  const handleLogout = () => {
-    clearAdmin();
-    toast.success("Logged out successfully");
-    // Use window.location for hard navigation to ensure clean state
-    setTimeout(() => {
+  const handleLogout = async () => {
+    try {
+      await adminAuthService.logout();
+      clearAdmin();
+      toast.success("Logged out successfully");
+      // Use a hard navigation after the server has cleared the HttpOnly session.
       window.location.href = ADMIN_CONFIG.ROUTES.LOGIN;
-    }, 100);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Unable to sign out. Please try again.";
+      toast.error(message);
+    }
   };
 
   return (
@@ -172,8 +176,8 @@ export default function AdminHeader() {
                 <Button
                   variant="outline"
                   className="w-full border-slate-600 text-slate-300 hover:text-white hover:bg-slate-800"
-                  onClick={() => {
-                    handleLogout();
+                  onClick={async () => {
+                    await handleLogout();
                     toggleMenu();
                   }}
                 >

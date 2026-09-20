@@ -1,0 +1,6 @@
+import Link from 'next/link'
+
+function safeHref(value: string) { return /^(\/|https:\/\/mythirumanam\.in\/)/.test(value) ? value : null }
+function inline(text: string) { return text.split(/(\[[^\]]+\]\([^)]*\)|\*\*[^*]+\*\*|\*[^*]+\*)/).map((part, index) => { const link = part.match(/^\[([^\]]+)\]\(([^)]*)\)$/); if (link) { const href = safeHref(link[2]); return href ? <Link key={index} href={href} className="font-semibold text-amber-800 underline">{link[1]}</Link> : <span key={index}>{link[1]}</span> }; if (part.startsWith('**')) return <strong key={index}>{part.slice(2, -2)}</strong>; if (part.startsWith('*')) return <em key={index}>{part.slice(1, -1)}</em>; return part }) }
+
+export function MarkdownArticle({ content }: { content: string }) { return <div className="space-y-5">{content.replace(/<[^>]*>/g, '').split('\n').map((line, index) => line.startsWith('### ') ? <h3 key={index} className="text-xl font-bold">{inline(line.slice(4))}</h3> : line.startsWith('## ') ? <h2 key={index} className="text-2xl font-bold">{inline(line.slice(3))}</h2> : line.startsWith('# ') ? <h1 key={index} className="text-3xl font-bold">{inline(line.slice(2))}</h1> : line.startsWith('- ') ? <li key={index} className="ml-6 list-disc">{inline(line.slice(2))}</li> : line ? <p key={index} className="leading-8 text-stone-700">{inline(line)}</p> : null)}</div> }

@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAdminStore } from '@/store/adminStore'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -8,14 +8,23 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 export default function AdminSettingsPage() {
   const { isAuthenticated } = useAdminStore()
   const router = useRouter()
+  const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  useEffect(() => {
+    if (!mounted) return
     if (!isAuthenticated()) {
       router.push('/admin/login')
     }
-  }, [isAuthenticated, router])
+  }, [isAuthenticated, mounted, router])
 
-  if (!isAuthenticated()) {
+  // The persisted admin state only exists in the browser. Rendering the same
+  // placeholder on the server and the initial client pass prevents hydration
+  // from comparing an anonymous server tree with an authenticated client tree.
+  if (!mounted || !isAuthenticated()) {
     return null
   }
 

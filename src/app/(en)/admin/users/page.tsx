@@ -39,19 +39,17 @@ export default function AdminUsersPage() {
   const [showDialog, setShowDialog] = useState(false)
   const [actionLoading, setActionLoading] = useState(false)
 
-  useEffect(() => {
-    if (!isAuthenticated()) {
-      router.push(ADMIN_CONFIG.ROUTES.LOGIN)
-    } else {
-      fetchUsers()
-    }
-  }, [isAuthenticated, router])
-
-  const fetchUsers = async () => {
+  async function fetchUsers() {
     try {
       setLoading(true)
-      const response = await fetch(`/api/admin/users?search=${search}`)
-      if (!response.ok) throw new Error('Failed to fetch users')
+      const response = await fetch(`/api/admin/users?search=${encodeURIComponent(search)}`)
+      if (!response.ok) {
+        const body = await response.json().catch(() => null)
+        if (response.status === 401 || response.status === 403) {
+          router.push(ADMIN_CONFIG.ROUTES.LOGIN)
+        }
+        throw new Error(body?.message || `Failed to fetch users (${response.status})`)
+      }
 
       const data = await response.json()
       setUsers(data.users || [])
@@ -62,6 +60,14 @@ export default function AdminUsersPage() {
       setLoading(false)
     }
   }
+
+  useEffect(() => {
+    if (!isAuthenticated()) {
+      router.push(ADMIN_CONFIG.ROUTES.LOGIN)
+    } else {
+      fetchUsers()
+    }
+  }, [isAuthenticated, router])
 
   const handleSearch = () => {
     fetchUsers()
@@ -86,7 +92,7 @@ export default function AdminUsersPage() {
       toast.success('User status updated')
       fetchUsers()
       setShowDialog(false)
-    } catch (error) {
+    } catch {
       toast.error('Failed to update user')
     } finally {
       setActionLoading(false)
@@ -107,7 +113,7 @@ export default function AdminUsersPage() {
       toast.success('User verified successfully')
       fetchUsers()
       setShowDialog(false)
-    } catch (error) {
+    } catch {
       toast.error('Failed to verify user')
     } finally {
       setActionLoading(false)

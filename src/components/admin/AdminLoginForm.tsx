@@ -34,10 +34,11 @@ export function AdminLoginForm() {
   const onSubmit = async (data: AdminLoginInput) => {
     setIsLoading(true)
     try {
-      // Use admin service layer - easy to replace with microservice later
+      // The trusted API verifies the active admin record and creates an
+      // HttpOnly server session used by requireActiveAdmin().
       const { admin } = await adminAuthService.login(data)
 
-      // Set admin in store
+      // Store only UI state after the server-verifiable session exists.
       setAdmin(admin)
 
       // Show success message

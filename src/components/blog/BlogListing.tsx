@@ -1,7 +1,8 @@
 import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
-import type { BlogArticle, BlogLocale } from '@/content/blog/articles'
-import { getBlogPath, getBlogListingPath } from '@/content/blog/articles'
+import type { BlogLocale } from '@/content/blog/articles'
+import { getBlogListingPath } from '@/content/blog/articles'
+import type { PublicBlogListItem } from '@/lib/blog/public-blog-types'
 
 type BlogListingCopy = {
   eyebrow: string
@@ -30,7 +31,11 @@ const listingCopy: Record<BlogLocale, BlogListingCopy> = {
   },
 }
 
-export function BlogListing({ locale, articles }: { locale: BlogLocale; articles: readonly BlogArticle[] }) {
+function getArticlePath(article: Pick<PublicBlogListItem, 'locale' | 'slug'>) {
+  return article.locale === 'en' ? `/blog/${article.slug}` : `/ta/blog/${article.slug}`
+}
+
+export function BlogListing({ locale, articles }: { locale: BlogLocale; articles: readonly PublicBlogListItem[] }) {
   const copy = listingCopy[locale]
   const otherLocale = locale === 'en' ? 'ta' : 'en'
   const currentLabel = locale === 'en' ? 'English' : 'தமிழ்'
@@ -68,10 +73,10 @@ export function BlogListing({ locale, articles }: { locale: BlogLocale; articles
           <div className="grid gap-5 md:grid-cols-2">
             {articles.map((article) => (
               <article key={`${article.locale}-${article.slug}`} className="rounded-2xl border border-amber-200 bg-white p-6 shadow-sm">
-                <p className="text-sm font-bold uppercase tracking-[0.18em] text-amber-800">{article.category}</p>
+                <p className="text-sm font-bold uppercase tracking-[0.18em] text-amber-800">{article.category ?? (locale === 'ta' ? 'விழா வழிகாட்டி' : 'Celebration guide')}</p>
                 <h2 className="mt-3 text-2xl font-bold text-stone-950">
                   <Link
-                    href={getBlogPath(article)}
+                    href={getArticlePath(article)}
                     className="rounded-sm hover:text-amber-800 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-amber-700"
                   >
                     {article.title}
@@ -82,7 +87,7 @@ export function BlogListing({ locale, articles }: { locale: BlogLocale; articles
                   <time dateTime={article.publishedAt}>{article.publishedAt}</time>
                 </p>
                 <Link
-                  href={getBlogPath(article)}
+                  href={getArticlePath(article)}
                   className="mt-5 inline-flex min-h-11 items-center gap-2 font-bold text-amber-800 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-amber-700"
                 >
                   {copy.readLabel} <ArrowRight aria-hidden="true" className="h-5 w-5" />

@@ -3,6 +3,7 @@ import { ArrowRight } from 'lucide-react'
 import type { BlogLocale } from '@/content/blog/articles'
 import { getBlogListingPath } from '@/content/blog/articles'
 import type { PublicBlogListItem } from '@/lib/blog/public-blog-types'
+import { formatBlogDate } from '@/lib/blog/format-blog-date'
 
 type BlogListingCopy = {
   eyebrow: string
@@ -84,7 +85,7 @@ export function BlogListing({ locale, articles }: { locale: BlogLocale; articles
                 </h2>
                 <p className="mt-3 leading-7 text-stone-600">{article.excerpt}</p>
                 <p className="mt-4 text-sm font-semibold text-stone-500">
-                  <time dateTime={article.publishedAt}>{article.publishedAt}</time>
+                  <time dateTime={article.publishedAt}>{formatBlogDate(article.publishedAt, locale)}</time>
                 </p>
                 <Link
                   href={getArticlePath(article)}

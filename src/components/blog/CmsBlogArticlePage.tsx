@@ -5,6 +5,7 @@ import { CelebrationBreadcrumbs } from '@/components/celebrations/CelebrationBre
 import { IndependentServiceNotice } from '@/components/celebrations/IndependentServiceNotice'
 import { getPublicCmsBlogPath } from '@/lib/blog/public-blog-seo'
 import type { PublicBlogArticle, PublicBlogLocaleAvailability } from '@/lib/blog/public-blog-types'
+import { formatBlogDate } from '@/lib/blog/format-blog-date'
 
 export function CmsBlogArticlePage({
   article,
@@ -36,7 +37,7 @@ export function CmsBlogArticlePage({
             <h1 className="mt-4 max-w-4xl text-4xl font-bold leading-tight sm:text-5xl">{article.title}</h1>
             {article.excerpt ? <p className="mt-6 max-w-3xl text-lg leading-8 text-amber-50">{article.excerpt}</p> : null}
             <div className="mt-6 flex flex-wrap items-center gap-3 text-sm font-semibold text-amber-100">
-              <time dateTime={article.publishedAt}>{article.publishedAt}</time>
+              <time dateTime={article.publishedAt}>{formatBlogDate(article.publishedAt, article.locale)}</time>
             </div>
             {alternateAvailable ? (
               <nav aria-label="Article language" className="mt-8 flex items-center gap-3 text-sm font-bold">

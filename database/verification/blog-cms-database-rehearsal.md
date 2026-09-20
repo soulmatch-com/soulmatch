@@ -47,3 +47,11 @@ Pending an approved SQL migration workflow/connection for the approved productio
 - Seed status: **NOT EXECUTED**.
 - Blocker: this workspace has no Supabase CLI, `DATABASE_URL`/Postgres connection, or Supabase Management API credential. A service-role REST key cannot safely execute arbitrary DDL or the SQL seed.
 - Public state: `BLOG_CMS_PUBLIC_ENABLED` remains false; public routes and sitemap remain code-backed.
+
+## Ownership foreign-key correction (pending application)
+
+- Cause of the failed admin create request: the initial CMS migration references `auth.users(id)` for `blog_posts.created_by` and `updated_by`, while `requireActiveAdmin()` supplies IDs from `public.admins`.
+- Corrective migration created: `database/migrations/20260920_fix_blog_cms_admin_ownership_fk.sql`.
+- The correction replaces only those two foreign keys with nullable references to `public.admins(id)` using `ON DELETE SET NULL`; it does not alter content, publication state, or public routing.
+- Read-only verifier created: `database/verification/verify_blog_cms_admin_ownership_fk.sql`.
+- Status: **NOT APPLIED**. Apply this correction before retrying Blog CMS draft creation, then run its verifier.

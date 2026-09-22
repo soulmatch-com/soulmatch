@@ -17,8 +17,11 @@ import {
 } from '@/lib/celebrations/plan-v2'
 
 type DetailErrors = Partial<Record<keyof CelebrationPlanDetailsDraft, string>>
-const fieldClass = 'h-12 border-amber-200 text-base focus-visible:ring-amber-700'
-const selectClass = 'h-12 w-full rounded-md border border-amber-200 bg-white px-3 text-base focus:outline-none focus:ring-2 focus:ring-amber-700'
+// Celebration planning cards are intentionally light in both application themes.
+// Explicit dark-mode overrides keep labels and input values legible when a visitor
+// has enabled dark mode at the system level.
+const fieldClass = 'h-12 border-amber-200 bg-white text-base text-stone-950 placeholder:text-stone-500 [color-scheme:light] focus-visible:ring-amber-700 dark:bg-white dark:text-stone-950 dark:placeholder:text-stone-500'
+const selectClass = 'h-12 w-full rounded-md border border-amber-200 bg-white px-3 text-base text-stone-950 [color-scheme:light] focus:outline-none focus:ring-2 focus:ring-amber-700 dark:bg-white dark:text-stone-950'
 
 export function PlanDetailsScreen({
   selection,
@@ -100,7 +103,7 @@ export function PlanDetailsScreen({
                   onChange={(event) => updateDetails('additionalRequirements', event.target.value)}
                   aria-invalid={!!errors.additionalRequirements}
                   aria-describedby={errors.additionalRequirements ? 'additionalRequirements-error' : undefined}
-                  className="w-full rounded-md border border-amber-200 bg-white px-3 py-3 text-base focus:outline-none focus:ring-2 focus:ring-amber-700"
+                  className="w-full rounded-md border border-amber-200 bg-white px-3 py-3 text-base text-stone-950 placeholder:text-stone-500 [color-scheme:light] focus:outline-none focus:ring-2 focus:ring-amber-700 dark:bg-white dark:text-stone-950 dark:placeholder:text-stone-500"
                 />
               </Field>
             </div>
@@ -235,7 +238,7 @@ function ContextItem({ label, value, actionLabel, onAction }: { label: string; v
 function Field({ id, label, hint, required, error, children }: { id: keyof CelebrationPlanDetailsDraft; label: string; hint?: string; required?: boolean; error?: string; children: ReactNode }) {
   return (
     <div className="space-y-2">
-      <Label htmlFor={id} className="text-base">
+      <Label htmlFor={id} className="text-base text-stone-950 dark:text-stone-950">
         {label}
         {required && <span className="ml-1 text-red-700" aria-hidden="true">*</span>}
         {hint && <span className="ml-1 font-normal text-stone-500">({hint})</span>}

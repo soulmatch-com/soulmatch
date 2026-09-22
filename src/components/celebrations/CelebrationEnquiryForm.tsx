@@ -34,8 +34,10 @@ const stepFields: Array<Array<keyof CelebrationEnquiryFormValues>> = [
   ['serviceIds', 'otherServiceDetails'],
   ['contactName', 'mobile', 'email', 'relationship', 'preferredContactMethod', 'notes'],
 ]
-const fieldClass = 'h-12 border-amber-200 text-base focus-visible:ring-amber-700'
-const selectClass = 'h-12 w-full rounded-md border border-amber-200 bg-white px-3 text-base focus:outline-none focus:ring-2 focus:ring-amber-700'
+// This form uses light cards in every theme, so controls must not inherit the
+// dark UI primitive colours when the visitor has dark mode enabled.
+const fieldClass = 'h-12 border-amber-200 bg-white text-base text-stone-950 placeholder:text-stone-500 [color-scheme:light] focus-visible:ring-amber-700 dark:bg-white dark:text-stone-950 dark:placeholder:text-stone-500'
+const selectClass = 'h-12 w-full rounded-md border border-amber-200 bg-white px-3 text-base text-stone-950 [color-scheme:light] focus:outline-none focus:ring-2 focus:ring-amber-700 dark:bg-white dark:text-stone-950'
 
 export function CelebrationEnquiryForm({
   services,
@@ -611,7 +613,7 @@ function Field({
 }) {
   return (
     <div className="space-y-2">
-      <Label htmlFor={id} className="text-base">
+      <Label htmlFor={id} className="text-base text-stone-950 dark:text-stone-950">
         {label}
         {required && <span className="ml-1 text-red-700" aria-hidden="true">*</span>}
         {hint && <span className="ml-1 font-normal text-stone-500">({hint})</span>}

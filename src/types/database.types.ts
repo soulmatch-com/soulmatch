@@ -9,6 +9,39 @@ export type Json =
 export interface Database {
   public: {
     Tables: {
+      email_subscribers: {
+        Row: {
+          id: string
+          email: string
+          preferred_locale: 'en' | 'ta' | null
+          status: 'subscribed' | 'unsubscribed'
+          consent_source: 'blog_listing' | 'blog_article'
+          consented_at: string
+          unsubscribed_at: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          email: string
+          preferred_locale?: 'en' | 'ta' | null
+          status?: 'subscribed' | 'unsubscribed'
+          consent_source: 'blog_listing' | 'blog_article'
+          consented_at?: string
+          unsubscribed_at?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          email?: string
+          preferred_locale?: 'en' | 'ta' | null
+          status?: 'subscribed' | 'unsubscribed'
+          consent_source?: 'blog_listing' | 'blog_article'
+          consented_at?: string
+          unsubscribed_at?: string | null
+          updated_at?: string
+        }
+      }
       celebration_services: {
         Row: {
           id: string

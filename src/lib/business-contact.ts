@@ -18,6 +18,18 @@ function validEmail(value: string | undefined) {
   return normalized && emailPattern.test(normalized) ? normalized : undefined
 }
 
+function validExternalUrl(value: string | undefined) {
+  const normalized = clean(value)
+  if (!normalized) return undefined
+
+  try {
+    const url = new URL(normalized)
+    return url.protocol === 'https:' || url.protocol === 'http:' ? url.href : undefined
+  } catch {
+    return undefined
+  }
+}
+
 function displayPhone(value: string | undefined) {
   return value?.replace(/^\+91(\d{5})(\d{5})$/, '+91 $1 $2')
 }
@@ -34,4 +46,12 @@ export const businessContactLinks = {
   whatsappHref: businessContact.whatsappE164
     ? `https://wa.me/${businessContact.whatsappE164.replace('+', '')}?text=${encodeURIComponent('Hello MyThirumanam, I would like help planning a Thirukadaiyur celebration.')}`
     : undefined,
+}
+
+export const businessSocialLinks = {
+  instagram: validExternalUrl(process.env.NEXT_PUBLIC_MYTHIRUMANAM_INSTAGRAM_URL) ?? 'https://www.instagram.com/mythirumanam/',
+  facebook: validExternalUrl(process.env.NEXT_PUBLIC_MYTHIRUMANAM_FACEBOOK_URL) ?? 'https://www.facebook.com/Mythirumanamm/',
+  youtube: validExternalUrl(process.env.NEXT_PUBLIC_MYTHIRUMANAM_YOUTUBE_URL),
+  linkedin: validExternalUrl(process.env.NEXT_PUBLIC_MYTHIRUMANAM_LINKEDIN_URL),
+  x: validExternalUrl(process.env.NEXT_PUBLIC_MYTHIRUMANAM_X_URL),
 }

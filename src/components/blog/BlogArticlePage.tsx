@@ -1,7 +1,8 @@
 import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
 import type { BlogArticle, BlogLocale, BlogSection } from '@/content/blog/articles'
-import { getBlogPath } from '@/content/blog/articles'
+import { getBlogPath, getBlogUrl } from '@/content/blog/articles'
+import { FacebookShareButton } from '@/components/blog/FacebookShareButton'
 import { CelebrationBreadcrumbs } from '@/components/celebrations/CelebrationBreadcrumbs'
 import { IndependentServiceNotice } from '@/components/celebrations/IndependentServiceNotice'
 import { formatBlogDate } from '@/lib/blog/format-blog-date'
@@ -51,6 +52,9 @@ export function BlogArticlePage({ article, alternateArticle }: ArticleRenderProp
                 {alternateLabel}
               </Link>
             </nav>
+            <div className="mt-5">
+              <FacebookShareButton locale={article.locale} url={getBlogUrl(article)} />
+            </div>
           </div>
         </header>
 

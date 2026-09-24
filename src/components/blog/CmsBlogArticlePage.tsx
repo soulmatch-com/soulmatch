@@ -1,9 +1,10 @@
 import Link from 'next/link'
 
+import { FacebookShareButton } from '@/components/blog/FacebookShareButton'
 import { MarkdownArticle } from '@/components/blog/MarkdownArticle'
 import { CelebrationBreadcrumbs } from '@/components/celebrations/CelebrationBreadcrumbs'
 import { IndependentServiceNotice } from '@/components/celebrations/IndependentServiceNotice'
-import { getPublicCmsBlogPath } from '@/lib/blog/public-blog-seo'
+import { getPublicCmsBlogPath, getPublicCmsBlogUrl } from '@/lib/blog/public-blog-seo'
 import type { PublicBlogArticle, PublicBlogLocaleAvailability } from '@/lib/blog/public-blog-types'
 import { formatBlogDate } from '@/lib/blog/format-blog-date'
 
@@ -51,6 +52,9 @@ export function CmsBlogArticlePage({
                 </Link>
               </nav>
             ) : null}
+            <div className="mt-5">
+              <FacebookShareButton locale={article.locale} url={getPublicCmsBlogUrl(article.locale, article.slug)} />
+            </div>
           </div>
         </header>
 

@@ -26,7 +26,7 @@ test('deployment safety remains default-off and execution separation is preserve
 
 test('notification domain is Blog-independent and the runbook preserves the explicit approval gate', async () => {
   for (const source of await Promise.all(notificationFiles)) assert.doesNotMatch(source, /@\/lib\/blog|@\/content\/blog|blog_posts|blog_post_translations/)
-  for (const text of ['NOTIFICATION_SCHEDULER_ENABLED=false','add_notification_provider_events.sql','RESEND_WEBHOOK_SECRET','manual worker','AWAITING EXPLICIT TARGET APPROVAL']) {
+  for (const text of ['NOTIFICATION_SCHEDULER_ENABLED=false','add_notification_provider_events.sql','fix_notification_queue_campaign_ambiguity.sql','fix_notification_worker_claim_id_ambiguity.sql','RESEND_WEBHOOK_SECRET','manual worker','AWAITING EXPLICIT TARGET APPROVAL']) {
     if (text === 'AWAITING EXPLICIT TARGET APPROVAL') assert.match(runbook, /explicit target approval/i)
     else if (text === 'manual worker') assert.match(runbook, /manually invoke the protected worker/i)
     else assert.match(runbook, new RegExp(text))

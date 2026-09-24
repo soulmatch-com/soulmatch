@@ -7,7 +7,7 @@ ORDER BY table_name, ordinal_position;
 SELECT conrelid::regclass AS table_name, conname, pg_get_constraintdef(oid) AS definition
 FROM pg_constraint
 WHERE conrelid IN ('public.notification_campaigns'::regclass, 'public.notification_jobs'::regclass)
-ORDER BY table_name::text, conname;
+ORDER BY conrelid::regclass::text, conname;
 
 SELECT indexname, indexdef FROM pg_indexes
 WHERE schemaname = 'public' AND tablename = 'notification_jobs' ORDER BY indexname;

@@ -2,6 +2,10 @@
 
 Status: code is ready for a controlled rollout only. Do not enable automatic delivery without explicit target approval.
 
+## Environment boundary
+
+The existing remote Supabase project is production. Local development and local migration rehearsal use the isolated Supabase CLI stack described in [local Supabase development](./local-supabase-development.md). Do not use production Supabase credentials locally except for a separately approved production operation.
+
 ## Architecture
 
 Admin queues a campaign, which freezes eligible recipients into notification jobs. The worker sends only queued jobs after rechecking subscription, locale, active suppression, and a secure unsubscribe URL. Resend delivery events are verified and recorded separately from worker execution status.
@@ -29,6 +33,9 @@ Admin queues a campaign, which freezes eligible recipients into notification job
 - [ ] `add_email_suppressions.sql` applied
 - [ ] `add_notification_queue_audit.sql` applied
 - [ ] `add_notification_provider_events.sql` applied
+- [ ] `fix_notification_queue_campaign_ambiguity.sql` applied
+- [ ] `fix_notification_worker_claim_ambiguity.sql` applied
+- [ ] `fix_notification_worker_claim_id_ambiguity.sql` applied
 - [ ] Each individual read-only verifier passed
 - [ ] `verify_notification_system.sql` passed
 

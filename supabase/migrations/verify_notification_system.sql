@@ -1,4 +1,4 @@
--- Master read-only verifier. Run only after migrations 1-7 on an approved target.
+-- Master read-only verifier. Run only after notification migrations 1-10 on an approved target.
 SELECT c.relname AS table_name, c.relrowsecurity AS rls_enabled
 FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
 WHERE n.nspname='public' AND c.relname IN ('email_subscribers','notification_campaigns','notification_jobs','email_suppressions','notification_provider_events') ORDER BY c.relname;
@@ -9,7 +9,7 @@ WHERE table_schema='public' AND table_name IN ('email_subscribers','notification
 
 SELECT conrelid::regclass AS table_name, conname, pg_get_constraintdef(oid) AS definition FROM pg_constraint
 WHERE conrelid IN ('public.email_subscribers'::regclass,'public.notification_campaigns'::regclass,'public.notification_jobs'::regclass,'public.email_suppressions'::regclass,'public.notification_provider_events'::regclass)
-ORDER BY table_name::text, conname;
+ORDER BY conrelid::regclass::text, conname;
 
 SELECT tablename, indexname, indexdef FROM pg_indexes WHERE schemaname='public'
   AND tablename IN ('email_subscribers','notification_campaigns','notification_jobs','email_suppressions','notification_provider_events') ORDER BY tablename,indexname;

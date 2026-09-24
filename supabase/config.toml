@@ -1,0 +1,7 @@
+# Local Supabase development only. This configuration has no remote project link
+# and contains no credentials. The existing remote Supabase project is production.
+project_id = "mythirumanam-local"
+
+[auth]
+site_url = "http://localhost:3000"
+additional_redirect_urls = ["http://127.0.0.1:3000"]

@@ -2,6 +2,8 @@
 
 Status: code is ready for a controlled rollout only. Do not enable automatic delivery without explicit target approval.
 
+Production rollout is currently paused pending the read-only schema inventory and reconciliation plan in [notification production schema inventory](./notification-production-schema-inventory.md). Do not apply notification migrations to the existing production project until the reconciliation migration is separately reviewed and approved.
+
 ## Environment boundary
 
 The existing remote Supabase project is production. Local development and local migration rehearsal use the isolated Supabase CLI stack described in [local Supabase development](./local-supabase-development.md). Do not use production Supabase credentials locally except for a separately approved production operation.

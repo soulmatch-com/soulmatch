@@ -57,11 +57,13 @@ Use only explicitly approved test mailbox data in an approved environment. Do no
 
 ## Scheduler activation
 
-Only after the controlled test is approved, separately authorize setting `NOTIFICATION_SCHEDULER_ENABLED=true`. Confirm the cron route authenticates with `CRON_SECRET`, processes bounded batches, honors suppression, and does not create duplicate sends.
+Only after the controlled test is approved, separately authorize setting `NOTIFICATION_SCHEDULER_ENABLED=true`. The scheduler endpoint is `GET /api/internal/notifications/scheduled-process`; it authenticates with `Authorization: Bearer <CRON_SECRET>`, processes bounded batches, honors suppression, and does not create duplicate sends.
+
+Vercel Hobby supports only daily Vercel Cron schedules, so this repository intentionally does not register the near-real-time notification route with Vercel Cron. For production scheduling, either upgrade to a Vercel plan that supports the required cadence and restore a secured Vercel Cron entry, or keep Vercel Hobby and use an external scheduler to call the secured endpoint. Do not enable the scheduler until that trigger and the controlled test have been separately approved.
 
 ## Rollback
 
-First response: set `NOTIFICATION_SCHEDULER_ENABLED=false`. This stops automatic worker execution without destructive schema rollback. If required, then disable the Vercel cron, disable the Resend webhook, and rotate relevant provider or endpoint secrets. Preserve applied schema unless a specific migration defect requires a separately approved corrective migration.
+First response: set `NOTIFICATION_SCHEDULER_ENABLED=false`. This stops automatic worker execution without destructive schema rollback. If required, then disable the configured scheduler trigger, disable the Resend webhook, and rotate relevant provider or endpoint secrets. Preserve applied schema unless a specific migration defect requires a separately approved corrective migration.
 
 ## Post-rollout checks
 

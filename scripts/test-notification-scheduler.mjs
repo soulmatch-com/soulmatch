@@ -72,10 +72,12 @@ test('scheduler route uses separate cron authentication and only the worker boun
   assert.doesNotMatch(queueRoute, /NotificationScheduler|scheduled-process|createNotificationWorker/)
 })
 
-test('default-off deployment configuration documents secrets and schedules only the secured route', () => {
+test('default-off deployment configuration documents secrets without registering an unsupported frequent Vercel cron', () => {
   assert.match(config, /NOTIFICATION_SCHEDULER_ENABLED === 'true'/)
   assert.match(env, /NOTIFICATION_SCHEDULER_ENABLED=false/)
   assert.match(env, /CRON_SECRET=/)
-  assert.deepEqual(vercel.crons, [{ path: '/api/internal/notifications/scheduled-process', schedule: '*/5 * * * *' }])
+  const notificationCron = (vercel.crons ?? []).find((cron) => cron.path === '/api/internal/notifications/scheduled-process')
+  assert.equal(notificationCron, undefined)
+  assert.doesNotMatch(JSON.stringify(vercel), /\*\/5 \* \* \* \*/)
   assert.match(scheduler, /result\.claimed < this\.config\.batchSize/)
 })

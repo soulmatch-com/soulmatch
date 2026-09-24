@@ -2,10 +2,19 @@ import { type NextRequest, NextResponse } from 'next/server'
 import { SupabaseSubscriberRepository } from '@/modules/notifications/subscribers/subscriber-repository'
 import { SubscriberService } from '@/modules/notifications/subscribers/subscriber-service'
 import { subscribeRequestSchema } from '@/modules/notifications/subscribers/subscriber-validation'
+import { checkSubscriberRateLimit } from '@/modules/notifications/subscribers/subscriber-rate-limit'
 
 const MAX_REQUEST_BYTES = 4 * 1024
 
 export async function POST(request: NextRequest) {
+  const rateLimit = await checkSubscriberRateLimit(request)
+  if (!rateLimit.allowed) {
+    return NextResponse.json(
+      { message: 'Too many subscription attempts. Please try again later.' },
+      { status: 429, headers: 'retryAfterSeconds' in rateLimit ? { 'Retry-After': String(rateLimit.retryAfterSeconds) } : undefined },
+    )
+  }
+
   const declaredLength = Number(request.headers.get('content-length') ?? 0)
   if (Number.isFinite(declaredLength) && declaredLength > MAX_REQUEST_BYTES) {
     return NextResponse.json({ message: 'Request is too large.' }, { status: 413 })

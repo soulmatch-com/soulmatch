@@ -19,6 +19,12 @@
       "maxDuration": 10
     }
   },
+  "crons": [
+    {
+      "path": "/api/internal/notifications/scheduled-process",
+      "schedule": "*/5 * * * *"
+    }
+  ],
   "headers": [
     {
       "source": "/(.*)",

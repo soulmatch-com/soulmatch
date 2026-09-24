@@ -1,0 +1,48 @@
+'use client'
+
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { useState } from 'react'
+
+type CampaignPreview = {
+  id: string; locale: 'en' | 'ta'; status: 'draft' | 'queued' | 'processing' | 'completed' | 'partially_failed' | 'failed' | 'cancelled'
+  subject: string; preheader: string | null; headline: string; summary: string | null; targetUrl: string; sourcePublishedAt: string; createdAt: string
+  queuedAt: string | null; completedAt: string | null; recipientCount: number; sentCount: number; failedCount: number; skippedCount: number
+}
+
+const date = (value: string, locale: 'en' | 'ta') => new Intl.DateTimeFormat(locale === 'ta' ? 'ta-IN' : 'en-IN', { dateStyle: 'medium' }).format(new Date(value))
+const statusLabel = (status: CampaignPreview['status']) => status === 'partially_failed' ? 'Partially Failed' : status[0].toUpperCase() + status.slice(1)
+
+type DeliverySummary = { delivered: number; delayed: number; bounced: number; complained: number; suppressed: number; failed: number }
+export default function BlogCampaignPreview({ blogId, campaign, recipientEstimate, deliverySummary }: { blogId: string; campaign: CampaignPreview; recipientEstimate: number; deliverySummary: DeliverySummary | null }) {
+  const router = useRouter()
+  const [confirming, setConfirming] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
+  const [feedback, setFeedback] = useState<string | null>(null)
+  const tamil = campaign.locale === 'ta'
+  const remaining = Math.max(0, campaign.recipientCount - campaign.sentCount - campaign.failedCount - campaign.skippedCount)
+
+  async function queueCampaign() {
+    if (submitting) return
+    setSubmitting(true); setFeedback(null)
+    try {
+      const response = await fetch(`/api/admin/blogs/${blogId}/campaign/${campaign.id}/queue`, { method: 'POST' })
+      const result: unknown = await response.json().catch(() => null)
+      if (!result || typeof result !== 'object' || !('status' in result) || typeof result.status !== 'string') throw new Error('Unable to queue this campaign.')
+      if (result.status === 'no_recipients') { setFeedback('No eligible subscribers are currently available for this campaign.'); setConfirming(false); return }
+      if (!response.ok || !['queued', 'already_queued'].includes(result.status)) throw new Error('Unable to queue this campaign.')
+      setFeedback('Campaign has been queued for delivery.'); setConfirming(false); router.refresh()
+    } catch (error) { setFeedback(error instanceof Error ? error.message : 'Unable to queue this campaign.') } finally { setSubmitting(false) }
+  }
+
+  return <main className="container mx-auto px-4 py-10"><div className="mx-auto max-w-3xl">
+    <Link href={`/admin/blogs/${blogId}/edit`} className="text-sm font-medium text-slate-700 hover:text-slate-950">← Back to Blog</Link>
+    <div className="mt-5 flex flex-wrap items-start justify-between gap-3"><div><h1 className="text-3xl font-bold text-slate-900">Campaign Preview</h1><p className="mt-2 text-slate-600">Read-only stored campaign snapshot. Queueing prepares delivery only; it does not send email.</p></div><button type="button" onClick={() => router.refresh()} className="rounded-md border border-slate-300 px-3 py-2 text-sm font-medium text-slate-800 hover:bg-slate-50">Refresh Status</button></div>
+    <dl className="mt-6 grid gap-3 rounded-xl border border-slate-200 bg-white p-5 text-sm sm:grid-cols-2"><div><dt className="text-slate-500">Campaign ID</dt><dd className="mt-1 break-all font-mono text-slate-900">{campaign.id}</dd></div><div><dt className="text-slate-500">Locale</dt><dd className="mt-1 text-slate-900">{campaign.locale === 'ta' ? 'Tamil' : 'English'}</dd></div><div><dt className="text-slate-500">Status</dt><dd className="mt-1 text-slate-900">{statusLabel(campaign.status)}</dd></div><div><dt className="text-slate-500">Created date</dt><dd className="mt-1 text-slate-900">{date(campaign.createdAt, campaign.locale)}</dd></div><div className="sm:col-span-2"><dt className="text-slate-500">Source publication date</dt><dd className="mt-1 text-slate-900">{date(campaign.sourcePublishedAt, campaign.locale)}</dd></div></dl>
+    <section className="mt-6 rounded-xl border border-slate-200 bg-white p-5" aria-labelledby="delivery-heading"><h2 id="delivery-heading" className="text-lg font-semibold text-slate-900">Delivery status</h2>{campaign.status === 'draft' ? <><p className="mt-2 text-sm text-slate-700">Eligible recipients: <strong>{recipientEstimate}</strong></p><p className="mt-1 text-sm text-slate-600">Eligible recipients are calculated again when the campaign is queued.</p><button type="button" onClick={() => setConfirming(true)} className="mt-4 rounded-md bg-[#681c24] px-4 py-2 font-semibold text-white hover:bg-[#53161d]">Queue Campaign</button></> : <div className="mt-3 grid grid-cols-2 gap-3 text-sm sm:grid-cols-4"><p>Recipients: <strong>{campaign.recipientCount}</strong></p><p>Sent: <strong>{campaign.sentCount}</strong></p><p>Failed: <strong>{campaign.failedCount}</strong></p><p>Skipped: <strong>{campaign.skippedCount}</strong></p>{campaign.status === 'processing' ? <p className="sm:col-span-4">Remaining: <strong>{remaining}</strong></p> : null}{campaign.completedAt ? <p className="sm:col-span-4">Completed: {date(campaign.completedAt, campaign.locale)}</p> : null}</div>}</section>
+    <section className="mt-4 rounded-xl border border-slate-200 bg-white p-5" aria-labelledby="provider-delivery-heading"><h2 id="provider-delivery-heading" className="text-lg font-semibold text-slate-900">Provider delivery outcomes</h2><p className="mt-1 text-sm text-slate-600">Sent above means provider accepted the request; these are later provider delivery events.</p>{deliverySummary ? <div className="mt-3 grid grid-cols-2 gap-3 text-sm sm:grid-cols-3"><p>Delivered: <strong>{deliverySummary.delivered}</strong></p><p>Delayed: <strong>{deliverySummary.delayed}</strong></p><p>Bounced: <strong>{deliverySummary.bounced}</strong></p><p>Complained: <strong>{deliverySummary.complained}</strong></p><p>Suppressed: <strong>{deliverySummary.suppressed}</strong></p><p>Provider Failed: <strong>{deliverySummary.failed}</strong></p></div> : <p className="mt-3 text-sm text-amber-900">Provider delivery summary is unavailable until notification provider-event storage is configured.</p>}</section>
+    {feedback ? <p role="status" className="mt-4 rounded-md bg-slate-100 p-3 text-sm text-slate-800">{feedback}</p> : null}
+    {confirming ? <div role="dialog" aria-modal="true" aria-labelledby="queue-confirmation-title" className="fixed inset-0 z-50 grid place-items-center bg-slate-950/40 p-4"><div className="w-full max-w-md rounded-xl bg-white p-6 shadow-xl"><h2 id="queue-confirmation-title" className="text-xl font-bold text-slate-900">Queue this email campaign?</h2><dl className="mt-4 space-y-2 text-sm text-slate-700"><div><dt className="font-medium">Campaign</dt><dd>{campaign.headline}</dd></div><div><dt className="font-medium">Language</dt><dd>{campaign.locale === 'ta' ? 'Tamil' : 'English'}</dd></div><div><dt className="font-medium">Currently eligible recipients</dt><dd>{recipientEstimate}</dd></div></dl><p className="mt-4 text-sm text-slate-600">Recipients will be recalculated when queued. Once queued, the recipient set is frozen and this campaign cannot be edited through the normal draft workflow.</p><div className="mt-6 flex justify-end gap-3"><button type="button" disabled={submitting} onClick={() => setConfirming(false)} className="rounded-md border border-slate-300 px-4 py-2 font-medium text-slate-800 disabled:opacity-60">Cancel</button><button type="button" disabled={submitting} onClick={queueCampaign} className="rounded-md bg-[#681c24] px-4 py-2 font-semibold text-white disabled:opacity-60">{submitting ? 'Queueing…' : 'Queue Campaign'}</button></div></div></div> : null}
+    <section className="mt-6 rounded-xl border border-slate-200 bg-white p-6 shadow-sm" aria-labelledby="email-preview-heading"><p className="font-serif text-xl font-bold text-[#681c24]">MyThirumanam</p><p id="email-preview-heading" className="mt-5 text-sm font-bold uppercase tracking-wide text-amber-800">{tamil ? 'புதிய வழிகாட்டி' : 'New Guide'}</p><div className="mt-5 rounded-lg bg-slate-50 p-4 text-sm"><p className="font-semibold text-slate-700">Subject</p><p className="mt-1 text-slate-900">{campaign.subject}</p><p className="mt-4 font-semibold text-slate-700">Preheader</p><p className="mt-1 text-slate-900">{campaign.preheader ?? '—'}</p></div><h2 className="mt-7 text-2xl font-bold text-slate-950">{campaign.headline}</h2>{campaign.summary ? <p className="mt-3 leading-7 text-slate-700">{campaign.summary}</p> : null}<a href={campaign.targetUrl} className="mt-6 inline-flex min-h-11 items-center rounded-md bg-[#681c24] px-5 py-3 font-semibold text-white">{tamil ? 'முழு வழிகாட்டியை படிக்கவும்' : 'Read the Full Guide'}</a><div className="mt-8 border-t border-slate-200 pt-6"><p className="font-semibold text-slate-900">{tamil ? 'உங்கள் விழாவை திட்டமிடுகிறீர்களா?' : 'Planning your celebration?'}</p><a href="/plan" className="mt-3 inline-flex min-h-11 items-center rounded-md border border-[#681c24] px-5 py-3 font-semibold text-[#681c24]">{tamil ? 'உங்கள் திருக்கடையூர் விழாவை திட்டமிடுங்கள்' : 'Plan Your Thirukadaiyur Celebration'}</a></div><footer className="mt-8 border-t border-slate-200 pt-5 text-sm text-slate-600"><p>MyThirumanam</p><p className="mt-1">{tamil ? 'சுயாதீன விழா திட்டமிடல் மற்றும் ஒருங்கிணைப்பு சேவை.' : 'Independent celebration planning and coordination service.'}</p></footer></section>
+  </div></main>
+}

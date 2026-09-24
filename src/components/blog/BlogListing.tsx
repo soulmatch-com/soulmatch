@@ -4,6 +4,7 @@ import type { BlogLocale } from '@/content/blog/articles'
 import { getBlogListingPath } from '@/content/blog/articles'
 import type { PublicBlogListItem } from '@/lib/blog/public-blog-types'
 import { formatBlogDate } from '@/lib/blog/format-blog-date'
+import { BlogSubscriptionBox } from './BlogSubscriptionBox'
 
 type BlogListingCopy = {
   eyebrow: string
@@ -97,6 +98,7 @@ export function BlogListing({ locale, articles }: { locale: BlogLocale; articles
             ))}
           </div>
         )}
+        <BlogSubscriptionBox locale={locale} source="blog_listing" />
       </section>
     </main>
   )

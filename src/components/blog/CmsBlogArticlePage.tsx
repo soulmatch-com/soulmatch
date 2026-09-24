@@ -7,6 +7,7 @@ import { IndependentServiceNotice } from '@/components/celebrations/IndependentS
 import { getPublicCmsBlogPath, getPublicCmsBlogUrl } from '@/lib/blog/public-blog-seo'
 import type { PublicBlogArticle, PublicBlogLocaleAvailability } from '@/lib/blog/public-blog-types'
 import { formatBlogDate } from '@/lib/blog/format-blog-date'
+import { BlogSubscriptionBox } from './BlogSubscriptionBox'
 
 export function CmsBlogArticlePage({
   article,
@@ -59,8 +60,11 @@ export function CmsBlogArticlePage({
         </header>
 
         <div className="mx-auto grid max-w-5xl gap-10 px-4 py-14 sm:px-6 lg:grid-cols-[minmax(0,1fr)_16rem]">
-          <div className="min-w-0 rounded-2xl border border-amber-200 bg-white p-5 shadow-sm sm:p-8">
-            <MarkdownArticle content={article.content} />
+          <div className="min-w-0">
+            <div className="rounded-2xl border border-amber-200 bg-white p-5 shadow-sm sm:p-8">
+              <MarkdownArticle content={article.content} />
+            </div>
+            <BlogSubscriptionBox locale={article.locale} source="blog_article" />
           </div>
           <aside className="lg:sticky lg:top-24 lg:self-start">
             <IndependentServiceNotice className="rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm text-stone-700" />

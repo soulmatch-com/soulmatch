@@ -7,9 +7,11 @@ import { DuplicateSubscriberError, type EmailSubscriber, type SubscribeInput } f
 type SubscriberRow = Database['public']['Tables']['email_subscribers']['Row']
 
 export interface SubscriberRepository {
+  findById(id: string): Promise<EmailSubscriber | null>
   findByEmail(email: string): Promise<EmailSubscriber | null>
   create(input: SubscribeInput, timestamp: string): Promise<EmailSubscriber>
   resubscribe(existing: EmailSubscriber, input: SubscribeInput, timestamp: string): Promise<EmailSubscriber>
+  unsubscribe(id: string, timestamp: string): Promise<void>
 }
 
 function toSubscriber(row: SubscriberRow): EmailSubscriber {
@@ -22,6 +24,12 @@ function toSubscriber(row: SubscriberRow): EmailSubscriber {
 
 export class SupabaseSubscriberRepository implements SubscriberRepository {
   private readonly db = createAdminClient()
+
+  async findById(id: string) {
+    const { data, error } = await this.db.from('email_subscribers').select('*').eq('id', id).maybeSingle()
+    if (error) throw new Error('Subscriber lookup failed')
+    return data ? toSubscriber(data) : null
+  }
 
   async findByEmail(email: string) {
     const { data, error } = await this.db.from('email_subscribers').select('*').eq('email', email).maybeSingle()
@@ -46,5 +54,10 @@ export class SupabaseSubscriberRepository implements SubscriberRepository {
     }).eq('id', existing.id).select('*').single()
     if (error) throw new Error('Subscriber resubscription failed')
     return toSubscriber(data)
+  }
+
+  async unsubscribe(id: string, timestamp: string) {
+    const { error } = await this.db.from('email_subscribers').update({ status: 'unsubscribed', unsubscribed_at: timestamp, updated_at: timestamp }).eq('id', id)
+    if (error) throw new Error('Subscriber unsubscribe failed')
   }
 }

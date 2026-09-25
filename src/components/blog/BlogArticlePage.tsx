@@ -6,6 +6,7 @@ import { FacebookShareButton } from '@/components/blog/FacebookShareButton'
 import { CelebrationBreadcrumbs } from '@/components/celebrations/CelebrationBreadcrumbs'
 import { IndependentServiceNotice } from '@/components/celebrations/IndependentServiceNotice'
 import { formatBlogDate } from '@/lib/blog/format-blog-date'
+import { BlogSubscriptionBox } from './BlogSubscriptionBox'
 
 type ArticleRenderProps = {
   article: BlogArticle
@@ -86,6 +87,7 @@ export function BlogArticlePage({ article, alternateArticle }: ArticleRenderProp
                 ) : null}
               </div>
             </section>
+            <BlogSubscriptionBox locale={article.locale} source="blog_article" />
           </div>
 
           <aside className="space-y-5 lg:sticky lg:top-24 lg:self-start">

@@ -2,7 +2,7 @@ import assert from 'node:assert/strict'
 import { readFile } from 'node:fs/promises'
 import test from 'node:test'
 
-const edit = await readFile(new URL('../src/app/(en)/admin/blogs/[id]/edit/page.tsx', import.meta.url), 'utf8')
+const edit = await readFile(new URL('../src/app/(en)/admin/(protected)/blogs/[id]/edit/page.tsx', import.meta.url), 'utf8')
 const controls = await readFile(new URL('../src/components/admin/BlogPublicationControls.tsx', import.meta.url), 'utf8')
 const editor = await readFile(new URL('../src/components/admin/BlogEditorForm.tsx', import.meta.url), 'utf8')
 

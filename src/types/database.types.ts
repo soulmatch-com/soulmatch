@@ -9,6 +9,166 @@ export type Json =
 export interface Database {
   public: {
     Tables: {
+      email_subscribers: {
+        Row: {
+          id: string
+          email: string
+          preferred_locale: 'en' | 'ta' | null
+          status: 'subscribed' | 'unsubscribed'
+          consent_source: 'blog_listing' | 'blog_article'
+          consented_at: string
+          unsubscribed_at: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          email: string
+          preferred_locale?: 'en' | 'ta' | null
+          status?: 'subscribed' | 'unsubscribed'
+          consent_source: 'blog_listing' | 'blog_article'
+          consented_at?: string
+          unsubscribed_at?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          email?: string
+          preferred_locale?: 'en' | 'ta' | null
+          status?: 'subscribed' | 'unsubscribed'
+          consent_source?: 'blog_listing' | 'blog_article'
+          consented_at?: string
+          unsubscribed_at?: string | null
+          updated_at?: string
+        }
+      }
+      email_suppressions: {
+        Row: { id: string; subscriber_id: string; reason: 'bounce' | 'complaint' | 'provider_suppression' | 'manual_admin'; source: 'provider' | 'admin' | 'system'; suppressed_at: string; released_at: string | null; created_at: string; updated_at: string }
+        Insert: { id?: string; subscriber_id: string; reason: 'bounce' | 'complaint' | 'provider_suppression' | 'manual_admin'; source: 'provider' | 'admin' | 'system'; suppressed_at?: string; released_at?: string | null; created_at?: string; updated_at?: string }
+        Update: { released_at?: string | null; updated_at?: string }
+      }
+      notification_campaigns: {
+        Row: {
+          id: string
+          campaign_type: 'blog_publication'
+          source_type: 'blog'
+          source_id: string
+          locale: 'en' | 'ta' | null
+          channel: 'email'
+          subject: string
+          preheader: string | null
+          headline: string
+          summary: string | null
+          target_url: string
+          source_published_at: string
+          status: 'draft' | 'queued' | 'processing' | 'completed' | 'partially_failed' | 'failed' | 'cancelled'
+          created_by: string | null
+          queued_by: string | null
+          created_at: string
+          updated_at: string
+          queued_at: string | null
+          started_at: string | null
+          completed_at: string | null
+          recipient_count: number
+          sent_count: number
+          failed_count: number
+          skipped_count: number
+        }
+        Insert: {
+          id?: string
+          campaign_type: 'blog_publication'
+          source_type: 'blog'
+          source_id: string
+          locale?: 'en' | 'ta' | null
+          channel: 'email'
+          subject: string
+          preheader?: string | null
+          headline: string
+          summary?: string | null
+          target_url: string
+          source_published_at: string
+          status?: 'draft' | 'queued' | 'processing' | 'completed' | 'partially_failed' | 'failed' | 'cancelled'
+          created_by?: string | null
+          queued_by?: string | null
+          created_at?: string
+          updated_at?: string
+          queued_at?: string | null
+          started_at?: string | null
+          completed_at?: string | null
+          recipient_count?: number
+          sent_count?: number
+          failed_count?: number
+          skipped_count?: number
+        }
+        Update: {
+          status?: 'draft' | 'queued' | 'processing' | 'completed' | 'partially_failed' | 'failed' | 'cancelled'
+          queued_by?: string | null
+          updated_at?: string
+          queued_at?: string | null
+          started_at?: string | null
+          completed_at?: string | null
+          recipient_count?: number
+          sent_count?: number
+          failed_count?: number
+          skipped_count?: number
+        }
+      }
+      notification_jobs: {
+        Row: {
+          id: string
+          campaign_id: string
+          subscriber_id: string
+          channel: 'email'
+          status: 'pending' | 'processing' | 'retry' | 'sent' | 'failed' | 'skipped'
+          attempt_count: number
+          next_attempt_at: string | null
+          claimed_at: string | null
+          processed_at: string | null
+          provider_message_id: string | null
+          last_error_code: string | null
+          delivery_status: 'delivered' | 'delayed' | 'bounced' | 'complained' | 'suppressed' | 'failed' | null
+          delivery_updated_at: string | null
+          delivered_at: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          campaign_id: string
+          subscriber_id: string
+          channel: 'email'
+          status?: 'pending' | 'processing' | 'retry' | 'sent' | 'failed' | 'skipped'
+          attempt_count?: number
+          next_attempt_at?: string | null
+          claimed_at?: string | null
+          processed_at?: string | null
+          provider_message_id?: string | null
+          last_error_code?: string | null
+          delivery_status?: 'delivered' | 'delayed' | 'bounced' | 'complained' | 'suppressed' | 'failed' | null
+          delivery_updated_at?: string | null
+          delivered_at?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          status?: 'pending' | 'processing' | 'retry' | 'sent' | 'failed' | 'skipped'
+          attempt_count?: number
+          next_attempt_at?: string | null
+          claimed_at?: string | null
+          processed_at?: string | null
+          provider_message_id?: string | null
+          last_error_code?: string | null
+          delivery_status?: 'delivered' | 'delayed' | 'bounced' | 'complained' | 'suppressed' | 'failed' | null
+          delivery_updated_at?: string | null
+          delivered_at?: string | null
+          updated_at?: string
+        }
+      }
+      notification_provider_events: {
+        Row: { id: string; provider: 'resend'; provider_event_id: string; provider_message_id: string | null; event_type: string; job_id: string | null; campaign_id: string | null; occurred_at: string | null; processing_status: 'processed' | 'ignored' | 'unmatched'; created_at: string; updated_at: string }
+        Insert: { id?: string; provider: 'resend'; provider_event_id: string; provider_message_id?: string | null; event_type: string; job_id?: string | null; campaign_id?: string | null; occurred_at?: string | null; processing_status: 'processed' | 'ignored' | 'unmatched'; created_at?: string; updated_at?: string }
+        Update: { processing_status?: 'processed' | 'ignored' | 'unmatched'; job_id?: string | null; campaign_id?: string | null; updated_at?: string }
+      }
       celebration_services: {
         Row: {
           id: string
@@ -492,6 +652,30 @@ export interface Database {
           p_ceremony_duration?: string | null
         }
         Returns: string
+      }
+      queue_notification_campaign: {
+        Args: { p_campaign_id: string; p_queued_by?: string | null }
+        Returns: { status: string; campaign_id: string; recipient_count: number }[]
+      }
+      count_notification_campaign_recipients: {
+        Args: { p_campaign_id: string }
+        Returns: number
+      }
+      claim_notification_jobs: {
+        Args: { p_batch_size: number }
+        Returns: { id: string; campaign_id: string; subscriber_id: string; channel: 'email'; attempt_count: number }[]
+      }
+      record_notification_job_outcome: {
+        Args: { p_job_id: string; p_outcome: string; p_attempt_count: number; p_provider_message_id?: string | null; p_error_code?: string | null; p_next_attempt_at?: string | null }
+        Returns: boolean
+      }
+      process_notification_provider_event: {
+        Args: { p_provider: string; p_provider_event_id: string; p_provider_message_id: string | null; p_event_type: string; p_occurred_at: string | null; p_delivery_status: string | null; p_suppression_reason: string | null }
+        Returns: { processing_status: string; job_id: string | null; campaign_id: string | null }[]
+      }
+      get_notification_campaign_delivery_summary: {
+        Args: { p_campaign_id: string }
+        Returns: { delivered: number; delayed: number; bounced: number; complained: number; suppressed: number; failed: number }[]
       }
     }
     Enums: {

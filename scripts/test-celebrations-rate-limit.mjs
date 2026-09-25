@@ -11,7 +11,7 @@ const valid = () => celebrationEnquiryApiSchema.parse({
   celebrationType: '60th-marriage', husbandName: 'Test Husband', wifeName: 'Test Wife',
   husbandDob: '1960-01-01', wifeDob: '1962-01-01', preferredDate: '2027-01-01',
   guestCountRange: '20-50', travellingFrom: 'Test City', arrangementPreference: 'ceremony-only',
-  contactName: 'Test Contact', mobile: '+10000000000', relationship: 'Family Member',
+  contactName: 'Test Contact', mobile: '9876543210', relationship: 'Family Member',
   preferredContactMethod: 'phone', serviceIds: ['11111111-1111-4111-8111-111111111111'],
 })
 

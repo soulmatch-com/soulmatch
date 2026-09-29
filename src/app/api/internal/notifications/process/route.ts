@@ -17,7 +17,10 @@ export async function POST(request: NextRequest) {
   try {
     const result = await createNotificationWorker().processNotificationBatch()
     return NextResponse.json(result)
-  } catch {
+  } catch (error) {
+    console.error('Notification worker batch failed', {
+      message: error instanceof Error ? error.message : 'Unknown error',
+    })
     return NextResponse.json({ message: 'Unable to process notification batch.' }, { status: 500 })
   }
 }

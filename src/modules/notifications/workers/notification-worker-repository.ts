@@ -8,7 +8,7 @@ export class SupabaseNotificationWorkerRepository implements NotificationWorkerR
 
   async claimJobs(batchSize: number): Promise<ClaimedNotificationJob[]> {
     const { data, error } = await this.db.rpc('claim_notification_jobs', { p_batch_size: batchSize })
-    if (error) throw new Error('Notification job claim failed')
+    if (error) throw new Error(`Notification job claim failed: ${error.message}`)
     const rows = (data ?? []) as Array<{ id: string; campaign_id: string; subscriber_id: string; channel: 'email'; attempt_count: number }>
     return rows.map((job) => ({ id: job.id, campaignId: job.campaign_id, subscriberId: job.subscriber_id, channel: job.channel, attemptCount: job.attempt_count }))
   }

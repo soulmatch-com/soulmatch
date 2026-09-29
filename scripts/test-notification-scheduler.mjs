@@ -69,6 +69,8 @@ test('scheduler route uses separate cron authentication and only the worker boun
   assert.match(scheduler, /processNotificationBatch/)
   assert.doesNotMatch(scheduler, /Resend|notification_jobs|retry-policy|campaigns|subscribers|setInterval|setTimeout/)
   assert.match(workerFactory, /ResendEmailProvider/)
+  assert.match(workerFactory, /GmailApiEmailProvider/)
+  assert.match(workerFactory, /NOTIFICATION_EMAIL_PROVIDER === 'gmail_api'/)
   assert.doesNotMatch(queueRoute, /NotificationScheduler|scheduled-process|createNotificationWorker/)
 })
 

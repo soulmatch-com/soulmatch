@@ -5,6 +5,7 @@ import { NotificationWorker } from '../src/modules/notifications/workers/notific
 import { MAX_NOTIFICATION_ATTEMPTS, getRetryDelayMs, shouldRetry } from '../src/modules/notifications/workers/retry-policy.ts'
 import { renderBlogPublicationEmail } from '../src/modules/notifications/templates/blog-email-template.ts'
 import { ResendEmailProvider } from '../src/modules/notifications/providers/resend-email-provider.ts'
+import { GmailApiEmailProvider } from '../src/modules/notifications/providers/gmail-api-email-provider.ts'
 
 const campaignId = '11111111-1111-4111-8111-111111111111'
 const jobId = '22222222-2222-4222-8222-222222222222'
@@ -92,6 +93,26 @@ test('provider adapter normalizes configuration and response outcomes without ne
   assert.deepEqual(await accepted.send({ to: 'person@example.com', from: '', subject: 'Test', html: '<p>Test</p>', text: 'Test', idempotencyKey: jobId }), { status: 'accepted', providerMessageId: 'resend-1' })
 })
 
+test('Gmail API provider refreshes OAuth credentials and submits a MIME message', async () => {
+  const requests = []
+  const provider = new GmailApiEmailProvider({
+    clientId: 'client-id', clientSecret: 'client-secret', refreshToken: 'refresh-token', from: 'MyThirumanam <mailer@gmail.com>',
+    request: async (url, init) => {
+      requests.push({ url, init })
+      if (url === 'https://oauth2.googleapis.com/token') return Response.json({ access_token: 'access-token' })
+      return Response.json({ id: 'gmail-message-1' })
+    },
+  })
+  const result = await provider.send({ to: 'person@example.com', from: '', subject: 'Test', html: '<p>Test</p>', text: 'Test', idempotencyKey: jobId })
+  assert.deepEqual(result, { status: 'accepted', providerMessageId: 'gmail-message-1' })
+  assert.equal(requests.length, 2)
+  assert.equal(requests[1].init.headers.Authorization, 'Bearer access-token')
+  const raw = JSON.parse(requests[1].init.body).raw
+  const mime = Buffer.from(raw, 'base64url').toString('utf8')
+  assert.match(mime, /To: person@example\.com/)
+  assert.match(mime, /Message-ID: <notification-22222222-2222-4222-8222-222222222222@gmail\.com>/)
+})
+
 test('worker migration claims with SKIP LOCKED, bounded batches, stale-lease recovery, and atomic outcomes', () => {
   const migration = readFileSync(new URL('../supabase/migrations/add_notification_worker_functions.sql', import.meta.url), 'utf8')
   assert.match(migration, /claim_notification_jobs/)
@@ -114,11 +135,13 @@ test('worker/provider remain notification-owned with no public trigger, schedule
     'src/modules/notifications/workers/notification-worker-repository.ts',
     'src/modules/notifications/providers/email-provider.ts',
     'src/modules/notifications/providers/resend-email-provider.ts',
+    'src/modules/notifications/providers/gmail-api-email-provider.ts',
   ]
-  const source = files.map((path) => readFileSync(new URL(`../${path}`, import.meta.url), 'utf8')).join('\n')
+  const sources = files.map((path) => readFileSync(new URL(`../${path}`, import.meta.url), 'utf8'))
+  const source = sources.join('\n')
   assert.doesNotMatch(source, /@\/lib\/blog|@\/content\/blog|blog_posts|NextRequest|NextResponse|setInterval|cron|scheduler|api\/internal/i)
   assert.doesNotMatch(readFileSync(new URL('../src/components/admin/BlogCampaignControls.tsx', import.meta.url), 'utf8'), /Queue Campaign|Send Campaign/)
-  assert.doesNotMatch(source, /console\.(?:log|error)[\s\S]*(?:subscriber\.email|message\.to)/)
+  for (const fileSource of sources) assert.doesNotMatch(fileSource, /console\.(?:log|error)[\s\S]*(?:subscriber\.email|message\.to)/)
 })
 
 test('worker function verifier is read-only and functions are service-role only', () => {

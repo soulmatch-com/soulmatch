@@ -28,7 +28,7 @@ Admin queues a campaign, which freezes eligible recipients into notification job
 
 ### Gmail API alternative
 
-For a Gmail sender, set `NOTIFICATION_EMAIL_PROVIDER=gmail_api` and configure `NOTIFICATION_GMAIL_OAUTH_CLIENT_ID`, `NOTIFICATION_GMAIL_OAUTH_CLIENT_SECRET`, `NOTIFICATION_GMAIL_OAUTH_REFRESH_TOKEN`, and `NOTIFICATION_EMAIL_FROM` as the authorized Gmail mailbox. Enable the Gmail API in the Google Cloud project and authorize the `https://www.googleapis.com/auth/gmail.send` scope with offline access to obtain the refresh token. These values are server-only and must be configured in the deployment environment, then followed by a redeploy. Gmail API delivery does not emit Resend webhooks, so provider-event delivery summaries remain Resend-specific.
+For a Gmail sender, set `NOTIFICATION_EMAIL_PROVIDER=gmail_api` and configure `NOTIFICATION_EMAIL_FROM` as the authorized Gmail mailbox. Gmail delivery reuses the existing `GMAIL_OAUTH_CLIENT_ID`, `GMAIL_OAUTH_CLIENT_SECRET`, and `GMAIL_OAUTH_REFRESH_TOKEN` values; the `NOTIFICATION_GMAIL_OAUTH_*` equivalents are optional overrides for a separate sender account. Enable the Gmail API in the Google Cloud project and authorize the `https://www.googleapis.com/auth/gmail.send` scope with offline access to obtain the refresh token. These values are server-only and must be configured in the deployment environment, then followed by a redeploy. Gmail API delivery does not emit Resend webhooks, so provider-event delivery summaries remain Resend-specific.
 
 ## Database checklist
 

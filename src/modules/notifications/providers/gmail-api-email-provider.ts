@@ -65,9 +65,9 @@ export class GmailApiEmailProvider implements EmailProvider {
   private readonly request: typeof fetch
 
   constructor({
-    clientId = process.env.NOTIFICATION_GMAIL_OAUTH_CLIENT_ID,
-    clientSecret = process.env.NOTIFICATION_GMAIL_OAUTH_CLIENT_SECRET,
-    refreshToken = process.env.NOTIFICATION_GMAIL_OAUTH_REFRESH_TOKEN,
+    clientId = process.env.NOTIFICATION_GMAIL_OAUTH_CLIENT_ID ?? process.env.GMAIL_OAUTH_CLIENT_ID,
+    clientSecret = process.env.NOTIFICATION_GMAIL_OAUTH_CLIENT_SECRET ?? process.env.GMAIL_OAUTH_CLIENT_SECRET,
+    refreshToken = process.env.NOTIFICATION_GMAIL_OAUTH_REFRESH_TOKEN ?? process.env.GMAIL_OAUTH_REFRESH_TOKEN,
     from = process.env.NOTIFICATION_EMAIL_FROM,
     request = fetch,
   }: GmailApiConfig = {}) {

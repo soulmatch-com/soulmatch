@@ -27,12 +27,14 @@ export class ResendEmailProvider implements EmailProvider {
         const providerMessageId = body && typeof body === 'object' && 'id' in body && typeof body.id === 'string' ? body.id : null
         return { status: 'accepted', providerMessageId }
       }
+      console.error('Resend email request failed', { status: response.status })
       if (response.status === 429) return { status: 'failed', retryable: true, errorCode: 'rate_limited' }
       if (response.status >= 500) return { status: 'failed', retryable: true, errorCode: 'server_error' }
       if (response.status === 400) return { status: 'failed', retryable: false, errorCode: 'invalid_request' }
       if (response.status === 422) return { status: 'failed', retryable: false, errorCode: 'invalid_recipient' }
       return { status: 'failed', retryable: true, errorCode: 'provider_unavailable' }
     } catch (error) {
+      console.error('Resend email request errored', { message: error instanceof Error ? error.message : 'Unknown error' })
       return { status: 'failed', retryable: true, errorCode: error instanceof DOMException && error.name === 'TimeoutError' ? 'timeout' : 'provider_unavailable' }
     }
   }

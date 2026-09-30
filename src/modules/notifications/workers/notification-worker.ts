@@ -39,7 +39,7 @@ export class NotificationWorker {
     const subscriber = await this.repository.getSubscriber(job.subscriberId)
     if (!subscriber) { await this.repository.recordOutcome(job.id, { status: 'failed', attemptCount: job.attemptCount, errorCode: 'subscriber_missing' }); return 'failed' }
     if (subscriber.status !== 'subscribed') { await this.repository.recordOutcome(job.id, { status: 'skipped', attemptCount: job.attemptCount, errorCode: 'unsubscribed' }); return 'skipped' }
-    if (subscriber.preferredLocale !== campaign.locale) { await this.repository.recordOutcome(job.id, { status: 'skipped', attemptCount: job.attemptCount, errorCode: 'locale_mismatch' }); return 'skipped' }
+    if (!subscriber.subscribedLocales.includes(campaign.locale)) { await this.repository.recordOutcome(job.id, { status: 'skipped', attemptCount: job.attemptCount, errorCode: 'locale_mismatch' }); return 'skipped' }
     if (await this.suppressions.hasActiveSuppression(subscriber.id)) { await this.repository.recordOutcome(job.id, { status: 'skipped', attemptCount: job.attemptCount, errorCode: 'subscriber_suppressed' }); return 'skipped' }
 
     let unsubscribeUrl: string | null

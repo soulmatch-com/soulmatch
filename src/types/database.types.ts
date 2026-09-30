@@ -14,6 +14,7 @@ export interface Database {
           id: string
           email: string
           preferred_locale: 'en' | 'ta' | null
+          subscribed_locales: Array<'en' | 'ta'>
           status: 'subscribed' | 'unsubscribed'
           consent_source: 'blog_listing' | 'blog_article'
           consented_at: string
@@ -25,6 +26,7 @@ export interface Database {
           id?: string
           email: string
           preferred_locale?: 'en' | 'ta' | null
+          subscribed_locales?: Array<'en' | 'ta'>
           status?: 'subscribed' | 'unsubscribed'
           consent_source: 'blog_listing' | 'blog_article'
           consented_at?: string
@@ -35,6 +37,7 @@ export interface Database {
         Update: {
           email?: string
           preferred_locale?: 'en' | 'ta' | null
+          subscribed_locales?: Array<'en' | 'ta'>
           status?: 'subscribed' | 'unsubscribed'
           consent_source?: 'blog_listing' | 'blog_article'
           consented_at?: string

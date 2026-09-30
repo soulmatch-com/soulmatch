@@ -43,6 +43,7 @@ For a Gmail sender, set `NOTIFICATION_EMAIL_PROVIDER=gmail_api` and configure `N
 - [ ] `fix_notification_queue_campaign_ambiguity.sql` applied
 - [ ] `fix_notification_worker_claim_ambiguity.sql` applied
 - [ ] `fix_notification_worker_claim_id_ambiguity.sql` applied
+- [ ] `add_notification_subscriber_locales.sql` applied
 - [ ] Each individual read-only verifier passed
 - [ ] `verify_notification_system.sql` passed
 

@@ -82,7 +82,7 @@ test('worker safety and architecture remain notification-owned with no scheduler
     assert.doesNotMatch(source, /src\/lib\/blog\/admin-blog-repository.*NotificationWorker|Resend.*blog|setInterval|cron/i)
   }
   assert.match(worker, /subscriber\.status !== 'subscribed'/)
-  assert.match(worker, /subscriber\.preferredLocale !== campaign\.locale/)
+  assert.match(worker, /subscriber\.subscribedLocales\.includes\(campaign\.locale\)/)
   assert.match(worker, /hasActiveSuppression/)
   assert.match(worker, /unsubscribe_unavailable/)
   assert.doesNotMatch(preview, /Send Campaign/)

@@ -10,13 +10,14 @@ export interface SubscriberRepository {
   findById(id: string): Promise<EmailSubscriber | null>
   findByEmail(email: string): Promise<EmailSubscriber | null>
   create(input: SubscribeInput, timestamp: string): Promise<EmailSubscriber>
+  addLocale(existing: EmailSubscriber, input: SubscribeInput, timestamp: string): Promise<EmailSubscriber>
   resubscribe(existing: EmailSubscriber, input: SubscribeInput, timestamp: string): Promise<EmailSubscriber>
   unsubscribe(id: string, timestamp: string): Promise<void>
 }
 
 function toSubscriber(row: SubscriberRow): EmailSubscriber {
   return {
-    id: row.id, email: row.email, preferredLocale: row.preferred_locale,
+    id: row.id, email: row.email, subscribedLocales: row.subscribed_locales,
     status: row.status, consentSource: row.consent_source, consentedAt: row.consented_at,
     unsubscribedAt: row.unsubscribed_at, createdAt: row.created_at, updatedAt: row.updated_at,
   }
@@ -39,7 +40,7 @@ export class SupabaseSubscriberRepository implements SubscriberRepository {
 
   async create(input: SubscribeInput, timestamp: string) {
     const { data, error } = await this.db.from('email_subscribers').insert({
-      email: input.email, preferred_locale: input.locale, status: 'subscribed', consent_source: input.source,
+      email: input.email, preferred_locale: input.locale, subscribed_locales: [input.locale], status: 'subscribed', consent_source: input.source,
       consented_at: timestamp, unsubscribed_at: null, created_at: timestamp, updated_at: timestamp,
     }).select('*').single()
     if (error?.code === '23505') throw new DuplicateSubscriberError('Subscriber already exists')
@@ -47,9 +48,18 @@ export class SupabaseSubscriberRepository implements SubscriberRepository {
     return toSubscriber(data)
   }
 
+  async addLocale(existing: EmailSubscriber, input: SubscribeInput, timestamp: string) {
+    const locales = [...new Set([...existing.subscribedLocales, input.locale])]
+    const { data, error } = await this.db.from('email_subscribers').update({
+      subscribed_locales: locales, consent_source: input.source, consented_at: timestamp, updated_at: timestamp,
+    }).eq('id', existing.id).select('*').single()
+    if (error) throw new Error('Subscriber locale subscription failed')
+    return toSubscriber(data)
+  }
+
   async resubscribe(existing: EmailSubscriber, input: SubscribeInput, timestamp: string) {
     const { data, error } = await this.db.from('email_subscribers').update({
-      status: 'subscribed', preferred_locale: input.locale, consent_source: input.source,
+      status: 'subscribed', preferred_locale: input.locale, subscribed_locales: [input.locale], consent_source: input.source,
       consented_at: timestamp, unsubscribed_at: null, updated_at: timestamp,
     }).eq('id', existing.id).select('*').single()
     if (error) throw new Error('Subscriber resubscription failed')
@@ -57,7 +67,7 @@ export class SupabaseSubscriberRepository implements SubscriberRepository {
   }
 
   async unsubscribe(id: string, timestamp: string) {
-    const { error } = await this.db.from('email_subscribers').update({ status: 'unsubscribed', unsubscribed_at: timestamp, updated_at: timestamp }).eq('id', id)
+    const { error } = await this.db.from('email_subscribers').update({ status: 'unsubscribed', subscribed_locales: [], unsubscribed_at: timestamp, updated_at: timestamp }).eq('id', id)
     if (error) throw new Error('Subscriber unsubscribe failed')
   }
 }

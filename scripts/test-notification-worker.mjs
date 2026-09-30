@@ -13,7 +13,7 @@ const subscriberId = '33333333-3333-4333-8333-333333333333'
 const now = new Date('2026-09-24T12:00:00.000Z')
 
 const campaign = (overrides = {}) => ({ id: campaignId, campaignType: 'blog_publication', locale: 'en', channel: 'email', status: 'queued', subject: 'New Guide: Planning', preheader: 'Helpful guide', headline: 'Planning Guide', summary: 'Practical information for families.', targetUrl: 'https://mythirumanam.in/blog/planning-guide', ...overrides })
-const subscriber = (overrides = {}) => ({ id: subscriberId, email: 'person@example.com', preferredLocale: 'en', status: 'subscribed', ...overrides })
+const subscriber = (overrides = {}) => ({ id: subscriberId, email: 'person@example.com', subscribedLocales: ['en'], status: 'subscribed', ...overrides })
 
 class FakeRepository {
   constructor({ currentCampaign = campaign(), currentSubscriber = subscriber(), job = { id: jobId, campaignId, subscriberId, channel: 'email', attemptCount: 0 } } = {}) { this.currentCampaign = currentCampaign; this.currentSubscriber = currentSubscriber; this.job = job; this.outcomes = [] }
@@ -56,7 +56,7 @@ test('worker sends a matching subscribed recipient with a stable job idempotency
 })
 
 test('unsubscribed or locale-mismatched subscribers are skipped without provider calls', async () => {
-  for (const currentSubscriber of [subscriber({ status: 'unsubscribed' }), subscriber({ preferredLocale: 'ta' })]) {
+  for (const currentSubscriber of [subscriber({ status: 'unsubscribed' }), subscriber({ subscribedLocales: ['ta'] })]) {
     const repository = new FakeRepository({ currentSubscriber })
     const provider = new FakeProvider({ status: 'accepted', providerMessageId: 'unexpected' })
     await new NotificationWorker(repository, provider, unsubscribeUrls(), noSuppression, () => now).processNotificationBatch()

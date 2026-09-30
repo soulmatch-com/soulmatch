@@ -20,9 +20,9 @@ export class SupabaseNotificationWorkerRepository implements NotificationWorkerR
   }
 
   async getSubscriber(subscriberId: string): Promise<WorkerSubscriber | null> {
-    const { data, error } = await this.db.from('email_subscribers').select('id, email, preferred_locale, status').eq('id', subscriberId).maybeSingle()
+    const { data, error } = await this.db.from('email_subscribers').select('id, email, subscribed_locales, status').eq('id', subscriberId).maybeSingle()
     if (error) throw new Error('Subscriber worker lookup failed')
-    return data ? { id: data.id, email: data.email, preferredLocale: data.preferred_locale, status: data.status } : null
+    return data ? { id: data.id, email: data.email, subscribedLocales: data.subscribed_locales, status: data.status } : null
   }
 
   async recordOutcome(jobId: string, outcome: JobOutcome) {

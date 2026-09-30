@@ -10,7 +10,7 @@ export type SubscriberStatus = (typeof subscriberStatuses)[number]
 export interface EmailSubscriber {
   id: string
   email: string
-  preferredLocale: SubscriberLocale | null
+  subscribedLocales: SubscriberLocale[]
   status: SubscriberStatus
   consentSource: SubscriberConsentSource
   consentedAt: string
@@ -27,6 +27,7 @@ export interface SubscribeInput {
 
 export type SubscribeResult =
   | { status: 'subscribed' }
+  | { status: 'locale_subscribed' }
   | { status: 'already_subscribed' }
   | { status: 'resubscribed' }
 

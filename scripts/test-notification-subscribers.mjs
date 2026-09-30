@@ -11,12 +11,17 @@ class MemorySubscriberRepository {
   records = []
   async findByEmail(email) { return this.records.find((record) => record.email === email) ?? null }
   async create(input, now) {
-    const record = { id: String(this.records.length + 1), email: input.email, preferredLocale: input.locale, status: 'subscribed', consentSource: input.source, consentedAt: now, unsubscribedAt: null, createdAt: now, updatedAt: now }
+    const record = { id: String(this.records.length + 1), email: input.email, subscribedLocales: [input.locale], status: 'subscribed', consentSource: input.source, consentedAt: now, unsubscribedAt: null, createdAt: now, updatedAt: now }
     this.records.push(record)
     return record
   }
+  async addLocale(existing, input, now) {
+    existing.subscribedLocales = [...new Set([...existing.subscribedLocales, input.locale])]
+    Object.assign(existing, { consentSource: input.source, consentedAt: now, updatedAt: now })
+    return existing
+  }
   async resubscribe(existing, input, now) {
-    Object.assign(existing, { status: 'subscribed', preferredLocale: input.locale, consentSource: input.source, consentedAt: now, unsubscribedAt: null, updatedAt: now })
+    Object.assign(existing, { status: 'subscribed', subscribedLocales: [input.locale], consentSource: input.source, consentedAt: now, unsubscribedAt: null, updatedAt: now })
     return existing
   }
 }
@@ -33,13 +38,13 @@ test('valid English subscription is accepted and normalized', async () => {
   const result = await new SubscriberService(repository, () => timestamp).subscribe(parsed())
   assert.deepEqual(result, { status: 'subscribed' })
   assert.equal(repository.records[0].email, 'user@example.com')
-  assert.equal(repository.records[0].preferredLocale, 'en')
+  assert.deepEqual(repository.records[0].subscribedLocales, ['en'])
 })
 
 test('valid Tamil subscription is accepted', async () => {
   const repository = new MemorySubscriberRepository()
   await new SubscriberService(repository, () => timestamp).subscribe(parsed({ locale: 'ta' }))
-  assert.equal(repository.records[0].preferredLocale, 'ta')
+  assert.deepEqual(repository.records[0].subscribedLocales, ['ta'])
 })
 
 test('invalid email, false or missing consent, locale, and source are rejected', () => {
@@ -51,14 +56,14 @@ test('invalid email, false or missing consent, locale, and source are rejected',
   assert.equal(subscribeRequestSchema.safeParse(payload({ source: 'https://unsafe.example' })).success, false)
 })
 
-test('case-insensitive duplicate returns already_subscribed without a second row or locale change', async () => {
+test('case-insensitive duplicate adds a newly consented locale without a second row', async () => {
   const repository = new MemorySubscriberRepository()
   const service = new SubscriberService(repository, () => timestamp)
   await service.subscribe(parsed({ locale: 'en' }))
   const result = await service.subscribe(parsed({ email: 'user@example.com', locale: 'ta' }))
-  assert.deepEqual(result, { status: 'already_subscribed' })
+  assert.deepEqual(result, { status: 'locale_subscribed' })
   assert.equal(repository.records.length, 1)
-  assert.equal(repository.records[0].preferredLocale, 'en')
+  assert.deepEqual(repository.records[0].subscribedLocales, ['en', 'ta'])
 })
 
 test('a concurrent unique-email conflict remains idempotent', async () => {
@@ -83,7 +88,7 @@ test('an unsubscribed user is resubscribed in the same row with renewed consent 
   assert.equal(repository.records.length, 1)
   assert.equal(record.unsubscribedAt, null)
   assert.equal(record.consentedAt, timestamp)
-  assert.equal(record.preferredLocale, 'ta')
+  assert.deepEqual(record.subscribedLocales, ['ta'])
   assert.equal(record.consentSource, 'blog_article')
 })
 

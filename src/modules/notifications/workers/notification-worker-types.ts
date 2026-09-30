@@ -17,7 +17,7 @@ export type NotificationBatchProcessor = {
 
 export type ClaimedNotificationJob = { id: string; campaignId: string; subscriberId: string; channel: 'email'; attemptCount: number }
 export type WorkerCampaign = { id: string; campaignType: 'blog_publication'; locale: 'en' | 'ta' | null; channel: 'email'; status: 'queued' | 'processing' | 'completed' | 'partially_failed' | 'failed' | 'cancelled' | 'draft'; subject: string; preheader: string | null; headline: string; summary: string | null; targetUrl: string }
-export type WorkerSubscriber = { id: string; email: string; preferredLocale: 'en' | 'ta' | null; status: 'subscribed' | 'unsubscribed' }
+export type WorkerSubscriber = { id: string; email: string; subscribedLocales: Array<'en' | 'ta'>; status: 'subscribed' | 'unsubscribed' }
 export type JobOutcome = { status: 'sent' | 'skipped' | 'failed' | 'retry'; attemptCount: number; providerMessageId?: string | null; errorCode?: string | null; nextAttemptAt?: string | null }
 export type NotificationWorkerRepository = {
   claimJobs(batchSize: number): Promise<ClaimedNotificationJob[]>

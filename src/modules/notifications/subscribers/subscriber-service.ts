@@ -21,7 +21,11 @@ export class SubscriberService {
         // so the API remains idempotent without exposing database details.
         if (!(error instanceof DuplicateSubscriberError)) throw error
         const concurrentSubscriber = await this.repository.findByEmail(input.email)
-        if (concurrentSubscriber?.status === 'subscribed') return { status: 'already_subscribed' }
+        if (concurrentSubscriber?.status === 'subscribed') {
+          if (concurrentSubscriber.subscribedLocales.includes(input.locale)) return { status: 'already_subscribed' }
+          await this.repository.addLocale(concurrentSubscriber, input, this.now())
+          return { status: 'locale_subscribed' }
+        }
         if (concurrentSubscriber?.status === 'unsubscribed') {
           await this.repository.resubscribe(concurrentSubscriber, input, this.now())
           return { status: 'resubscribed' }
@@ -29,7 +33,11 @@ export class SubscriberService {
         throw error
       }
     }
-    if (existing.status === 'subscribed') return { status: 'already_subscribed' }
+    if (existing.status === 'subscribed') {
+      if (existing.subscribedLocales.includes(input.locale)) return { status: 'already_subscribed' }
+      await this.repository.addLocale(existing, input, this.now())
+      return { status: 'locale_subscribed' }
+    }
 
     await this.repository.resubscribe(existing, input, this.now())
     return { status: 'resubscribed' }

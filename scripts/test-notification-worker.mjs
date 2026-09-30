@@ -38,6 +38,8 @@ test('English and Tamil templates render campaign snapshots, CTAs, and independe
   assert.match(english.html, /Read the Full Guide/)
   assert.match(english.html, /https:\/\/mythirumanam\.in\/plan/)
   assert.match(english.html, /Independent celebration planning and coordination service\./)
+  assert.match(english.html, /https:\/\/mythirumanam\.in\/brand\/mythirumanam-logo\.png/)
+  assert.match(english.html, /background:#681c24/)
   assert.match(tamil.html, /திட்டமிடல் வழிகாட்டி/)
   assert.match(tamil.html, /முழு வழிகாட்டியை படிக்கவும்/)
   assert.throws(() => renderBlogPublicationEmail(campaign(), ''), /unsubscribe URL is required/)
@@ -109,6 +111,7 @@ test('Gmail API provider refreshes OAuth credentials and submits a MIME message'
   assert.equal(requests[1].init.headers.Authorization, 'Bearer access-token')
   const raw = JSON.parse(requests[1].init.body).raw
   const mime = Buffer.from(raw, 'base64url').toString('utf8')
+  assert.match(mime, /From: =\?UTF-8\?B\?.+\?= <mailer@gmail\.com>/)
   assert.match(mime, /To: person@example\.com/)
   assert.match(mime, /Message-ID: <notification-22222222-2222-4222-8222-222222222222@gmail\.com>/)
 })

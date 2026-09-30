@@ -19,6 +19,14 @@ function senderAddress(value: string) {
   return address
 }
 
+function senderHeader(value: string) {
+  const cleaned = cleanHeader(value)
+  const match = cleaned.match(/^(.*?)\s*<([^<>@\s]+@[^<>@\s]+\.[^<>@\s]+)>$/)
+  if (!match) return senderAddress(cleaned)
+  const name = cleanHeader(match[1])
+  return name ? `${encodeHeader(name)} <${match[2]}>` : match[2]
+}
+
 function encodeHeader(value: string) {
   return `=?UTF-8?B?${Buffer.from(cleanHeader(value), 'utf8').toString('base64')}?=`
 }
@@ -27,7 +35,7 @@ function createRawMessage(message: EmailMessage, from: string) {
   const boundary = `notification-${message.idempotencyKey}`
   const sender = senderAddress(from)
   const mime = [
-    `From: ${encodeHeader(from)}`,
+    `From: ${senderHeader(from)}`,
     `Reply-To: ${sender}`,
     `To: ${cleanHeader(message.to)}`,
     `Subject: ${encodeHeader(message.subject)}`,

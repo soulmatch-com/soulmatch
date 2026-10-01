@@ -7,6 +7,7 @@ const create = await readFile(new URL('../src/app/(en)/admin/(protected)/blogs/n
 const form = await readFile(new URL('../src/components/admin/BlogEditorForm.tsx', import.meta.url), 'utf8')
 const edit = await readFile(new URL('../src/app/(en)/admin/(protected)/blogs/[id]/edit/page.tsx', import.meta.url), 'utf8')
 const createApi = await readFile(new URL('../src/lib/blog/admin-blog-api.ts', import.meta.url), 'utf8')
+const actions = await readFile(new URL('../src/components/admin/BlogListActions.tsx', import.meta.url), 'utf8')
 
 test('Blog Management is an admin-protected server list using the CMS repository', () => {
   assert.match(list, /await requireActiveAdmin\(\)/)
@@ -31,6 +32,24 @@ test('Blog Management renders aggregate and per-locale status without article Ma
   assert.match(list, /StatusBadge status=\{blog\.status\}/)
   assert.match(list, /blog\.english\.title \|\| blog\.tamil\.title \|\| 'Untitled Draft'/)
   assert.doesNotMatch(list, /blog\.english\.content|blog\.tamil\.content/)
+})
+
+test('Blog Management provides locale-specific publish and email campaign actions from each row', () => {
+  assert.match(list, /<BlogListActions blogId=\{blog\.id\} englishStatus=\{blog\.english\.status\} tamilStatus=\{blog\.tamil\.status\}/)
+  assert.match(actions, /<DropdownMenu>/)
+  assert.match(actions, /More blog actions/)
+  assert.match(actions, /<DropdownMenuContent align="end"/)
+  assert.match(actions, /Publish \$\{localeName\(locale\)\}/)
+  assert.match(actions, /Email Campaign \(\$\{localeName\(locale\)\}\)/)
+  assert.match(actions, /<Ellipsis className=/)
+  assert.match(actions, /<Pencil className=/)
+  assert.match(actions, /<Upload className=/)
+  assert.match(actions, /📧 \{locale === 'en' \? 'ENG' : 'TAM'\}/)
+  assert.match(actions, /`\/api\/admin\/blogs\/\$\{blogId\}\/publish`/)
+  assert.match(actions, /`\/api\/admin\/blogs\/\$\{blogId\}\/campaigns`/)
+  assert.match(actions, /router\.push\(`\/admin\/blogs\/\$\{blogId\}\/campaign\/\$\{result\.campaignId\}\/preview`\)/)
+  assert.match(actions, /status === 'draft'/)
+  assert.doesNotMatch(actions, /recipientCount|subscriberIds|emails|NotificationWorker/)
 })
 
 test('Add Blog is protected and includes general, English, and Tamil draft fields', () => {

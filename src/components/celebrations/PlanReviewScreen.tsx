@@ -38,6 +38,7 @@ export function PlanReviewScreen({
   const [botToken, setBotToken] = useState<string>()
   const [challengeVersion, setChallengeVersion] = useState(0)
   const [submitting, setSubmitting] = useState(false)
+  const [subscribeToUpdates, setSubscribeToUpdates] = useState(false)
   const [submitMessage, setSubmitMessage] = useState<string>()
   const submittingRef = useRef(false)
   const turnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY
@@ -52,6 +53,11 @@ export function PlanReviewScreen({
 
   const submit = async () => {
     if (submittingRef.current || (challengeRequired && !botToken)) return
+    if (subscribeToUpdates && !details?.email) {
+      setSubmitMessage('Enter an email address to subscribe to updates.')
+      onEditDetails()
+      return
+    }
     const built = buildPlanV2Submission(selection, services)
     if (!built.ok) {
       setSubmitMessage(built.message)
@@ -62,7 +68,7 @@ export function PlanReviewScreen({
     submittingRef.current = true
     setSubmitting(true)
     setSubmitMessage(undefined)
-    const result = await submitCelebrationEnquiry(built.payload, botToken)
+    const result = await submitCelebrationEnquiry({ ...built.payload, subscribeToUpdates }, botToken)
     submittingRef.current = false
     setSubmitting(false)
     if (result.ok || result.kind !== 'rate-limited') {
@@ -156,6 +162,11 @@ export function PlanReviewScreen({
           <IndependentServiceNotice variant="planning" />
         </div>
       </div>
+
+      <label className="mt-6 flex cursor-pointer items-start gap-3 rounded-2xl border border-amber-200 bg-white p-4 text-stone-800">
+        <input type="checkbox" checked={subscribeToUpdates} onChange={(event) => setSubscribeToUpdates(event.target.checked)} disabled={submitting} className="mt-1 h-5 w-5 shrink-0 accent-amber-700" />
+        <span className="text-sm leading-6">Send me MyThirumanam planning guides and celebration updates by email. I can unsubscribe at any time.</span>
+      </label>
 
       {turnstileSiteKey ? (
         <TurnstileChallenge key={challengeVersion} siteKey={turnstileSiteKey} onTokenChange={handleBotToken} />

@@ -1,6 +1,5 @@
 'use client'
 
-import Script from 'next/script'
 import { useEffect, useRef, useState } from 'react'
 import { CELEBRATION_TURNSTILE_ACTION } from '@/lib/celebrations/bot-verification-core'
 
@@ -20,6 +19,35 @@ export function TurnstileChallenge({ siteKey, onTokenChange }: { siteKey: string
   const [scriptReady, setScriptReady] = useState(false)
 
   useEffect(() => {
+    let active = true
+    const markReady = () => {
+      if (active) setScriptReady(true)
+    }
+
+    if (window.turnstile) {
+      markReady()
+      return () => { active = false }
+    }
+
+    const selector = 'script[data-celebration-turnstile]'
+    let script = document.querySelector<HTMLScriptElement>(selector)
+    if (!script) {
+      script = document.createElement('script')
+      script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit'
+      script.async = true
+      script.dataset.celebrationTurnstile = 'true'
+      document.head.appendChild(script)
+    }
+    script.addEventListener('load', markReady)
+    if (window.turnstile) markReady()
+
+    return () => {
+      active = false
+      script?.removeEventListener('load', markReady)
+    }
+  }, [])
+
+  useEffect(() => {
     if (!scriptReady || !containerRef.current || !window.turnstile || widgetIdRef.current) return
     widgetIdRef.current = window.turnstile.render(containerRef.current, {
       sitekey: siteKey,
@@ -35,7 +63,6 @@ export function TurnstileChallenge({ siteKey, onTokenChange }: { siteKey: string
   }, [onTokenChange, scriptReady, siteKey])
 
   return <div aria-label="Submission verification" className="mt-6 min-h-[70px] max-w-full overflow-hidden">
-    <Script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" strategy="afterInteractive" onReady={() => setScriptReady(true)} />
     <div ref={containerRef} />
     <p className="mt-2 text-sm text-stone-600" aria-live="polite">Complete the security verification before submitting.</p>
   </div>

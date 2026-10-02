@@ -7,6 +7,8 @@ import { checkCelebrationEnquiryRateLimit } from '@/lib/celebrations/rate-limit'
 import { verifyCelebrationBotChallenge } from '@/lib/celebrations/bot-verification'
 import { CELEBRATION_BOT_TOKEN_HEADER } from '@/lib/celebrations/bot-verification-core'
 import { celebrationEnquiryApiSchema } from '@/lib/validations/celebration-enquiry-api.schema'
+import { SupabaseSubscriberRepository } from '@/modules/notifications/subscribers/subscriber-repository'
+import { SubscriberService } from '@/modules/notifications/subscribers/subscriber-service'
 
 const MAX_REQUEST_BYTES = 32 * 1024
 
@@ -104,6 +106,18 @@ export async function POST(request: NextRequest) {
       await sendBookingNotification({ enquiryId: result.enquiryId, enquiryReference: enquiry.enquiry_reference, enquiry: validation.data, services: (data ?? []) as PublicCelebrationService[] })
     } catch (error) {
       console.error('Celebration notification failed', { enquiryId: result.enquiryId, type: error instanceof Error ? error.name : 'UnknownError' })
+    }
+
+    if (validation.data.subscribeToUpdates && validation.data.email) {
+      try {
+        await new SubscriberService(new SupabaseSubscriberRepository()).subscribe({
+          email: validation.data.email,
+          locale: 'en',
+          source: 'plan_enquiry',
+        })
+      } catch (error) {
+        console.error('Celebration enquiry subscription failed', { enquiryId: result.enquiryId, type: error instanceof Error ? error.name : 'UnknownError' })
+      }
     }
 
     return NextResponse.json({ success: true, enquiryId: result.enquiryId, enquiryReference: enquiry.enquiry_reference }, { status: 201 })

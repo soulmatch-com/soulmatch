@@ -16,7 +16,7 @@ export interface Database {
           preferred_locale: 'en' | 'ta' | null
           subscribed_locales: Array<'en' | 'ta'>
           status: 'subscribed' | 'unsubscribed'
-          consent_source: 'blog_listing' | 'blog_article'
+          consent_source: 'blog_listing' | 'blog_article' | 'plan_enquiry'
           consented_at: string
           unsubscribed_at: string | null
           created_at: string
@@ -28,7 +28,7 @@ export interface Database {
           preferred_locale?: 'en' | 'ta' | null
           subscribed_locales?: Array<'en' | 'ta'>
           status?: 'subscribed' | 'unsubscribed'
-          consent_source: 'blog_listing' | 'blog_article'
+          consent_source: 'blog_listing' | 'blog_article' | 'plan_enquiry'
           consented_at?: string
           unsubscribed_at?: string | null
           created_at?: string
@@ -39,7 +39,7 @@ export interface Database {
           preferred_locale?: 'en' | 'ta' | null
           subscribed_locales?: Array<'en' | 'ta'>
           status?: 'subscribed' | 'unsubscribed'
-          consent_source?: 'blog_listing' | 'blog_article'
+          consent_source?: 'blog_listing' | 'blog_article' | 'plan_enquiry'
           consented_at?: string
           unsubscribed_at?: string | null
           updated_at?: string

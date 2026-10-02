@@ -1,7 +1,7 @@
 export const subscriberLocales = ['en', 'ta'] as const
 export type SubscriberLocale = (typeof subscriberLocales)[number]
 
-export const subscriberConsentSources = ['blog_listing', 'blog_article'] as const
+export const subscriberConsentSources = ['blog_listing', 'blog_article', 'plan_enquiry'] as const
 export type SubscriberConsentSource = (typeof subscriberConsentSources)[number]
 
 export const subscriberStatuses = ['subscribed', 'unsubscribed'] as const

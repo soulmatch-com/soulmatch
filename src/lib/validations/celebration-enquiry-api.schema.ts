@@ -45,6 +45,7 @@ export function createCelebrationEnquiryApiSchema(referenceDate = new Date()) {
     contactName: requiredPersonName('Contact name'),
     mobile: indianMobileSchema,
     email: z.string().trim().email('Enter a valid email').max(320).optional().or(z.literal('')).transform((value) => value || undefined),
+    subscribeToUpdates: z.boolean().optional().default(false),
     relationship: requiredRelationship,
     preferredContactMethod: z.enum(preferredContactMethods, { error: 'Please select a preferred contact method.' }),
     serviceIds: z.array(z.string().uuid('Every service ID must be a valid UUID')).max(20, 'Too many services selected').transform((ids) => [...new Set(ids)]),
@@ -65,6 +66,9 @@ export function createCelebrationEnquiryApiSchema(referenceDate = new Date()) {
     }
     if (data.preferredContactMethod === 'email' && !data.email) {
       context.addIssue({ code: 'custom', path: ['email'], message: 'Email is required when email is your preferred contact method' })
+    }
+    if (data.subscribeToUpdates && !data.email) {
+      context.addIssue({ code: 'custom', path: ['email'], message: 'Enter an email address to subscribe to updates' })
     }
   })
 }

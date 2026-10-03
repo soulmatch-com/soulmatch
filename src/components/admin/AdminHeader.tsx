@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Shield, Users, Settings, BarChart3, LogOut, Menu, X, Clock, UserCheck, Heart, BookOpen } from "lucide-react";
+import { Shield, Users, Settings, BarChart3, LogOut, Menu, X, Clock, UserCheck, Heart, BookOpen, ContactRound } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { adminAuthService, useAdminStore, ADMIN_CONFIG } from "@/modules/admin";
@@ -60,6 +60,10 @@ export default function AdminHeader() {
             <Link href={ADMIN_CONFIG.ROUTES.SUCCESS_STORIES} className="text-slate-300 hover:text-white transition-colors">
               <Heart className="h-5 w-5 inline mr-2" />
               Success Stories
+            </Link>
+            <Link href={ADMIN_CONFIG.ROUTES.LEADS} className="text-slate-300 hover:text-white transition-colors">
+              <ContactRound className="h-5 w-5 inline mr-2" />
+              Leads
             </Link>
             <Link href={ADMIN_CONFIG.ROUTES.BLOGS} className="text-slate-300 hover:text-white transition-colors">
               <BookOpen className="h-5 w-5 inline mr-2" />
@@ -150,6 +154,10 @@ export default function AdminHeader() {
             >
               <Heart className="h-5 w-5 inline mr-2" />
               Success Stories
+            </Link>
+            <Link href={ADMIN_CONFIG.ROUTES.LEADS} className="block text-slate-300 hover:text-white transition-colors py-2" onClick={toggleMenu}>
+              <ContactRound className="h-5 w-5 inline mr-2" />
+              Leads
             </Link>
             <Link
               href={ADMIN_CONFIG.ROUTES.BLOGS}

@@ -331,6 +331,70 @@ export interface Database {
           created_at?: string
         }
       }
+      leads: {
+        Row: {
+          id: string
+          celebration_enquiry_id: string | null
+          source: 'website' | 'instagram' | 'whatsapp' | 'call' | 'referral' | 'other'
+          status: 'new' | 'contacted' | 'follow_up' | 'qualified' | 'confirmed' | 'completed' | 'lost'
+          contact_name: string
+          mobile: string | null
+          email: string | null
+          requirement_summary: string | null
+          event_date: string | null
+          event_type: '60th-marriage' | '70th-marriage' | '80th-marriage' | null
+          event_session: 'one_session' | 'two_sessions' | null
+          total_members: number | null
+          assigned_admin_id: string | null
+          next_follow_up_at: string | null
+          lost_reason: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          celebration_enquiry_id?: string | null
+          source?: 'website' | 'instagram' | 'whatsapp' | 'call' | 'referral' | 'other'
+          status?: 'new' | 'contacted' | 'follow_up' | 'qualified' | 'confirmed' | 'completed' | 'lost'
+          contact_name: string
+          mobile?: string | null
+          email?: string | null
+          requirement_summary?: string | null
+          event_date?: string | null
+          event_type?: '60th-marriage' | '70th-marriage' | '80th-marriage' | null
+          event_session?: 'one_session' | 'two_sessions' | null
+          total_members?: number | null
+          assigned_admin_id?: string | null
+          next_follow_up_at?: string | null
+          lost_reason?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          celebration_enquiry_id?: string | null
+          source?: 'website' | 'instagram' | 'whatsapp' | 'call' | 'referral' | 'other'
+          status?: 'new' | 'contacted' | 'follow_up' | 'qualified' | 'confirmed' | 'completed' | 'lost'
+          contact_name?: string
+          mobile?: string | null
+          email?: string | null
+          requirement_summary?: string | null
+          event_date?: string | null
+          event_type?: '60th-marriage' | '70th-marriage' | '80th-marriage' | null
+          event_session?: 'one_session' | 'two_sessions' | null
+          total_members?: number | null
+          assigned_admin_id?: string | null
+          next_follow_up_at?: string | null
+          lost_reason?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      lead_notes: {
+        Row: { id: string; lead_id: string; admin_id: string | null; body: string; created_at: string }
+        Insert: { id?: string; lead_id: string; admin_id?: string | null; body: string; created_at?: string }
+        Update: { id?: string; lead_id?: string; admin_id?: string | null; body?: string; created_at?: string }
+      }
       interests: {
         Row: {
           id: string

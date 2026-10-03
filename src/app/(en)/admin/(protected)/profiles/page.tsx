@@ -124,11 +124,6 @@ export default function AdminProfilesPage() {
   return (
     <div className="container mx-auto py-10 px-4">
       <div className="max-w-7xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-slate-900">Profile Management</h1>
-          <p className="text-slate-600 mt-2">Manage user profiles and verifications</p>
-        </div>
-
         {/* Filters */}
         <Card className="mb-6">
           <CardHeader>

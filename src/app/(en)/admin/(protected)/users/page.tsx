@@ -142,13 +142,6 @@ export default function AdminUsersPage() {
   return (
     <div className="container mx-auto py-10 px-4">
       <div className="max-w-7xl mx-auto">
-        <div className="mb-8 flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-slate-900">User Management</h1>
-            <p className="text-slate-600 mt-2">Manage all registered users</p>
-          </div>
-        </div>
-
         <Card>
           <CardHeader>
             <div className="flex items-center justify-between flex-wrap gap-4">

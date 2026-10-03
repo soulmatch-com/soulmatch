@@ -99,14 +99,6 @@ export default function VerificationQueuePage() {
   return (
     <div className="container mx-auto py-10 px-4">
       <div className="max-w-7xl mx-auto">
-        <div className="mb-8">
-          <div className="flex items-center gap-3 mb-2">
-            <Clock className="w-8 h-8 text-orange-600" />
-            <h1 className="text-3xl font-bold text-slate-900">Profile Verification Queue</h1>
-          </div>
-          <p className="text-slate-600">Review and verify pending user profiles</p>
-        </div>
-
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center justify-between">

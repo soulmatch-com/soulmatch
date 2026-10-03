@@ -12,7 +12,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Plus, Star, Eye, EyeOff, Pencil, Trash2, Check, X, Heart, Upload } from 'lucide-react'
+import { Plus, Star, Eye, EyeOff, Pencil, Trash2, Check, X, Upload } from 'lucide-react'
 import { toast } from 'sonner'
 import { successStorySchema } from '@/lib/validations/success-story.schema'
 import { z } from 'zod'
@@ -395,14 +395,7 @@ export default function SuccessStoriesPage() {
     <div className="container mx-auto py-10 px-4">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-slate-900 flex items-center gap-2">
-              <Heart className="h-8 w-8 text-rose-600" />
-              Success Stories Management
-            </h1>
-            <p className="text-slate-600 mt-2">Manage family success stories for the homepage</p>
-          </div>
+        <div className="flex justify-end mb-8">
           <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
             <DialogTrigger asChild>
               <Button onClick={handleCreate} className="bg-gradient-to-r from-blue-700 to-emerald-700">

@@ -33,14 +33,18 @@ export default function ActiveProfilesPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
+  const [hasHydrated, setHasHydrated] = useState(false)
+
+  useEffect(() => { setHasHydrated(true) }, [])
 
   useEffect(() => {
+    if (!hasHydrated) return
     if (!isAuthenticated()) {
       router.push('/admin/login')
     } else {
       fetchActiveProfiles()
     }
-  }, [isAuthenticated, router, page])
+  }, [hasHydrated, isAuthenticated, router, page])
 
   const fetchActiveProfiles = async () => {
     setIsLoading(true)
@@ -117,21 +121,13 @@ export default function ActiveProfilesPage() {
     return age
   }
 
-  if (!isAuthenticated()) {
+  if (!hasHydrated || !isAuthenticated()) {
     return null
   }
 
   return (
     <div className="container mx-auto py-10 px-4">
       <div className="max-w-7xl mx-auto">
-        <div className="mb-8">
-          <div className="flex items-center gap-3 mb-2">
-            <UserCheck className="w-8 h-8 text-green-600" />
-            <h1 className="text-3xl font-bold text-slate-900">Active Profiles</h1>
-          </div>
-          <p className="text-slate-600">View and manage all active user profiles</p>
-        </div>
-
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center justify-between">

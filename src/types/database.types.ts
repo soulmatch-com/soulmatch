@@ -395,6 +395,21 @@ export interface Database {
         Insert: { id?: string; lead_id: string; admin_id?: string | null; body: string; created_at?: string }
         Update: { id?: string; lead_id?: string; admin_id?: string | null; body?: string; created_at?: string }
       }
+      quotations: {
+        Row: { id: string; quotation_number: string; status: 'draft' | 'sent' | 'accepted' | 'rejected' | 'expired'; currency: 'INR'; valid_until: string | null; notes: string | null; total_amount: number; created_by: string | null; created_at: string; updated_at: string }
+        Insert: { id?: string; quotation_number: string; status?: 'draft' | 'sent' | 'accepted' | 'rejected' | 'expired'; currency?: 'INR'; valid_until?: string | null; notes?: string | null; total_amount?: number; created_by?: string | null; created_at?: string; updated_at?: string }
+        Update: { id?: string; quotation_number?: string; status?: 'draft' | 'sent' | 'accepted' | 'rejected' | 'expired'; currency?: 'INR'; valid_until?: string | null; notes?: string | null; total_amount?: number; created_by?: string | null; created_at?: string; updated_at?: string }
+      }
+      quotation_items: {
+        Row: { id: string; quotation_id: string; celebration_service_id: string; service_code: string; service_name: string; quantity: number; unit_price: number; line_total: number; created_at: string }
+        Insert: { id?: string; quotation_id: string; celebration_service_id: string; service_code: string; service_name: string; quantity?: number; unit_price: number; line_total: number; created_at?: string }
+        Update: { id?: string; quotation_id?: string; celebration_service_id?: string; service_code?: string; service_name?: string; quantity?: number; unit_price?: number; line_total?: number; created_at?: string }
+      }
+      quotation_leads: {
+        Row: { quotation_id: string; lead_id: string; created_at: string }
+        Insert: { quotation_id: string; lead_id: string; created_at?: string }
+        Update: { quotation_id?: string; lead_id?: string; created_at?: string }
+      }
       interests: {
         Row: {
           id: string

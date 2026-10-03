@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation'
 
-import AdminHeader from '@/components/admin/AdminHeader'
+import { AdminShell } from '@/components/admin/AdminShell'
 import { requireActiveAdmin } from '@/lib/admin-auth'
 
 export default async function ProtectedAdminLayout({ children }: { children: React.ReactNode }) {
@@ -8,9 +8,6 @@ export default async function ProtectedAdminLayout({ children }: { children: Rea
   if ('response' in authorization) redirect('/admin/login')
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <AdminHeader />
-      <main>{children}</main>
-    </div>
+    <AdminShell>{children}</AdminShell>
   )
 }

@@ -49,7 +49,7 @@ export default function LeadsPage() {
   }, [status, source, search])
 
   return <div className="container mx-auto max-w-7xl px-4 py-10">
-    <div className="mb-8 flex flex-wrap items-end justify-between gap-4"><div><p className="text-sm font-semibold uppercase tracking-wider text-slate-500">Customer pipeline</p><h1 className="mt-1 text-3xl font-bold text-slate-900">Leads</h1><p className="mt-2 text-slate-600">Website, Instagram, WhatsApp, phone, and referral enquiries in one workspace.</p></div><Button asChild><Link href="/admin/leads/new"><Plus className="mr-2 h-4 w-4" />Add lead</Link></Button></div>
+    <div className="mb-5 flex justify-end"><Button asChild><Link href="/admin/leads/new"><Plus className="mr-2 h-4 w-4" />Add lead</Link></Button></div>
     {stats && <div className="mb-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">{[['New today', stats.newToday, 'text-blue-700'], ['Follow-ups due', stats.pendingFollowUps, 'text-amber-700'], ['Overdue', stats.overdueFollowUps, 'text-rose-700'], ['Confirmed', stats.confirmed, 'text-emerald-700']].map(([title, value, colour]) => <div key={String(title)} className="rounded-xl border bg-white p-4"><p className="text-sm text-slate-600">{title}</p><p className={`mt-1 text-2xl font-bold ${colour}`}>{value}</p></div>)}</div>}
     <div className="mb-5 grid gap-3 rounded-xl border bg-white p-4 sm:grid-cols-[1fr_180px_180px]">
       <label className="relative"><Search className="absolute left-3 top-3 h-4 w-4 text-slate-400" /><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search name, mobile or email" className="h-10 w-full rounded-md border border-slate-300 pl-9 pr-3 text-sm" /></label>

@@ -60,11 +60,7 @@ export default async function AdminBlogsPage({ searchParams }: { searchParams: S
   return (
     <div className="container mx-auto px-4 py-10">
       <div className="mx-auto max-w-7xl">
-        <div className="mb-8 flex flex-wrap items-start justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-bold text-slate-900">Blog Management</h1>
-            <p className="mt-2 text-slate-600">Create and manage English and Tamil blog articles.</p>
-          </div>
+        <div className="mb-8 flex justify-end">
           <Link href="/admin/blogs/new" className="inline-flex h-10 items-center gap-2 rounded-md bg-slate-900 px-4 text-sm font-medium text-white transition-colors hover:bg-slate-800">
             <Plus className="h-4 w-4" />
             Add Blog

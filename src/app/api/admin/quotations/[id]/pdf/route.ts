@@ -1,7 +1,9 @@
 import { readFile } from 'node:fs/promises'
 import path from 'node:path'
 import { NextResponse } from 'next/server'
-import { PDFDocument, StandardFonts, rgb } from 'pdf-lib'
+import 'regenerator-runtime/runtime'
+import fontkit from '@pdf-lib/fontkit'
+import { PDFDocument, PDFFont, StandardFonts, rgb } from 'pdf-lib'
 import { requireActiveAdmin } from '@/lib/admin-auth'
 import { createAdminClient } from '@/lib/supabase/admin'
 
@@ -14,7 +16,66 @@ const gold = rgb(0.79, 0.49, 0.04)
 const cream = rgb(1, 0.98, 0.92)
 const slate = rgb(0.2, 0.24, 0.3)
 const border = rgb(0.9, 0.72, 0.4)
+const blue = rgb(0.07, 0.32, 0.78)
 const numberFormatter = new Intl.NumberFormat('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+
+const poojas: Array<[string, string]> = [['கஜ பூஜை', 'Gaja Pooja'], ['கோ பூஜை', 'Go Pooja (Cow Worship)'], ['குதிரைக்கு பூஜை', 'Kuthiraikku Pooja'], ['விநாயகர் தரிசனம்', 'Vinayagar Darshan'], ['சாமி தரிசனம்', 'Saami Dharisanam'], ['சங்கல்பம் – குடும்ப உறுப்பினர்களின் நட்சத்திர விவர பூஜை', 'Sankalpam – family nakshatra details'], ['கலச பூஜை – 27 சங்கல்பத்தின் ஆவாஹனம்', 'Kalasa Pooja – 27 Sankalpams']]
+const homams: Array<[string, string]> = [['கணபதி ஹோமம்', 'Ganapathi Homam'], ['நவகிரஹ ஹோமம்', 'Navagraha Homam'], ['மிருத்யுஞ்ஜய ஹோமம்', 'Mrityunjaya Homam'], ['ஆயுள் ஹோமம்', 'Ayul Homam'], ['தன்வந்திரி ஹோமம்', 'Dhanvantari Homam'], ['சுதர்சன ஹோமம்', 'Sudarshana Homam'], ['துர்கா ஹோமம்', 'Durga Homam'], ['ஷஷ்டி ஹோமம்', 'Shasti Homam'], ['அஷ்ட லக்ஷ்மி ஹோமம்', 'Ashta Lakshmi Homam'], ['அய்யப்பன் ஹோமம்', 'Ayyappan Homam'], ['ஆஞ்சநேயர் ஹோமம்', 'Anjaneyar Homam'], ['குலதெய்வ ஹோமம்', 'Kula Deivam Homam'], ['நட்சத்திர ஹோமம்', 'Nakshatra Homam']]
+
+function addCeremonyPage(pdf: PDFDocument, logo: Awaited<ReturnType<PDFDocument['embedPng']>>, regular: PDFFont, bold: PDFFont, serifBold: PDFFont, tamil: PDFFont, ceremony: string) {
+  const page = pdf.addPage([pageWidth, pageHeight])
+  const text = (value: string, x: number, atY: number, size = 10, font = regular, color = slate) => page.drawText(value, { x, y: atY, size, font, color })
+  const centered = (value: string, atY: number, size: number, font = regular, color = slate) => text(value, (pageWidth - font.widthOfTextAtSize(value, size)) / 2, atY, size, font, color)
+  const line = (x1: number, y1: number, x2: number, y2: number) => page.drawLine({ start: { x: x1, y: y1 }, end: { x: x2, y: y2 }, thickness: 0.65, color: border })
+  const tableLeft = 30
+  const tableWidth = pageWidth - tableLeft * 2
+  const logoWidth = 108
+  const logoHeight = logoWidth * logo.height / logo.width
+  page.drawImage(logo, { x: 36, y: 790, width: logoWidth, height: logoHeight })
+  centered('QUOTATION', 804, 16, serifBold, brand)
+  centered(`${ceremony.toUpperCase()} MARRIAGE`, 788, 7, bold, gold)
+  text('Website : www.mythirumanam.in', 392, 810, 7.5, bold, brand)
+  text('Contact : +91 78453 05728', 392, 796, 7.5, bold, brand)
+  centered('RITUAL & CEREMONY DETAILS', 720, 15, serifBold, brand)
+  page.drawRectangle({ x: tableLeft, y: 698, width: tableWidth, height: 14, color: cream, borderColor: gold, borderWidth: 0.75 })
+  line(pageWidth / 2, 698, pageWidth / 2, 712)
+  text('Evening: 6:00 PM – 8:00 PM', 105, 702, 7.5, bold, brand)
+  text('Morning: 7:00 AM – 10:00 AM', 365, 702, 7.5, bold, brand)
+  const drawTable = (title: string, rows: Array<[string, string]>, startY: number, leftHeader: string, rightHeader: string) => {
+    text(title, tableLeft + 1, startY, 11, serifBold, brand)
+    const headerTop = startY - 5
+    const headerHeight = 14
+    const numberWidth = 85
+    const tamilWidth = 265
+    const tamilLeft = tableLeft + numberWidth
+    const englishLeft = tamilLeft + tamilWidth
+    page.drawRectangle({ x: tableLeft, y: headerTop - headerHeight, width: tableWidth, height: headerHeight, color: brand })
+    const header = (value: string, left: number, width: number, font = bold) => text(value, left + (width - font.widthOfTextAtSize(value, 7)) / 2, headerTop - 10, 7, font, rgb(1, 1, 1))
+    header('No.', tableLeft, numberWidth)
+    header(leftHeader, tamilLeft, tamilWidth, tamil)
+    header(rightHeader, englishLeft, tableWidth - numberWidth - tamilWidth)
+    let y = headerTop - headerHeight
+    rows.forEach(([tamilValue, englishValue], index) => {
+      const rowHeight = 13
+      page.drawRectangle({ x: tableLeft, y: y - rowHeight, width: tableWidth, height: rowHeight, color: index % 2 ? rgb(1, 0.99, 0.96) : rgb(1, 1, 1), borderColor: border, borderWidth: 0.5 })
+      line(tamilLeft, y, tamilLeft, y - rowHeight)
+      line(englishLeft, y, englishLeft, y - rowHeight)
+      const number = String(index + 1)
+      text(number, tableLeft + (numberWidth - regular.widthOfTextAtSize(number, 7)) / 2, y - 9, 7)
+      text(tamilValue, tamilLeft + 6, y - 9, 6.5, tamil)
+      text(englishValue, englishLeft + 6, y - 9, 6.5)
+      y -= rowHeight
+    })
+    return y
+  }
+  const afterPooja = drawTable('Pooja / Ceremony', poojas, 680, 'Ritual / பூஜை', 'Description')
+  const afterHomam = drawTable('Homam Details', homams, afterPooja - 34, 'ஹோமம்', 'Homam')
+  const notesY = Math.max(95, afterHomam - 66)
+  text('Notes: Terms to Bring', tableLeft + 1, notesY, 11, serifBold, brand)
+  text('➜  Muhurtha Veshti & Pudavaigal (முகூர்த்த வேஷ்டி & புடவைகள்)', tableLeft + 18, notesY - 16, 8, tamil, blue)
+  text('➜  Mangalyam (மாங்கல்யம்)', tableLeft + 18, notesY - 30, 8, tamil, blue)
+  centered('MyThirumanam  |  www.mythirumanam.in  |  +91 78453 05728', 14, 6.5, bold, brand)
+}
 
 function compactDate(value: string | null) {
   if (!value) return 'Not provided'
@@ -66,6 +127,7 @@ export async function GET(_: Request, { params }: { params: Promise<{ id: string
   if (leadsError) return NextResponse.json({ error: 'Unable to load quotation lead details' }, { status: 500 })
 
   const pdf = await PDFDocument.create()
+  pdf.registerFontkit(fontkit)
   pdf.setTitle(`Quotation ${quotation.quotation_number}`)
   pdf.setAuthor('MyThirumanam')
   pdf.setSubject('Celebration quotation')
@@ -74,6 +136,8 @@ export async function GET(_: Request, { params }: { params: Promise<{ id: string
   const serifBold = await pdf.embedFont(StandardFonts.TimesRomanBold)
   const logoBytes = await readFile(path.join(process.cwd(), 'public/brand/mythirumanam-logo.png'))
   const logo = await pdf.embedPng(logoBytes)
+  const tamilFontBytes = await readFile(path.join(process.cwd(), 'public/brand/NotoSansTamil.ttf'))
+  const tamil = await pdf.embedFont(tamilFontBytes, { subset: true })
   const page = pdf.addPage([pageWidth, pageHeight])
   const text = (value: string, x: number, atY: number, size = 10, font = regular, color = slate) => page.drawText(value, { x, y: atY, size, font, color })
   const line = (x1: number, y1: number, x2: number, y2: number, color = border) => page.drawLine({ start: { x: x1, y: y1 }, end: { x: x2, y: y2 }, thickness: 0.75, color })
@@ -154,9 +218,7 @@ export async function GET(_: Request, { params }: { params: Promise<{ id: string
   line(342, 43, 445, 43, slate)
   centered('MyThirumanam  |  www.mythirumanam.in  |  +91 78453 05728', 14, 6.5, bold, brand)
 
-  const commonTemplate = await PDFDocument.load(await readFile(path.join(process.cwd(), 'Dhamaodaran-30102026.pdf')))
-  const [commonCeremonyPage] = await pdf.copyPages(commonTemplate, [1])
-  pdf.addPage(commonCeremonyPage)
+  addCeremonyPage(pdf, logo, regular, bold, serifBold, tamil, eventName(primaryLead?.event_type ?? null).replace('th Marriage', 'TH'))
 
   const bytes = await pdf.save()
   const body = new Uint8Array(bytes).buffer

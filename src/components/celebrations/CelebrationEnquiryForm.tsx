@@ -484,6 +484,10 @@ export function CelebrationEnquiryForm({
                   <input ref={legalAcknowledgementRef} type="checkbox" checked={legalAcknowledged} onChange={(event) => { setLegalAcknowledged(event.target.checked); if (event.target.checked) setLegalAcknowledgementError(undefined) }} aria-invalid={!!legalAcknowledgementError} aria-describedby={legalAcknowledgementError ? 'legal-acknowledgement-error' : undefined} className="mt-1 h-5 w-5 shrink-0 accent-amber-700" />
                   <span>I have read and agree to the <a href="/terms" target="_blank" rel="noopener noreferrer" className="font-semibold text-amber-800 underline">Terms &amp; Conditions</a> and acknowledge the <a href="/privacy" target="_blank" rel="noopener noreferrer" className="font-semibold text-amber-800 underline">Privacy Policy</a>.</span>
                 </label>
+                <label className="mt-4 flex cursor-pointer items-start gap-3 text-stone-800">
+                  <input type="checkbox" {...register('subscribeToUpdates')} className="mt-1 h-5 w-5 shrink-0 accent-amber-700" />
+                  <span>Send me MyThirumanam planning guides and celebration updates by email. I can unsubscribe at any time.</span>
+                </label>
                 {legalAcknowledgementError && <p id="legal-acknowledgement-error" role="alert" className="mt-3 font-medium text-red-700">{legalAcknowledgementError}</p>}
               </div>
             </section>

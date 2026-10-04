@@ -4,6 +4,7 @@ import { BookOpen, ChevronLeft, ChevronRight, Plus, Search } from 'lucide-react'
 
 import { getAdminBlogPosts } from '@/lib/blog/admin-blog-repository'
 import { requireActiveAdmin } from '@/lib/admin-auth'
+import BlogListActions from '@/components/admin/BlogListActions'
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>
 
@@ -119,7 +120,7 @@ export default async function AdminBlogsPage({ searchParams }: { searchParams: S
                         <td className="px-3 py-4"><StatusBadge status={blog.status} /></td>
                         <td className="whitespace-nowrap px-3 py-4">{formatDate(blog.published_at)}</td>
                         <td className="whitespace-nowrap px-3 py-4">{formatDate(blog.updated_at)}</td>
-                        <td className="px-3 py-4"><Link href={`/admin/blogs/${blog.id}/edit`} className="font-medium text-slate-900 underline hover:text-slate-600">Edit</Link></td>
+                        <td className="px-3 py-4"><BlogListActions blogId={blog.id} englishStatus={blog.english.status} tamilStatus={blog.tamil.status} /></td>
                       </tr>
                     ))}
                   </tbody>

@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { requireActiveAdmin } from '@/lib/admin-auth'
+import { expirableLeadStatuses, isPastEventDate, leadStatuses, indiaToday } from '@/lib/leads/status'
 import { createAdminClient } from '@/lib/supabase/admin'
 
 const sources = ['website', 'instagram', 'whatsapp', 'call', 'referral', 'other'] as const
-const statuses = ['new', 'contacted', 'follow_up', 'qualified', 'confirmed', 'completed', 'lost'] as const
+const statuses = leadStatuses
 const eventTypes = ['60th-marriage', '70th-marriage', '80th-marriage'] as const
 const eventSessions = ['one_session', 'two_sessions'] as const
 
@@ -32,8 +33,16 @@ export async function GET(request: NextRequest) {
   const query = params.get('q')?.trim()
   const supabase = createAdminClient()
 
+  const { error: expiryError } = await supabase.from('leads').update({ status: 'expired' }).lt('event_date', indiaToday()).in('status', expirableLeadStatuses)
+  if (expiryError) {
+    console.error('Unable to expire past-event leads', { code: expiryError.code, message: expiryError.message })
+    return NextResponse.json({ error: 'Unable to update expired leads. Apply the expired lead status database migration first.' }, { status: 500 })
+  }
+
   let leadsQuery = supabase.from('leads').select('*').order('created_at', { ascending: false }).limit(200)
-  if (statuses.includes(status as (typeof statuses)[number])) leadsQuery = leadsQuery.eq('status', status)
+  if (status === 'expired') leadsQuery = leadsQuery.eq('status', 'expired')
+  else leadsQuery = leadsQuery.neq('status', 'expired')
+  if (statuses.includes(status as (typeof statuses)[number]) && status !== 'expired') leadsQuery = leadsQuery.eq('status', status)
   if (sources.includes(source as (typeof sources)[number])) leadsQuery = leadsQuery.eq('source', source)
   if (query) {
     const safeQuery = query.replace(/[,().]/g, ' ')
@@ -66,7 +75,7 @@ export async function POST(request: NextRequest) {
 
   const { data, error } = await supabase.from('leads').insert({
     source: input.source,
-    status: input.status,
+    status: isPastEventDate(input.eventDate) ? 'expired' : input.status,
     contact_name: input.contactName,
     mobile: input.mobile || null,
     email: input.email || null,

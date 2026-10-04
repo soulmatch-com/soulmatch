@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { requireActiveAdmin } from '@/lib/admin-auth'
+import { expirableLeadStatuses, isPastEventDate, leadStatuses } from '@/lib/leads/status'
 import { createAdminClient } from '@/lib/supabase/admin'
 
-const statuses = ['new', 'contacted', 'follow_up', 'qualified', 'confirmed', 'completed', 'lost'] as const
+const statuses = leadStatuses
 const eventTypes = ['60th-marriage', '70th-marriage', '80th-marriage'] as const
 const eventSessions = ['one_session', 'two_sessions'] as const
 const updateSchema = z.object({
@@ -42,8 +43,15 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
   const parsed = updateSchema.safeParse(body)
   if (!parsed.success) return NextResponse.json({ error: 'Please check the update' }, { status: 400 })
   const input = parsed.data
+  const supabase = createAdminClient()
+  const { data: existing, error: existingError } = await supabase.from('leads').select('status, event_date').eq('id', id).maybeSingle()
+  if (existingError) return NextResponse.json({ error: 'Unable to load lead' }, { status: 500 })
+  if (!existing) return NextResponse.json({ error: 'Lead not found' }, { status: 404 })
+  const nextEventDate = input.eventDate === undefined ? existing.event_date : input.eventDate
+  const requestedStatus = input.status ?? existing.status
+  const nextStatus = isPastEventDate(nextEventDate) && expirableLeadStatuses.includes(requestedStatus as (typeof expirableLeadStatuses)[number]) ? 'expired' : input.status
   const update = {
-    ...(input.status !== undefined ? { status: input.status } : {}),
+    ...(nextStatus !== undefined ? { status: nextStatus } : {}),
     ...(input.nextFollowUpAt !== undefined ? { next_follow_up_at: input.nextFollowUpAt } : {}),
     ...(input.requirementSummary !== undefined ? { requirement_summary: input.requirementSummary } : {}),
     ...(input.eventDate !== undefined ? { event_date: input.eventDate } : {}),
@@ -52,7 +60,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     ...(input.totalMembers !== undefined ? { total_members: input.totalMembers } : {}),
     ...(input.lostReason !== undefined ? { lost_reason: input.lostReason } : {}),
   }
-  const { data, error } = await createAdminClient().from('leads').update(update).eq('id', id).select('*').maybeSingle()
+  const { data, error } = await supabase.from('leads').update(update).eq('id', id).select('*').maybeSingle()
   if (error) return NextResponse.json({ error: 'Unable to update lead' }, { status: 500 })
   if (!data) return NextResponse.json({ error: 'Lead not found' }, { status: 404 })
   return NextResponse.json({ lead: data })

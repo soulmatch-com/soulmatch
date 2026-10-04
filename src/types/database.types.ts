@@ -336,7 +336,7 @@ export interface Database {
           id: string
           celebration_enquiry_id: string | null
           source: 'website' | 'instagram' | 'whatsapp' | 'call' | 'referral' | 'other'
-          status: 'new' | 'contacted' | 'follow_up' | 'qualified' | 'confirmed' | 'completed' | 'lost'
+          status: 'new' | 'contacted' | 'follow_up' | 'qualified' | 'confirmed' | 'completed' | 'lost' | 'expired'
           contact_name: string
           mobile: string | null
           email: string | null
@@ -355,7 +355,7 @@ export interface Database {
           id?: string
           celebration_enquiry_id?: string | null
           source?: 'website' | 'instagram' | 'whatsapp' | 'call' | 'referral' | 'other'
-          status?: 'new' | 'contacted' | 'follow_up' | 'qualified' | 'confirmed' | 'completed' | 'lost'
+          status?: 'new' | 'contacted' | 'follow_up' | 'qualified' | 'confirmed' | 'completed' | 'lost' | 'expired'
           contact_name: string
           mobile?: string | null
           email?: string | null
@@ -374,7 +374,7 @@ export interface Database {
           id?: string
           celebration_enquiry_id?: string | null
           source?: 'website' | 'instagram' | 'whatsapp' | 'call' | 'referral' | 'other'
-          status?: 'new' | 'contacted' | 'follow_up' | 'qualified' | 'confirmed' | 'completed' | 'lost'
+          status?: 'new' | 'contacted' | 'follow_up' | 'qualified' | 'confirmed' | 'completed' | 'lost' | 'expired'
           contact_name?: string
           mobile?: string | null
           email?: string | null

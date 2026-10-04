@@ -1,8 +1,9 @@
 'use client'
 
 import { FormEvent, useCallback, useEffect, useState } from 'react'
-import { Pencil, Plus } from 'lucide-react'
+import { Pencil, Plus, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 
 type Service = { id: string; code: string; name: string; description: string | null; icon: string | null; location: string; is_active: boolean; display_order: number }
@@ -38,6 +39,7 @@ export function CelebrationServiceManager() {
   const [newService, setNewService] = useState<NewServiceDraft>(emptyNewService)
   const [editingService, setEditingService] = useState<Service | null>(null)
   const [editDraft, setEditDraft] = useState<ServiceDraft | null>(null)
+  const [deletingService, setDeletingService] = useState<Service | null>(null)
   const [isCreateOpen, setIsCreateOpen] = useState(false)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -100,6 +102,20 @@ export function CelebrationServiceManager() {
     } catch (err) { setError(err instanceof Error ? err.message : 'Unable to save service.') } finally { setSaving(false) }
   }
 
+  async function deleteService() {
+    if (!deletingService) return
+    setSaving(true); setError('')
+    try {
+      const response = await fetch(`/api/admin/celebration-services/${deletingService.id}`, { method: 'DELETE' })
+      const data = await response.json()
+      if (!response.ok) throw new Error(data.error || 'Unable to delete service.')
+      setDeletingService(null)
+      const remainingOnPage = services.length - 1
+      if (remainingOnPage === 0 && page > 1) setPage((current) => current - 1)
+      else await loadServices()
+    } catch (err) { setError(err instanceof Error ? err.message : 'Unable to delete service.') } finally { setSaving(false) }
+  }
+
   return <section className="rounded-xl border bg-white p-5">
     <div className="flex flex-wrap items-start justify-between gap-4"><div><h2 className="font-semibold text-slate-900">Celebration service catalogue</h2><p className="mt-1 text-sm text-slate-600">Manage the services available in the public planning journey and quotations.</p></div><Button type="button" onClick={openCreate}><Plus className="h-4 w-4" />Create service</Button></div>
     {error && <p role="alert" className="mt-4 rounded-md bg-rose-50 p-3 text-sm text-rose-800">{error}</p>}
@@ -110,11 +126,12 @@ export function CelebrationServiceManager() {
       <div className="flex items-end"><Button type="button" variant="outline" onClick={clearFilters} disabled={!search && !location && status === 'all'}>Clear filters</Button></div>
     </div>
     <div className="mt-6 overflow-x-auto"><table className="w-full min-w-[780px] text-left text-sm"><thead className="border-b text-xs uppercase tracking-wide text-slate-500"><tr><th className="p-3">Service</th><th className="p-3">Description</th><th className="p-3">Location</th><th className="p-3">Order</th><th className="p-3">Status</th><th className="p-3 text-right">Actions</th></tr></thead><tbody className="divide-y">
-      {services.map((service) => <tr key={service.id}><td className="p-3"><p className="font-medium text-slate-900">{service.name}</p><p className="mt-1 font-mono text-xs text-slate-500">{service.code}</p></td><td className="max-w-sm p-3 text-slate-600">{service.description || <span className="text-slate-400">No description</span>}</td><td className="p-3 text-slate-700">{service.location}</td><td className="p-3 text-slate-700">{service.display_order}</td><td className="p-3"><span className={`rounded-full px-2.5 py-1 text-xs font-medium ${service.is_active ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-600'}`}>{service.is_active ? 'Active' : 'Inactive'}</span></td><td className="p-3 text-right"><Button type="button" size="sm" variant="outline" onClick={() => openEdit(service)}><Pencil className="h-3.5 w-3.5" />Edit</Button></td></tr>)}
+      {services.map((service) => <tr key={service.id}><td className="p-3"><p className="font-medium text-slate-900">{service.name}</p><p className="mt-1 font-mono text-xs text-slate-500">{service.code}</p></td><td className="max-w-sm p-3 text-slate-600">{service.description || <span className="text-slate-400">No description</span>}</td><td className="p-3 text-slate-700">{service.location}</td><td className="p-3 text-slate-700">{service.display_order}</td><td className="p-3"><span className={`rounded-full px-2.5 py-1 text-xs font-medium ${service.is_active ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-600'}`}>{service.is_active ? 'Active' : 'Inactive'}</span></td><td className="p-3 text-right"><div className="flex justify-end gap-2"><Button type="button" size="icon" variant="outline" aria-label={`Edit ${service.name}`} title="Edit" onClick={() => openEdit(service)}><Pencil className="h-3.5 w-3.5" /></Button><Button type="button" size="icon" variant="destructive" aria-label={`Delete ${service.name}`} title="Delete" onClick={() => { setError(''); setDeletingService(service) }}><Trash2 className="h-3.5 w-3.5" /></Button></div></td></tr>)}
       {!loading && services.length === 0 && <tr><td colSpan={6} className="p-8 text-center text-slate-500">No celebration services have been added. Create one to get started.</td></tr>}{loading && <tr><td colSpan={6} className="p-8 text-center text-slate-500">Loading services…</td></tr>}
     </tbody></table></div>
     {!loading && pagination.total > 0 && <div className="mt-4 flex flex-wrap items-center justify-between gap-3 text-sm text-slate-600"><p>Showing {(pagination.page - 1) * pagination.limit + 1}–{Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total} services</p><div className="flex items-center gap-2"><Button type="button" size="sm" variant="outline" disabled={pagination.page <= 1} onClick={() => setPage((current) => current - 1)}>Previous</Button><span aria-live="polite">Page {pagination.page} of {pagination.totalPages}</span><Button type="button" size="sm" variant="outline" disabled={pagination.page >= pagination.totalPages} onClick={() => setPage((current) => current + 1)}>Next</Button></div></div>}
     <Dialog open={isCreateOpen} onOpenChange={(open) => !saving && setIsCreateOpen(open)}><DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto"><DialogHeader><DialogTitle>Create celebration service</DialogTitle><DialogDescription>Add a service to the catalogue used for planning and quotations.</DialogDescription></DialogHeader><form onSubmit={createService}><ServiceFormFields draft={newService} includeCode onChange={(field, value) => setNewService((current) => ({ ...current, [field]: value }))} /><DialogFooter className="mt-6"><Button type="button" variant="outline" disabled={saving} onClick={() => setIsCreateOpen(false)}>Cancel</Button><Button disabled={saving} type="submit">{saving ? 'Creating…' : 'Create service'}</Button></DialogFooter></form></DialogContent></Dialog>
     <Dialog open={editingService !== null} onOpenChange={(open) => !open && closeEdit()}><DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto"><DialogHeader><DialogTitle>Edit {editingService?.name}</DialogTitle><DialogDescription>The service code cannot be changed after creation.</DialogDescription></DialogHeader>{editDraft && <form onSubmit={saveService}><ServiceFormFields draft={editDraft} onChange={(field, value) => setEditDraft((current) => current ? { ...current, [field]: value } : current)} /><DialogFooter className="mt-6"><Button type="button" variant="outline" disabled={saving} onClick={closeEdit}>Cancel</Button><Button disabled={saving} type="submit">{saving ? 'Saving…' : 'Save changes'}</Button></DialogFooter></form>}</DialogContent></Dialog>
+    <AlertDialog open={deletingService !== null} onOpenChange={(open) => !open && !saving && setDeletingService(null)}><AlertDialogContent><AlertDialogHeader><AlertDialogTitle>Delete {deletingService?.name}?</AlertDialogTitle><AlertDialogDescription>This permanently removes the service from the celebration catalogue and it will no longer be available for enquiries or quotations.</AlertDialogDescription></AlertDialogHeader><AlertDialogFooter><AlertDialogCancel disabled={saving}>Cancel</AlertDialogCancel><AlertDialogAction disabled={saving} onClick={() => void deleteService()} className="bg-rose-700 text-white hover:bg-rose-800">{saving ? 'Deleting…' : 'Delete service'}</AlertDialogAction></AlertDialogFooter></AlertDialogContent></AlertDialog>
   </section>
 }

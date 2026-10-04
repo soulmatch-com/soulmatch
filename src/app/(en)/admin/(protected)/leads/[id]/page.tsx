@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 
 type Lead = { id: string; source: string; status: string; contact_name: string; mobile: string | null; email: string | null; requirement_summary: string | null; event_date: string | null; event_type: string | null; event_session: string | null; total_members: number | null; next_follow_up_at: string | null; created_at: string }
 type Note = { id: string; body: string; created_at: string }
-const statuses = ['new', 'contacted', 'follow_up', 'qualified', 'confirmed', 'completed', 'lost']
+const statuses = ['new', 'contacted', 'follow_up', 'qualified', 'confirmed', 'completed', 'lost', 'expired']
 const label = (value: string) => value.replace('_', ' ').replace(/\b\w/g, (letter) => letter.toUpperCase())
 
 export default function LeadDetailPage({ params }: { params: Promise<{ id: string }> }) {

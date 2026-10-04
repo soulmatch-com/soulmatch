@@ -26,3 +26,14 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
   if (!data) return NextResponse.json({ error: 'Celebration service not found' }, { status: 404 })
   return NextResponse.json({ service: data })
 }
+
+export async function DELETE(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const authorization = await requireActiveAdmin()
+  if ('response' in authorization) return authorization.response
+
+  const { id } = await params
+  const { data, error } = await createAdminClient().from('celebration_services').delete().eq('id', id).select('id').maybeSingle()
+  if (error) return NextResponse.json({ error: 'Unable to delete celebration service' }, { status: 500 })
+  if (!data) return NextResponse.json({ error: 'Celebration service not found' }, { status: 404 })
+  return NextResponse.json({ message: 'Celebration service deleted successfully' })
+}

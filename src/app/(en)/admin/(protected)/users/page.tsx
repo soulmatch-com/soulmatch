@@ -48,7 +48,7 @@ export default function AdminUsersPage() {
         if (response.status === 401 || response.status === 403) {
           router.push(ADMIN_CONFIG.ROUTES.LOGIN)
         }
-        throw new Error(body?.message || `Failed to fetch users (${response.status})`)
+        throw new Error(body?.error || body?.message || `Failed to fetch users (${response.status})`)
       }
 
       const data = await response.json()

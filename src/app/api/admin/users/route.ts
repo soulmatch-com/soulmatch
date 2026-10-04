@@ -29,7 +29,16 @@ export async function GET(request: NextRequest) {
 
     // Apply search filter
     if (search) {
-      query = query.or(`first_name.ilike.%${search}%,last_name.ilike.%${search}%,email.ilike.%${search}%`)
+      const safeSearch = search.replace(/[,().]/g, ' ')
+      const { data: authSearch, error: authSearchError } = await supabase.auth.admin.listUsers({ page: 1, perPage: 1000 })
+      if (authSearchError) {
+        console.error('Error searching auth users:', authSearchError)
+        return NextResponse.json({ message: 'Failed to search users' }, { status: 500 })
+      }
+      const emailMatches = authSearch.users.filter((user) => user.email?.toLowerCase().includes(safeSearch.toLowerCase())).map((user) => user.id)
+      const filters = [`first_name.ilike.%${safeSearch}%`, `last_name.ilike.%${safeSearch}%`]
+      if (emailMatches.length) filters.push(`user_id.in.(${emailMatches.join(',')})`)
+      query = query.or(filters.join(','))
     }
 
     // Apply pagination
@@ -46,7 +55,6 @@ export async function GET(request: NextRequest) {
     }
 
     // Get auth users data
-    const userIds = profiles?.map(p => p.user_id) || []
     const { data: { users }, error: authError } = await supabase.auth.admin.listUsers()
 
     if (authError) {

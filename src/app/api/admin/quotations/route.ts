@@ -26,7 +26,7 @@ export async function GET() {
   const [{ data: quotations, error: quotationsError }, { data: services, error: servicesError }, { data: leads, error: leadsError }] = await Promise.all([
     supabase.from('quotations').select('*').order('created_at', { ascending: false }),
     supabase.from('celebration_services').select('id, code, name, description, display_order').eq('is_active', true).order('display_order', { ascending: true }),
-    supabase.from('leads').select('id, contact_name, mobile, email').order('created_at', { ascending: false }).limit(200),
+    supabase.from('leads').select('id, contact_name, mobile, email').neq('status', 'expired').order('created_at', { ascending: false }).limit(200),
   ])
   if (quotationsError || servicesError || leadsError) return NextResponse.json({ error: 'Unable to load quotations' }, { status: 500 })
   const quotationIds = (quotations ?? []).map((quotation) => quotation.id)
@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
   const supabase = createAdminClient()
   const [servicesResult, leadsResult] = await Promise.all([
     supabase.from('celebration_services').select('id, code, name').eq('is_active', true).in('id', parsed.data.items.map((item) => item.serviceId)),
-    parsed.data.leadIds.length ? supabase.from('leads').select('id').in('id', parsed.data.leadIds) : Promise.resolve({ data: [], error: null }),
+    parsed.data.leadIds.length ? supabase.from('leads').select('id').neq('status', 'expired').in('id', parsed.data.leadIds) : Promise.resolve({ data: [], error: null }),
   ])
   if (servicesResult.error || !servicesResult.data || servicesResult.data.length !== parsed.data.items.length) return NextResponse.json({ error: 'One or more selected services are no longer available' }, { status: 400 })
   if (leadsResult.error || (leadsResult.data?.length ?? 0) !== parsed.data.leadIds.length) return NextResponse.json({ error: 'One or more selected leads could not be found' }, { status: 400 })

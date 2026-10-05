@@ -28,7 +28,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
   if (parsed.data.items && new Set(parsed.data.items.map((item) => item.serviceId)).size !== parsed.data.items.length) return NextResponse.json({ error: 'Duplicate services are not allowed' }, { status: 400 })
   if (parsed.data.leadIds) {
     if (new Set(parsed.data.leadIds).size !== parsed.data.leadIds.length) return NextResponse.json({ error: 'Duplicate leads are not allowed' }, { status: 400 })
-    const { data: leads, error: leadsError } = parsed.data.leadIds.length ? await supabase.from('leads').select('id').in('id', parsed.data.leadIds) : { data: [], error: null }
+    const { data: leads, error: leadsError } = parsed.data.leadIds.length ? await supabase.from('leads').select('id').neq('status', 'expired').in('id', parsed.data.leadIds) : { data: [], error: null }
     if (leadsError || (leads?.length ?? 0) !== parsed.data.leadIds.length) return NextResponse.json({ error: 'One or more selected leads could not be found' }, { status: 400 })
     const { error: deleteError } = await supabase.from('quotation_leads').delete().eq('quotation_id', id)
     if (deleteError) return NextResponse.json({ error: 'Unable to update linked leads' }, { status: 500 })

@@ -80,6 +80,27 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: false, message: 'Unable to submit the enquiry right now' }, { status: 500 })
     }
 
+    // The enquiry remains successful even if the internal CRM is temporarily unavailable.
+    // Existing enquiries are also backfilled by the lead-management migration.
+    try {
+      const { error: leadError } = await client.from('leads').upsert({
+        celebration_enquiry_id: result.enquiryId,
+        source: 'website',
+        status: 'new',
+        contact_name: validation.data.contactName,
+        mobile: validation.data.mobile,
+        email: validation.data.email || null,
+        requirement_summary: validation.data.otherServiceDetails || validation.data.specialRequirements || validation.data.notes || null,
+        event_date: validation.data.preferredDate,
+        event_type: ['60th-marriage', '70th-marriage', '80th-marriage'].includes(validation.data.celebrationType) ? validation.data.celebrationType : null,
+        event_session: validation.data.ceremonyDuration || null,
+        total_members: validation.data.expectedGuestCount || null,
+      }, { onConflict: 'celebration_enquiry_id' })
+      if (leadError) console.error('Lead creation failed', { enquiryId: result.enquiryId, code: leadError.code ?? 'unknown' })
+    } catch (error) {
+      console.error('Lead creation unexpectedly failed', { enquiryId: result.enquiryId, type: error instanceof Error ? error.name : 'UnknownError' })
+    }
+
     try {
       const { data } = await client.from('celebration_services').select('id, code, name, description, icon, display_order').in('id', validation.data.serviceIds)
       await sendBookingNotification({ enquiryId: result.enquiryId, enquiryReference: enquiry.enquiry_reference, enquiry: validation.data, services: (data ?? []) as PublicCelebrationService[] })

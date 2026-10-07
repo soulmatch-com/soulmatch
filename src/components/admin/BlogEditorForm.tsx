@@ -36,7 +36,7 @@ function TranslationSection({ locale, value, onChange, previewHref }: { locale: 
       <Field id={`${locale}-excerpt`} label={`${prefix} Excerpt`} value={value.excerpt} onChange={set('excerpt')} textarea />
       <Field id={`${locale}-seo-title`} label={`${prefix} SEO Title`} value={value.seoTitle} onChange={set('seoTitle')} count />
       <Field id={`${locale}-meta-description`} label={`${prefix} Meta Description`} value={value.metaDescription} onChange={set('metaDescription')} textarea count />
-      <Field id={`${locale}-content`} label={`${prefix} Content`} value={value.content} onChange={set('content')} textarea helper="Supports Markdown formatting. Save changes before previewing." />
+      <Field id={`${locale}-content`} label={`${prefix} Content`} value={value.content} onChange={set('content')} textarea helper="Supports headings, bullet lists, tables, links, emphasis, and fenced text blocks. Save changes before previewing." />
     </div>
   </section>
 }

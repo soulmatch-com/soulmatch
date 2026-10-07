@@ -67,7 +67,25 @@ export function MarkdownArticle({ content }: { content: string }) {
 
   for (let index = 0; index < lines.length; index += 1) {
     const line = lines[index]
-    if (lines[index + 1] && line.includes('|') && isTableDivider(lines[index + 1])) {
+    if (line.startsWith('```')) {
+      const code: string[] = []
+      const language = line.slice(3).trim()
+      let next = index + 1
+
+      while (next < lines.length && !lines[next].startsWith('```')) {
+        code.push(lines[next])
+        next += 1
+      }
+
+      if (next < lines.length) {
+        nodes.push(<pre key={index} className="overflow-x-auto rounded-lg border border-stone-200 bg-stone-950 p-4 text-sm leading-6 text-stone-100"><code data-language={language || undefined}>{code.join('\n')}</code></pre>)
+        index = next
+      } else {
+        nodes.push(<p key={index} className="leading-8 text-stone-700">{inline(line)}</p>)
+      }
+    } else if (/^\s{0,3}([-*_])(?:\s*\1){2,}\s*$/.test(line)) {
+      nodes.push(<hr key={index} className="border-0 border-t border-stone-200" />)
+    } else if (lines[index + 1] && line.includes('|') && isTableDivider(lines[index + 1])) {
       const table = renderTable(lines, index)
       nodes.push(table.node)
       index = table.next - 1

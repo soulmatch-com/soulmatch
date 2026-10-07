@@ -1,6 +1,7 @@
 import { Toaster } from 'sonner'
 import ConditionalHeader from '@/components/ConditionalHeader'
 import ConditionalFooter from '@/components/ConditionalFooter'
+import { WhatsAppFloatingButton } from '@/components/WhatsAppFloatingButton'
 import { AuthProvider } from '@/components/providers/AuthProvider'
 import { QueryProvider } from '@/components/providers/QueryProvider'
 
@@ -25,6 +26,7 @@ export function RootDocument({
             <ConditionalHeader />
             {children}
             <ConditionalFooter />
+            <WhatsAppFloatingButton />
             <Toaster position="top-center" richColors />
           </AuthProvider>
         </QueryProvider>

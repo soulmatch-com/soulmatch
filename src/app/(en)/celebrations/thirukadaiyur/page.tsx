@@ -192,14 +192,6 @@ export default async function ThirukadaiyurPage() {
           </div>
         </section>
 
-        <section className="border-t border-amber-200 bg-white py-16">
-          <div className="mx-auto max-w-6xl px-4 text-center sm:px-6">
-            <p className="text-sm font-bold uppercase tracking-[0.2em] text-blue-700">Matrimony</p>
-            <span className="mt-3 inline-flex rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-sm font-bold text-blue-800">Coming Soon</span>
-            <h2 className="mt-4 text-3xl font-bold">Matrimony services are being prepared</h2>
-          </div>
-        </section>
-
         <CelebrationCTA title="Ready to plan your celebration?" label="Plan Celebration" />
       </main>
       <CelebrationContactActions variant="mobile-sticky" />

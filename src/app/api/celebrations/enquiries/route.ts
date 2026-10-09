@@ -11,8 +11,13 @@ import { SupabaseSubscriberRepository } from '@/modules/notifications/subscriber
 import { SubscriberService } from '@/modules/notifications/subscribers/subscriber-service'
 
 const MAX_REQUEST_BYTES = 32 * 1024
+const idempotencyKeyPattern = /^[A-Za-z0-9][A-Za-z0-9._:-]{0,199}$/
 
 export async function POST(request: NextRequest) {
+  const suppliedIdempotencyKey = request.headers.get('idempotency-key')?.trim()
+  if (suppliedIdempotencyKey && !idempotencyKeyPattern.test(suppliedIdempotencyKey)) {
+    return NextResponse.json({ success: false, message: 'Invalid idempotency key' }, { status: 400 })
+  }
   const rateLimit = await checkCelebrationEnquiryRateLimit(request)
   if (!rateLimit.allowed) {
     if ('unavailable' in rateLimit) {
@@ -64,7 +69,7 @@ export async function POST(request: NextRequest) {
 
   try {
     const client = createAdminClient()
-    const result = await persistCelebrationEnquiry(client as unknown as CelebrationRpcClient, validation.data)
+    const result = await persistCelebrationEnquiry(client as unknown as CelebrationRpcClient, validation.data, suppliedIdempotencyKey)
     if (!result.success) {
       console.error('Celebration enquiry RPC failed', { code: result.errorCode ?? 'unknown' })
       return NextResponse.json({ success: false, message: 'Unable to submit the enquiry right now' }, { status: 500 })
@@ -78,27 +83,6 @@ export async function POST(request: NextRequest) {
     if (enquiryLookupError || !enquiry?.enquiry_reference) {
       console.error('Celebration enquiry reference lookup failed', { enquiryId: result.enquiryId, type: enquiryLookupError?.name ?? 'MissingReference' })
       return NextResponse.json({ success: false, message: 'Unable to submit the enquiry right now' }, { status: 500 })
-    }
-
-    // The enquiry remains successful even if the internal CRM is temporarily unavailable.
-    // Existing enquiries are also backfilled by the lead-management migration.
-    try {
-      const { error: leadError } = await client.from('leads').upsert({
-        celebration_enquiry_id: result.enquiryId,
-        source: 'website',
-        status: 'new',
-        contact_name: validation.data.contactName,
-        mobile: validation.data.mobile,
-        email: validation.data.email || null,
-        requirement_summary: validation.data.otherServiceDetails || validation.data.specialRequirements || validation.data.notes || null,
-        event_date: validation.data.preferredDate,
-        event_type: ['60th-marriage', '70th-marriage', '80th-marriage'].includes(validation.data.celebrationType) ? validation.data.celebrationType : null,
-        event_session: validation.data.ceremonyDuration || null,
-        total_members: validation.data.expectedGuestCount || null,
-      }, { onConflict: 'celebration_enquiry_id' })
-      if (leadError) console.error('Lead creation failed', { enquiryId: result.enquiryId, code: leadError.code ?? 'unknown' })
-    } catch (error) {
-      console.error('Lead creation unexpectedly failed', { enquiryId: result.enquiryId, type: error instanceof Error ? error.name : 'UnknownError' })
     }
 
     try {

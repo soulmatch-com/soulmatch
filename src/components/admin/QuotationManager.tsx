@@ -54,7 +54,7 @@ const money = new Intl.NumberFormat("en-IN", {
 const title = (value: string) =>
   value.replace(/\b\w/g, (letter) => letter.toUpperCase());
 
-export function QuotationManager({ quotationId }: { quotationId?: string }) {
+export function QuotationManager({ quotationId, initialLeadId, returnTo }: { quotationId?: string; initialLeadId?: string; returnTo?: string }) {
   const router = useRouter();
   const [services, setServices] = useState<Service[]>([]);
   const [quotations, setQuotations] = useState<Quotation[]>([]);
@@ -74,8 +74,8 @@ export function QuotationManager({ quotationId }: { quotationId?: string }) {
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
 
   useEffect(() => {
-    fetch("/api/admin/quotations")
-      .then(async (response) => {
+    Promise.all([fetch("/api/admin/quotations"), initialLeadId ? fetch(`/api/admin/leads/${initialLeadId}`) : Promise.resolve(null)])
+      .then(async ([response, leadResponse]) => {
         const data = await response.json();
         if (!response.ok)
           throw new Error(data.error || "Unable to load quotations.");
@@ -84,6 +84,14 @@ export function QuotationManager({ quotationId }: { quotationId?: string }) {
         setItems(data.items);
         setLeads(data.leads);
         setLinks(data.links);
+        if (leadResponse) {
+          const context = await leadResponse.json();
+          if (!leadResponse.ok || context.lead.status === "expired") throw new Error(context.error || "This lead is no longer available for quotations.");
+          setLeads((current) => current.some((lead) => lead.id === context.lead.id) ? current : [context.lead, ...current]);
+          setLeadIds([context.lead.id]);
+          const active = new Set(data.services.map((service: Service) => service.id));
+          setDraftItems((context.enquiryServices || []).filter((service: { service_id: string }) => active.has(service.service_id)).map((service: { service_id: string }) => ({ serviceId: service.service_id, quantity: "1", unitPrice: "" })));
+        }
         if (quotationId) {
           const quotation = data.quotations.find(
             (candidate: Quotation) => candidate.id === quotationId,
@@ -122,7 +130,7 @@ export function QuotationManager({ quotationId }: { quotationId?: string }) {
         ),
       )
       .finally(() => setLoading(false));
-  }, [quotationId]);
+  }, [quotationId, initialLeadId]);
 
   const total = useMemo(
     () =>
@@ -209,6 +217,7 @@ export function QuotationManager({ quotationId }: { quotationId?: string }) {
         router.push("/admin/quotations");
         return;
       }
+      if (returnTo) { router.push(returnTo); return; }
       setQuotations((current) => [data.quotation, ...current]);
       setItems((current) => [...current, ...data.items]);
       setLinks((current) => [...current, ...data.links]);

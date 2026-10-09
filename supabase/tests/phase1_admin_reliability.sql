@@ -41,6 +41,10 @@ BEGIN
     'Original special requirement', 'one_session', 'phase1-enquiry-key'
   ) INTO v_enquiry_id;
 
+  IF (SELECT status FROM public.celebration_enquiries WHERE id = v_enquiry_id) <> 'new' THEN
+    RAISE EXCEPTION 'New celebration enquiries must use the new status';
+  END IF;
+
   SELECT public.create_celebration_enquiry(
     'thirukadaiyur', 'not-sure', NULL, NULL, NULL, NULL, NULL, NULL, NULL,
     NULL, NULL, NULL, ARRAY[]::UUID[], NULL, NULL, NULL, NULL, NULL, NULL,

@@ -47,27 +47,23 @@ export async function POST(request: NextRequest) {
   if (!parsed.success) return NextResponse.json({ error: 'Please check the quotation details', details: parsed.error.flatten().fieldErrors }, { status: 400 })
   const supabase = createAdminClient()
   const [servicesResult, leadsResult] = await Promise.all([
-    supabase.from('celebration_services').select('id, code, name').eq('is_active', true).in('id', parsed.data.items.map((item) => item.serviceId)),
+    supabase.from('celebration_services').select('id').eq('is_active', true).in('id', parsed.data.items.map((item) => item.serviceId)),
     parsed.data.leadIds.length ? supabase.from('leads').select('id').neq('status', 'expired').in('id', parsed.data.leadIds) : Promise.resolve({ data: [], error: null }),
   ])
-  if (servicesResult.error || !servicesResult.data || servicesResult.data.length !== parsed.data.items.length) return NextResponse.json({ error: 'One or more selected services are no longer available' }, { status: 400 })
+  if (servicesResult.error || (servicesResult.data?.length ?? 0) !== parsed.data.items.length) return NextResponse.json({ error: 'One or more selected services are no longer available' }, { status: 400 })
   if (leadsResult.error || (leadsResult.data?.length ?? 0) !== parsed.data.leadIds.length) return NextResponse.json({ error: 'One or more selected leads could not be found' }, { status: 400 })
-  const servicesById = new Map(servicesResult.data.map((service) => [service.id, service]))
-  const items = parsed.data.items.map((item) => {
-    const service = servicesById.get(item.serviceId)!
-    const lineTotal = Number((item.quantity * item.unitPrice).toFixed(2))
-    return { celebration_service_id: service.id, service_code: service.code, service_name: service.name, quantity: item.quantity, unit_price: item.unitPrice, line_total: lineTotal }
+  const { data: quotationId, error: transactionError } = await supabase.rpc('create_admin_quotation', {
+    p_quotation_number: quotationNumber(), p_valid_until: parsed.data.validUntil ?? null,
+    p_notes: parsed.data.notes ?? null, p_created_by: authorization.admin.id,
+    p_items: parsed.data.items.map((item) => ({ service_id: item.serviceId, quantity: item.quantity, unit_price: item.unitPrice })),
+    p_lead_ids: parsed.data.leadIds,
   })
-  const totalAmount = Number(items.reduce((sum, item) => sum + item.line_total, 0).toFixed(2))
-  const { data: quotation, error: quotationError } = await supabase.from('quotations').insert({ quotation_number: quotationNumber(), valid_until: parsed.data.validUntil ?? null, notes: parsed.data.notes || null, total_amount: totalAmount, created_by: authorization.admin.id }).select('*').single()
-  if (quotationError || !quotation) return NextResponse.json({ error: 'Unable to create quotation' }, { status: 500 })
-  const [createdItemsResult, linksResult] = await Promise.all([
-    supabase.from('quotation_items').insert(items.map((item) => ({ ...item, quotation_id: quotation.id }))).select('*'),
-    parsed.data.leadIds.length ? supabase.from('quotation_leads').insert(parsed.data.leadIds.map((leadId) => ({ quotation_id: quotation.id, lead_id: leadId }))).select('*') : Promise.resolve({ data: [], error: null }),
+  if (transactionError || !quotationId) return NextResponse.json({ error: 'Unable to save quotation details' }, { status: 500 })
+  const [quotationResult, itemsResult, linksResult] = await Promise.all([
+    supabase.from('quotations').select('*').eq('id', quotationId).maybeSingle(),
+    supabase.from('quotation_items').select('*').eq('quotation_id', quotationId).order('created_at', { ascending: true }),
+    supabase.from('quotation_leads').select('*').eq('quotation_id', quotationId),
   ])
-  if (createdItemsResult.error || linksResult.error) {
-    await supabase.from('quotations').delete().eq('id', quotation.id)
-    return NextResponse.json({ error: 'Unable to save quotation details' }, { status: 500 })
-  }
-  return NextResponse.json({ quotation, items: createdItemsResult.data ?? [], links: linksResult.data ?? [] }, { status: 201 })
+  if (quotationResult.error || !quotationResult.data || itemsResult.error || linksResult.error) return NextResponse.json({ error: 'Unable to load saved quotation' }, { status: 500 })
+  return NextResponse.json({ quotation: quotationResult.data, items: itemsResult.data ?? [], links: linksResult.data ?? [] }, { status: 201 })
 }

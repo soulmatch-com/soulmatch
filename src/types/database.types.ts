@@ -732,7 +732,16 @@ export interface Database {
           p_plan_version?: number | null
           p_special_requirements?: string | null
           p_ceremony_duration?: string | null
+          p_idempotency_key?: string | null
         }
+        Returns: string
+      }
+      create_admin_quotation: {
+        Args: { p_quotation_number: string; p_valid_until: string | null; p_notes: string | null; p_created_by: string | null; p_items: Json; p_lead_ids?: string[] }
+        Returns: string
+      }
+      update_admin_quotation: {
+        Args: { p_quotation_id: string; p_status: string | null; p_set_valid_until: boolean; p_valid_until: string | null; p_set_notes: boolean; p_notes: string | null; p_replace_items: boolean; p_items: Json | null; p_replace_leads: boolean; p_lead_ids?: string[] }
         Returns: string
       }
       queue_notification_campaign: {

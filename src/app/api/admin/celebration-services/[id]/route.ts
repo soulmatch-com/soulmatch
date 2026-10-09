@@ -33,6 +33,7 @@ export async function DELETE(_request: NextRequest, { params }: { params: Promis
 
   const { id } = await params
   const { data, error } = await createAdminClient().from('celebration_services').delete().eq('id', id).select('id').maybeSingle()
+  if (error?.code === '23503') return NextResponse.json({ error: 'This service is referenced by historical enquiries or quotations. Deactivate it instead.' }, { status: 409 })
   if (error) return NextResponse.json({ error: 'Unable to delete celebration service' }, { status: 500 })
   if (!data) return NextResponse.json({ error: 'Celebration service not found' }, { status: 404 })
   return NextResponse.json({ message: 'Celebration service deleted successfully' })

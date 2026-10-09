@@ -12,7 +12,7 @@ export interface CelebrationRpcClient {
   ): PromiseLike<{ data: string | null; error: { code?: string } | null }>
 }
 
-export function toCelebrationRpcArgs(input: CelebrationEnquiryApiInput): RpcArgs {
+export function toCelebrationRpcArgs(input: CelebrationEnquiryApiInput, idempotencyKey?: string): RpcArgs {
   return {
     p_location: THIRUKADAIYUR_LOCATION,
     p_celebration_type: input.celebrationType,
@@ -42,11 +42,12 @@ export function toCelebrationRpcArgs(input: CelebrationEnquiryApiInput): RpcArgs
     p_plan_version: input.planVersion ?? null,
     p_special_requirements: input.specialRequirements ?? null,
     p_ceremony_duration: input.ceremonyDuration ?? null,
+    p_idempotency_key: idempotencyKey ?? null,
   }
 }
 
-export async function persistCelebrationEnquiry(client: CelebrationRpcClient, input: CelebrationEnquiryApiInput) {
-  const args = toCelebrationRpcArgs(input)
+export async function persistCelebrationEnquiry(client: CelebrationRpcClient, input: CelebrationEnquiryApiInput, idempotencyKey?: string) {
+  const args = toCelebrationRpcArgs(input, idempotencyKey)
   const { data, error } = await client.rpc('create_celebration_enquiry', args)
 
   if (error || !data) return { success: false as const, errorCode: error?.code }

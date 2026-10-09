@@ -43,6 +43,10 @@ test('RPC arguments force location and contain no status', () => {
   assert.equal(args.p_contact_name, 'Anand')
   assert.deepEqual(args.p_service_ids, [serviceId])
 })
+test('RPC arguments carry an optional idempotency key without changing the public payload', () => {
+  const args = toCelebrationRpcArgs(celebrationEnquiryApiSchema.parse(validPayload()), 'plan-submit-001')
+  assert.equal(args.p_idempotency_key, 'plan-submit-001')
+})
 test('RPC success returns only the created enquiry ID', async () => {
   const client = { rpc: async (name, args) => {
     assert.equal(name, 'create_celebration_enquiry')

@@ -31,7 +31,10 @@ export async function GET(_: NextRequest, { params }: { params: Promise<{ id: st
     supabase.from('lead_notes').select('*').eq('lead_id', id).order('created_at', { ascending: false }),
     lead.celebration_enquiry_id ? supabase.from('celebration_enquiries').select('*').eq('id', lead.celebration_enquiry_id).maybeSingle() : Promise.resolve({ data: null }),
   ])
-  return NextResponse.json({ lead, notes: notes ?? [], enquiry })
+  const { data: enquiryServices } = enquiry
+    ? await supabase.from('celebration_enquiry_services').select('service_id, celebration_services(id, code, name, description)').eq('enquiry_id', enquiry.id)
+    : { data: [] }
+  return NextResponse.json({ lead, notes: notes ?? [], enquiry, enquiryServices: enquiryServices ?? [] })
 }
 
 export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {

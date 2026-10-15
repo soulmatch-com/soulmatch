@@ -41,6 +41,10 @@ BEGIN
     'Original special requirement', 'one_session', 'phase1-enquiry-key'
   ) INTO v_enquiry_id;
 
+  IF (SELECT status FROM public.celebration_enquiries WHERE id = v_enquiry_id) <> 'new' THEN
+    RAISE EXCEPTION 'New celebration enquiries must use the new status';
+  END IF;
+
   SELECT public.create_celebration_enquiry(
     'thirukadaiyur', 'not-sure', NULL, NULL, NULL, NULL, NULL, NULL, NULL,
     NULL, NULL, NULL, ARRAY[]::UUID[], NULL, NULL, NULL, NULL, NULL, NULL,
@@ -90,7 +94,7 @@ BEGIN
   IF v_count <> 1 THEN RAISE EXCEPTION 'Quotation lead link was not committed'; END IF;
 
   PERFORM public.update_admin_quotation(
-    v_quotation_id, 'sent', FALSE, NULL, TRUE, 'Updated Phase 1 test', TRUE,
+    v_quotation_id, NULL, FALSE, NULL, TRUE, 'Updated Phase 1 test', TRUE,
     jsonb_build_array(jsonb_build_object('service_id', v_service_id, 'quantity', 3, 'unit_price', 150)),
     TRUE, ARRAY[v_lead_id]
   );

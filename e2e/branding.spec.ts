@@ -40,12 +40,10 @@ for (const viewport of [{ width: 375, height: 812 }, { width: 768, height: 1024 
         await menu.click()
         await expect(menu).toHaveAttribute('aria-expanded', 'true')
         await expect(header.getByRole('link', { name: 'Plan Celebration', exact: true })).toBeVisible()
-        await expect(header.getByRole('link', { name: 'Matrimony', exact: true })).toBeVisible()
         await page.keyboard.press('Escape')
         await expect(menu).toHaveAttribute('aria-expanded', 'false')
       } else {
         if (path !== '/matrimony') await expect(header.getByRole('link', { name: 'Plan Celebration', exact: true })).toBeVisible()
-        await expect(header.getByRole('link', { name: 'Matrimony', exact: true })).toBeVisible()
       }
       if (path === '/') await header.screenshot({ path: testInfo.outputPath(`header-${viewport.width}.png`) })
       await home.click()

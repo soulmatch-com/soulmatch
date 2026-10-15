@@ -1,0 +1,2 @@
+import{NextResponse}from'next/server';import{requireActiveAdmin}from'@/lib/admin-auth';import{createAdminClient}from'@/lib/supabase/admin'
+export async function GET(){const a=await requireActiveAdmin();if('response'in a)return a.response;const{data,error}=await createAdminClient().from('event_task_templates').select('*').eq('is_active',true).order('ceremony_type').order('title');if(error)return NextResponse.json({error:'Unable to load task templates'},{status:500});return NextResponse.json({templates:data??[]})}

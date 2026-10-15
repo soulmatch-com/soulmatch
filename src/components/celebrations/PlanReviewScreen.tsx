@@ -41,6 +41,7 @@ export function PlanReviewScreen({
   const [subscribeToUpdates, setSubscribeToUpdates] = useState(false)
   const [submitMessage, setSubmitMessage] = useState<string>()
   const submittingRef = useRef(false)
+  const idempotencyKeyRef = useRef<string | undefined>(undefined)
   const turnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY
   const challengeRequired = process.env.NODE_ENV === 'production' || Boolean(turnstileSiteKey)
   const handleBotToken = useCallback((token?: string) => setBotToken(token), [])
@@ -68,7 +69,8 @@ export function PlanReviewScreen({
     submittingRef.current = true
     setSubmitting(true)
     setSubmitMessage(undefined)
-    const result = await submitCelebrationEnquiry({ ...built.payload, subscribeToUpdates }, botToken)
+    idempotencyKeyRef.current ??= crypto.randomUUID()
+    const result = await submitCelebrationEnquiry({ ...built.payload, subscribeToUpdates }, botToken, fetch, idempotencyKeyRef.current)
     submittingRef.current = false
     setSubmitting(false)
     if (result.ok || result.kind !== 'rate-limited') {
@@ -76,6 +78,7 @@ export function PlanReviewScreen({
       setChallengeVersion((current) => current + 1)
     }
     if (result.ok) {
+      idempotencyKeyRef.current = undefined
       onSuccess(result.enquiryId, result.enquiryReference)
       return
     }

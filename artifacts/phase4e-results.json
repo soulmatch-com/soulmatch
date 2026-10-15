@@ -1,0 +1,1504 @@
+{
+  "config": {
+    "argv": [
+      "/opt/homebrew/Cellar/node/25.2.1/bin/node",
+      "/Users/thineshrc/Documents/soulmatch/node_modules/.bin/playwright",
+      "test",
+      "e2e/admin-auth.spec.ts",
+      "e2e/e2e-1-enquiry-lead.spec.ts",
+      "e2e/e2e-1-quotation-lifecycle-acceptance.spec.ts",
+      "e2e/e2e-1-booking-creation-acceptance.spec.ts",
+      "e2e/e2e-1-event-planning-acceptance.spec.ts",
+      "e2e/e2e-1-vendor-coordination-acceptance.spec.ts",
+      "e2e/e2e-1-customer-payments-acceptance.spec.ts",
+      "e2e/e2e-1-booking-completion-acceptance.spec.ts",
+      "e2e/e2e-1-cross-module-integrity-acceptance.spec.ts",
+      "e2e/e2e-1-booking-lifecycle-recovery-acceptance.spec.ts",
+      "--workers=1",
+      "--retries=0",
+      "--reporter=list,json,junit"
+    ],
+    "configFile": "/Users/thineshrc/Documents/soulmatch/playwright.config.ts",
+    "rootDir": "/Users/thineshrc/Documents/soulmatch/e2e",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/Users/thineshrc/Documents/soulmatch/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "",
+        "name": "",
+        "testDir": "/Users/thineshrc/Documents/soulmatch/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 45000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "list"
+      ],
+      [
+        "json"
+      ],
+      [
+        "junit"
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.63.0",
+    "workers": 1,
+    "webServer": {
+      "command": "npm run dev",
+      "url": "http://localhost:3000",
+      "reuseExistingServer": true,
+      "timeout": 120000
+    }
+  },
+  "suites": [
+    {
+      "title": "admin-auth.spec.ts",
+      "file": "admin-auth.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "normal admin login creates an HttpOnly session and protected APIs reject anonymous access",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 45000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1222,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-14T09:22:47.697Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "4030f0bfef91ae700c6b-4dd3b63f1606cdbde7cd",
+          "file": "admin-auth.spec.ts",
+          "line": 7,
+          "column": 5
+        },
+        {
+          "title": "inactive administrators cannot create an admin session",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 45000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 19,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-14T09:22:49.155Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "4030f0bfef91ae700c6b-e5b5f3ffd79cb47c594c",
+          "file": "admin-auth.spec.ts",
+          "line": 35,
+          "column": 5
+        }
+      ]
+    },
+    {
+      "title": "e2e-1-booking-completion-acceptance.spec.ts",
+      "file": "e2e-1-booking-completion-acceptance.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "Scenario H1 completes a booking through the authenticated direct-button lifecycle",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 4521,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-14T09:22:49.193Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "9d3e28e511815e152d7a-5b846a565a9d9761978b",
+          "file": "e2e-1-booking-completion-acceptance.spec.ts",
+          "line": 14,
+          "column": 5
+        }
+      ]
+    },
+    {
+      "title": "e2e-1-booking-creation-acceptance.spec.ts",
+      "file": "e2e-1-booking-creation-acceptance.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "Scenario D creates exactly one booking from an accepted quotation through the authenticated UI",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 5157,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-14T09:22:53.724Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "9aaed24a7ae218474030-0dd3bec4d44c5b7c9833",
+          "file": "e2e-1-booking-creation-acceptance.spec.ts",
+          "line": 28,
+          "column": 5
+        },
+        {
+          "title": "Scenario D hides booking creation for draft and sent quotations and rejects stale invalid creation",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 45000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 4895,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-14T09:22:58.887Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "9aaed24a7ae218474030-f3854c21a47f7cd96c61",
+          "file": "e2e-1-booking-creation-acceptance.spec.ts",
+          "line": 42,
+          "column": 5
+        },
+        {
+          "title": "Scenario D handles creation failures, conflicts, and loading without false success",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 45000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3072,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-14T09:23:03.788Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "9aaed24a7ae218474030-c0dbd592ab09496e3770",
+          "file": "e2e-1-booking-creation-acceptance.spec.ts",
+          "line": 47,
+          "column": 5
+        }
+      ]
+    },
+    {
+      "title": "e2e-1-booking-lifecycle-recovery-acceptance.spec.ts",
+      "file": "e2e-1-booking-lifecycle-recovery-acceptance.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "Scenario H3 recovers from lifecycle 400 validation",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 45000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 6614,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-14T09:23:06.871Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "4af9c85c8dd6d6ed191b-b37daff0e44c3732e20c",
+          "file": "e2e-1-booking-lifecycle-recovery-acceptance.spec.ts",
+          "line": 21,
+          "column": 7
+        },
+        {
+          "title": "Scenario H3 recovers from lifecycle 409 invalid transition",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 45000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 6677,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-14T09:23:13.491Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "4af9c85c8dd6d6ed191b-fb35b0663203f8b83989",
+          "file": "e2e-1-booking-lifecycle-recovery-acceptance.spec.ts",
+          "line": 21,
+          "column": 7
+        },
+        {
+          "title": "Scenario H3 recovers from lifecycle 500 server error",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 45000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 6627,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-14T09:23:20.173Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "4af9c85c8dd6d6ed191b-d2e32050d4338c147ece",
+          "file": "e2e-1-booking-lifecycle-recovery-acceptance.spec.ts",
+          "line": 21,
+          "column": 7
+        },
+        {
+          "title": "Scenario H3 recovers from an aborted lifecycle request without false success",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 45000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 5742,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-14T09:23:26.806Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "4af9c85c8dd6d6ed191b-b0274f4cb05b28537d80",
+          "file": "e2e-1-booking-lifecycle-recovery-acceptance.spec.ts",
+          "line": 27,
+          "column": 5
+        },
+        {
+          "title": "Scenario H3 prevents duplicate direct lifecycle submission while pending",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 45000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3979,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-14T09:23:32.553Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "4af9c85c8dd6d6ed191b-ce080e6009fa75bdb61d",
+          "file": "e2e-1-booking-lifecycle-recovery-acceptance.spec.ts",
+          "line": 32,
+          "column": 5
+        },
+        {
+          "title": "Scenario H3 enforces authorization, invalid actions, and direct-control accessibility",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 45000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 5857,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-14T09:23:36.537Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "4af9c85c8dd6d6ed191b-edfc32cd96f1602d1da3",
+          "file": "e2e-1-booking-lifecycle-recovery-acceptance.spec.ts",
+          "line": 37,
+          "column": 5
+        }
+      ]
+    },
+    {
+      "title": "e2e-1-cross-module-integrity-acceptance.spec.ts",
+      "file": "e2e-1-cross-module-integrity-acceptance.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "Scenario H2 preserves cross-module history and financial snapshots through authenticated completion",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 120000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 4986,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-14T09:23:42.407Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "9e2ffcede41261c5166e-2a4d0eec343c507fac60",
+          "file": "e2e-1-cross-module-integrity-acceptance.spec.ts",
+          "line": 79,
+          "column": 5
+        }
+      ]
+    },
+    {
+      "title": "e2e-1-customer-payments-acceptance.spec.ts",
+      "file": "e2e-1-customer-payments-acceptance.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "Scenario G records customer receipts in the authenticated UI and preserves financial snapshots",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 4374,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-14T09:23:47.408Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "2bd1811896054cd29781-ba64004be7cbd72987f4",
+          "file": "e2e-1-customer-payments-acceptance.spec.ts",
+          "line": 16,
+          "column": 5
+        },
+        {
+          "title": "Scenario G settles, corrects, authorizes and idempotently protects the append-only ledger",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3846,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-14T09:23:51.788Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "2bd1811896054cd29781-e3166f6c015093da7c9d",
+          "file": "e2e-1-customer-payments-acceptance.spec.ts",
+          "line": 18,
+          "column": 5
+        },
+        {
+          "title": "Scenario G refund and reversal dialogs validate, cancel, retain focus and append corrections",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 45000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 5266,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-14T09:23:55.640Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "2bd1811896054cd29781-eb0ef636bf1fb0c7e790",
+          "file": "e2e-1-customer-payments-acceptance.spec.ts",
+          "line": 20,
+          "column": 5
+        },
+        {
+          "title": "Scenario G payment HTTP 500 recovery",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 4407,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-14T09:24:00.912Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "2bd1811896054cd29781-0998f430152d5907355f",
+          "file": "e2e-1-customer-payments-acceptance.spec.ts",
+          "line": 22,
+          "column": 5
+        },
+        {
+          "title": "Scenario G refund HTTP 400 recovery retains the dialog and commits one real retry",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 4258,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-14T09:24:05.323Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "2bd1811896054cd29781-70bc9ea5729d7ec9f2d1",
+          "file": "e2e-1-customer-payments-acceptance.spec.ts",
+          "line": 63,
+          "column": 5
+        },
+        {
+          "title": "Scenario G refund HTTP 409 recovery refreshes financial state and commits one real retry",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 4167,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-14T09:24:09.586Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "2bd1811896054cd29781-a047fc34682bf8e8247a",
+          "file": "e2e-1-customer-payments-acceptance.spec.ts",
+          "line": 117,
+          "column": 5
+        },
+        {
+          "title": "Scenario G reversal HTTP 500 recovery retains the dialog and commits one real retry",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 4250,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-14T09:24:13.757Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "2bd1811896054cd29781-da5fb426701a1d07e31a",
+          "file": "e2e-1-customer-payments-acceptance.spec.ts",
+          "line": 174,
+          "column": 5
+        },
+        {
+          "title": "Scenario G reversal network-abort recovery retains the dialog and commits one real retry",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 4335,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-14T09:24:18.013Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "2bd1811896054cd29781-cc23b47545dcd42f30b6",
+          "file": "e2e-1-customer-payments-acceptance.spec.ts",
+          "line": 228,
+          "column": 5
+        },
+        {
+          "title": "Scenario G record payment prevents duplicate submission while the mutation is pending",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 4051,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-14T09:24:22.353Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "2bd1811896054cd29781-dd02f4f4845ba10a996d",
+          "file": "e2e-1-customer-payments-acceptance.spec.ts",
+          "line": 282,
+          "column": 5
+        },
+        {
+          "title": "Scenario G refund prevents duplicate submission while the mutation is pending",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 4184,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-14T09:24:26.409Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "2bd1811896054cd29781-80faa7e71b31b5eb1f69",
+          "file": "e2e-1-customer-payments-acceptance.spec.ts",
+          "line": 331,
+          "column": 5
+        },
+        {
+          "title": "Scenario G reversal prevents duplicate submission while the mutation is pending",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 4121,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-14T09:24:30.599Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "2bd1811896054cd29781-ceebd8f552a0629e5b25",
+          "file": "e2e-1-customer-payments-acceptance.spec.ts",
+          "line": 385,
+          "column": 5
+        }
+      ]
+    },
+    {
+      "title": "e2e-1-enquiry-lead.spec.ts",
+      "file": "e2e-1-enquiry-lead.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "E2E-1A public enquiry creates one linked CRM lead and renders its original details for an authenticated admin",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 10014,
+                  "errors": [],
+                  "stdout": [
+                    {
+                      "text": "[E2E-1A] fixture cleanup completed\n"
+                    }
+                  ],
+                  "stderr": [],
+                  "retry": 0,
+                  "steps": [
+                    {
+                      "title": "local Supabase identity verified",
+                      "duration": 855
+                    },
+                    {
+                      "title": "public enquiry page loaded and form completed",
+                      "duration": 1626
+                    },
+                    {
+                      "title": "enquiry submitted and success response received",
+                      "duration": 1424
+                    },
+                    {
+                      "title": "enquiry and one linked lead verified in database",
+                      "duration": 900
+                    },
+                    {
+                      "title": "administrator authenticated and lead detail opened",
+                      "duration": 719
+                    },
+                    {
+                      "title": "original enquiry details verified",
+                      "duration": 105
+                    },
+                    {
+                      "title": "lead creates a priced quotation and committed PDF",
+                      "duration": 1652
+                    },
+                    {
+                      "title": "draft quotation transitions through sent, manual delivery, and accepted",
+                      "duration": 1808
+                    }
+                  ],
+                  "startTime": "2026-10-14T09:24:34.728Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "fb6c5b1a9e43e3f6b93d-6523a1bdd1c0376af8fb",
+          "file": "e2e-1-enquiry-lead.spec.ts",
+          "line": 39,
+          "column": 5
+        }
+      ]
+    },
+    {
+      "title": "e2e-1-event-planning-acceptance.spec.ts",
+      "file": "e2e-1-event-planning-acceptance.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "Scenario E manages a generated checklist and booking task through the authenticated UI",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 5198,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-14T09:24:44.754Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "1bfb75855714f7398f7a-e690d0e9624744808884",
+          "file": "e2e-1-event-planning-acceptance.spec.ts",
+          "line": 257,
+          "column": 5
+        },
+        {
+          "title": "Scenario E applies booking task filters on the server using Asia/Kolkata business dates",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 5134,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-14T09:24:49.957Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "1bfb75855714f7398f7a-385697e869f46c4ecb23",
+          "file": "e2e-1-event-planning-acceptance.spec.ts",
+          "line": 377,
+          "column": 5
+        },
+        {
+          "title": "Scenario E recovers from edit failures and rejects a genuine stale browser edit",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 6041,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-14T09:24:55.099Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "1bfb75855714f7398f7a-d9b80df5c0d74ba6a8fe",
+          "file": "e2e-1-event-planning-acceptance.spec.ts",
+          "line": 516,
+          "column": 5
+        },
+        {
+          "title": "Scenario E enforces active assignment, booking-service ownership, and lifecycle eligibility",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 7795,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-14T09:25:01.147Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "1bfb75855714f7398f7a-45823c91e37755bae667",
+          "file": "e2e-1-event-planning-acceptance.spec.ts",
+          "line": 630,
+          "column": 5
+        },
+        {
+          "title": "Scenario E edit/create failures recover and loading prevents duplicate submission",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 5345,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-14T09:25:08.947Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "1bfb75855714f7398f7a-807c9c5517829f6d10c9",
+          "file": "e2e-1-event-planning-acceptance.spec.ts",
+          "line": 763,
+          "column": 5
+        }
+      ]
+    },
+    {
+      "title": "e2e-1-quotation-lifecycle-acceptance.spec.ts",
+      "file": "e2e-1-quotation-lifecycle-acceptance.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "E2E-1B handles a genuine stale lifecycle transition conflict and refreshes allowed actions",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 4037,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-14T09:25:14.302Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "2f9b1b9505fea5b04b57-433357b63cfc0c8b12f3",
+          "file": "e2e-1-quotation-lifecycle-acceptance.spec.ts",
+          "line": 46,
+          "column": 5
+        },
+        {
+          "title": "E2E-1C lifecycle dialog traps focus, dismisses safely, returns focus, and prevents duplicate submit",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3115,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-14T09:25:18.344Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "2f9b1b9505fea5b04b57-80e490636c6c5f007dc5",
+          "file": "e2e-1-quotation-lifecycle-acceptance.spec.ts",
+          "line": 57,
+          "column": 5
+        },
+        {
+          "title": "E2E-1D handles 400 validation error without false success and permits retry",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 45000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3275,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-14T09:25:21.464Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "2f9b1b9505fea5b04b57-2c263be8ad4321eb2f3a",
+          "file": "e2e-1-quotation-lifecycle-acceptance.spec.ts",
+          "line": 69,
+          "column": 7
+        },
+        {
+          "title": "E2E-1D handles 500 server error without false success and permits retry",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 45000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2978,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-14T09:25:24.743Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "2f9b1b9505fea5b04b57-dd7aef2f3b4b5f0dc678",
+          "file": "e2e-1-quotation-lifecycle-acceptance.spec.ts",
+          "line": 69,
+          "column": 7
+        },
+        {
+          "title": "E2E-1D handles an aborted lifecycle request without a stuck dialog",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 45000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2925,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-14T09:25:27.727Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "2f9b1b9505fea5b04b57-9a54d21bbfc8a410f6dc",
+          "file": "e2e-1-quotation-lifecycle-acceptance.spec.ts",
+          "line": 75,
+          "column": 5
+        },
+        {
+          "title": "E2E-1E derives expiry, rejects invalid renewal, reopens with a future date, and preserves snapshots",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 4041,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-14T09:25:30.657Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "2f9b1b9505fea5b04b57-3c5dafc5f54bb9181369",
+          "file": "e2e-1-quotation-lifecycle-acceptance.spec.ts",
+          "line": 80,
+          "column": 5
+        }
+      ]
+    },
+    {
+      "title": "e2e-1-vendor-coordination-acceptance.spec.ts",
+      "file": "e2e-1-vendor-coordination-acceptance.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "Scenario F browser: catalogue, assignment, audit lifecycle and financial isolation",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 6455,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-14T09:25:34.708Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "86d13025f9b987c05477-b799804091db26cbfbe9",
+          "file": "e2e-1-vendor-coordination-acceptance.spec.ts",
+          "line": 270,
+          "column": 5
+        },
+        {
+          "title": "Scenario F browser: stale edit, failures, ownership, and no duplicate writes",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 7957,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-14T09:25:41.168Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "86d13025f9b987c05477-abad19be2ed5b7057628",
+          "file": "e2e-1-vendor-coordination-acceptance.spec.ts",
+          "line": 423,
+          "column": 5
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-10-14T09:22:47.227Z",
+    "duration": 182045.145,
+    "expected": 38,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

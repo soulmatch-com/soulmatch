@@ -1,4 +1,8 @@
 import { defineConfig } from '@playwright/test'
+import { existsSync } from 'node:fs'
+
+const customExecutable = process.env.PLAYWRIGHT_BROWSER_EXECUTABLE
+if (customExecutable && !existsSync(customExecutable)) throw new Error(`PLAYWRIGHT_BROWSER_EXECUTABLE does not exist: ${customExecutable}`)
 
 export default defineConfig({
   testDir: './e2e',
@@ -12,9 +16,7 @@ export default defineConfig({
   use: {
     baseURL: 'http://localhost:3000',
     browserName: 'chromium',
-    launchOptions: {
-      executablePath: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
-    },
+    ...(customExecutable ? { launchOptions: { executablePath: customExecutable } } : {}),
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
   },

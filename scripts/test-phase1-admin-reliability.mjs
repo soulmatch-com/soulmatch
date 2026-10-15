@@ -14,6 +14,15 @@ test('enquiry RPC stores an idempotency key and creates the website lead in its 
   assert.match(migration, /WHEN unique_violation[\s\S]*idempotency_key/)
 })
 
+test('forward status repair keeps new as the enquiry default without narrowing legacy statuses', async () => {
+  const migration = await read('supabase/migrations/20261009120000_fix_celebration_enquiry_initial_status.sql')
+  assert.match(migration, /pg_get_constraintdef/)
+  assert.match(migration, /v_constraint_definition !~ '''new'''/)
+  assert.match(migration, /DROP CONSTRAINT celebration_enquiries_status_check/)
+  assert.match(migration, /CHECK \(\(%s\) OR \(status = %L\)\)/)
+  assert.match(migration, /ALTER COLUMN status SET DEFAULT 'new'/)
+})
+
 test('public route passes a validated idempotency key and no longer performs best-effort lead creation', async () => {
   const route = await read('src/app/api/celebrations/enquiries/route.ts')
   assert.match(route, /request\.headers\.get\('idempotency-key'\)/)

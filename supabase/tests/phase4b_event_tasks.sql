@@ -1,0 +1,15 @@
+BEGIN;
+DO $t$
+DECLARE s UUID;s2 UUID;l UUID;q UUID;b UUID;bs UUID;bs2 UUID;t UUID;c INTEGER;
+BEGIN
+ INSERT INTO public.celebration_services(code,name,location,is_active,display_order)VALUES('p4b'||substr(gen_random_uuid()::text,1,6),'Task service','thirukadaiyur',true,99995)RETURNING id INTO s; INSERT INTO public.celebration_services(code,name,location,is_active,display_order)VALUES('p4c'||substr(gen_random_uuid()::text,1,6),'Other task service','thirukadaiyur',true,99994)RETURNING id INTO s2;
+ INSERT INTO public.leads(source,contact_name)VALUES('other','Task lead')RETURNING id INTO l;
+ SELECT public.create_admin_quotation('P4B'||substr(gen_random_uuid()::text,1,6),CURRENT_DATE+1,NULL,NULL,jsonb_build_array(jsonb_build_object('service_id',s,'quantity',1,'unit_price',1),jsonb_build_object('service_id',s2,'quantity',1,'unit_price',1)),ARRAY[l]) INTO q; PERFORM public.transition_admin_quotation(q,'sent',NULL);PERFORM public.transition_admin_quotation(q,'accepted',NULL);SELECT public.create_admin_booking(q,NULL) INTO b;SELECT id INTO bs FROM public.celebration_booking_services WHERE booking_id=b ORDER BY created_at LIMIT 1; SELECT id INTO bs2 FROM public.celebration_booking_services WHERE booking_id=b AND id<>bs;
+ PERFORM public.transition_admin_booking(b,'confirmed',NULL,NULL); SELECT public.create_admin_event_task(b,bs,'Confirm catering',NULL,'food_catering',NULL,CURRENT_DATE+1,'high',NULL) INTO t;
+ PERFORM public.update_admin_event_task(t,'Updated catering','details','decoration',NULL,CURRENT_DATE+2,'urgent',bs2,1,NULL); IF NOT EXISTS(SELECT 1 FROM public.event_tasks WHERE id=t AND category='decoration' AND priority='urgent' AND booking_service_id=bs2 AND assigned_admin_id IS NULL) THEN RAISE EXCEPTION 'full task update failed'; END IF; PERFORM public.update_admin_event_task(t,'Updated catering','details','decoration',NULL,CURRENT_DATE+2,'urgent',NULL,2,NULL); IF (SELECT booking_service_id FROM public.event_tasks WHERE id=t) IS NOT NULL THEN RAISE EXCEPTION 'service clearing failed'; END IF;
+ BEGIN PERFORM public.create_admin_event_task(b,gen_random_uuid(),'bad',NULL,'food_catering',NULL,NULL,'high',NULL);RAISE EXCEPTION 'cross booking service accepted';EXCEPTION WHEN SQLSTATE '22023' THEN NULL;END;
+ PERFORM public.transition_admin_event_task(t,'in_progress',3,NULL);PERFORM public.transition_admin_event_task(t,'completed',4,NULL);PERFORM public.transition_admin_event_task(t,'pending',5,NULL);
+ IF (SELECT status FROM public.event_tasks WHERE id=t)<>'pending' THEN RAISE EXCEPTION 'task transition failed';END IF;SELECT count(*) INTO c FROM public.event_task_activities WHERE task_id=t;IF c<>6 THEN RAISE EXCEPTION 'audit rows missing';END IF;
+ SELECT public.generate_admin_booking_checklist(b,ARRAY(SELECT id FROM public.event_task_templates WHERE ceremony_type='all' LIMIT 1),NULL) INTO c;BEGIN PERFORM public.generate_admin_booking_checklist(b,ARRAY(SELECT id FROM public.event_task_templates WHERE ceremony_type='all' LIMIT 1),NULL);RAISE EXCEPTION 'duplicate checklist accepted';EXCEPTION WHEN SQLSTATE '22023' THEN NULL;END;
+END $t$;
+ROLLBACK;

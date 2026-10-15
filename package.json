@@ -4,6 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
+    "dev:local": "node scripts/dev-local-supabase.mjs",
+    "sync:local-supabase": "node scripts/sync-local-supabase-env.mjs",
     "build": "next build --webpack",
     "start": "next start",
     "lint": "eslint",

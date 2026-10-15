@@ -2,9 +2,12 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { comparePassword } from '@/lib/utils/password'
 import { adminSessionCookie, createAdminSession } from '@/lib/admin-session'
+import { checkRouteRateLimit } from '@/lib/rate-limit'
 
 export async function POST(request: NextRequest) {
   try {
+    const rateLimit = await checkRouteRateLimit(request, { keyPrefix: 'admin-login', capacity: 8, windowMs: 15 * 60 * 1000, saltEnvironmentVariable: 'ADMIN_LOGIN_RATE_LIMIT_SALT', unavailableMessage: 'Admin login rate limiter' })
+    if (!rateLimit.allowed) return NextResponse.json({ message: 'Too many login attempts' }, { status: 'unavailable' in rateLimit ? 503 : 429, headers: 'retryAfterSeconds' in rateLimit ? { 'Retry-After': String(rateLimit.retryAfterSeconds) } : undefined })
     const body = await request.json()
     const { email, password } = body
 
@@ -26,12 +29,7 @@ export async function POST(request: NextRequest) {
       .eq('email', email.toLowerCase())
       .single()
 
-    // Debug logging
-    console.log('Admin lookup error:', fetchError)
-    console.log('Admin found:', admin ? 'Yes' : 'No')
-
     if (fetchError || !admin) {
-      console.error('Login failed - Admin not found or error:', fetchError?.message)
       return NextResponse.json(
         {
           message: 'Invalid email or password',

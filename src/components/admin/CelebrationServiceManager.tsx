@@ -1,7 +1,7 @@
 'use client'
 
 import { FormEvent, useCallback, useEffect, useState } from 'react'
-import { Pencil, Plus, Power } from 'lucide-react'
+import { Copy, Pencil, Plus, Power } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
@@ -14,6 +14,7 @@ type Pagination = { page: number; limit: number; total: number; totalPages: numb
 const emptyNewService: NewServiceDraft = { code: '', name: '', description: '', icon: '', location: 'thirukadaiyur', displayOrder: '0', isActive: true }
 const draftOf = (service: Service): ServiceDraft => ({ name: service.name, description: service.description || '', icon: service.icon || '', location: service.location, displayOrder: String(service.display_order), isActive: service.is_active })
 const sortServices = (services: Service[]) => [...services].sort((a, b) => a.display_order - b.display_order || a.name.localeCompare(b.name))
+const iconActionTooltip = 'relative after:pointer-events-none after:absolute after:right-0 after:top-full after:z-20 after:mt-2 after:hidden after:whitespace-nowrap after:rounded after:bg-slate-900 after:px-2 after:py-1 after:text-xs after:font-medium after:text-white after:shadow-md after:content-[attr(data-tooltip)] hover:after:block focus-visible:after:block'
 
 type ServiceFormProps = { draft: NewServiceDraft | ServiceDraft; onChange: (field: string, value: string | boolean) => void; includeCode?: boolean }
 
@@ -79,6 +80,15 @@ export function CelebrationServiceManager() {
   function clearFilters() { setSearch(''); setLocation(''); setStatus('all'); setPage(1) }
 
   function openCreate() { setError(''); setNewService(emptyNewService); setIsCreateOpen(true) }
+  function openCopy(service: Service) {
+    setError('')
+    setNewService({
+      ...draftOf(service),
+      code: `${service.code}_copy`,
+      name: `${service.name} (Copy)`,
+    })
+    setIsCreateOpen(true)
+  }
   function openEdit(service: Service) { setError(''); setEditingService(service); setEditDraft(draftOf(service)) }
   function closeEdit() { if (!saving) { setEditingService(null); setEditDraft(null) } }
 
@@ -123,7 +133,7 @@ export function CelebrationServiceManager() {
       <div className="flex items-end"><Button type="button" variant="outline" onClick={clearFilters} disabled={!search && !location && status === 'all'}>Clear filters</Button></div>
     </div>
     <div className="mt-6 overflow-x-auto"><table className="w-full min-w-[780px] text-left text-sm"><thead className="border-b text-xs uppercase tracking-wide text-slate-500"><tr><th className="p-3">Service</th><th className="p-3">Description</th><th className="p-3">Location</th><th className="p-3">Order</th><th className="p-3">Status</th><th className="p-3 text-right">Actions</th></tr></thead><tbody className="divide-y">
-      {services.map((service) => <tr key={service.id}><td className="p-3"><p className="font-medium text-slate-900">{service.name}</p><p className="mt-1 font-mono text-xs text-slate-500">{service.code}</p></td><td className="max-w-sm p-3 text-slate-600">{service.description || <span className="text-slate-400">No description</span>}</td><td className="p-3 text-slate-700">{service.location}</td><td className="p-3 text-slate-700">{service.display_order}</td><td className="p-3"><span className={`rounded-full px-2.5 py-1 text-xs font-medium ${service.is_active ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-600'}`}>{service.is_active ? 'Active' : 'Inactive'}</span></td><td className="p-3 text-right"><div className="flex justify-end gap-2"><Button type="button" size="icon" variant="outline" aria-label={`Edit ${service.name}`} title="Edit" onClick={() => openEdit(service)}><Pencil className="h-3.5 w-3.5" /></Button><Button type="button" size="sm" variant="outline" aria-label={`${service.is_active ? 'Deactivate' : 'Activate'} ${service.name}`} onClick={() => { setError(''); setTogglingService(service) }}><Power className="mr-1 h-3.5 w-3.5" />{service.is_active ? 'Deactivate' : 'Activate'}</Button></div></td></tr>)}
+      {services.map((service) => <tr key={service.id}><td className="p-3"><p className="font-medium text-slate-900">{service.name}</p><p className="mt-1 font-mono text-xs text-slate-500">{service.code}</p></td><td className="max-w-sm p-3 text-slate-600">{service.description || <span className="text-slate-400">No description</span>}</td><td className="p-3 text-slate-700">{service.location}</td><td className="p-3 text-slate-700">{service.display_order}</td><td className="p-3"><span className={`rounded-full px-2.5 py-1 text-xs font-medium ${service.is_active ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-600'}`}>{service.is_active ? 'Active' : 'Inactive'}</span></td><td className="p-3 text-right"><div className="flex justify-end gap-2"><Button type="button" size="icon" variant="outline" aria-label={`Copy ${service.name}`} data-tooltip="Copy service" className={iconActionTooltip} onClick={() => openCopy(service)}><Copy className="h-3.5 w-3.5" /></Button><Button type="button" size="icon" variant="outline" aria-label={`Edit ${service.name}`} data-tooltip="Edit service" className={iconActionTooltip} onClick={() => openEdit(service)}><Pencil className="h-3.5 w-3.5" /></Button><Button type="button" size="sm" variant="outline" aria-label={`${service.is_active ? 'Deactivate' : 'Activate'} ${service.name}`} onClick={() => { setError(''); setTogglingService(service) }}><Power className="mr-1 h-3.5 w-3.5" />{service.is_active ? 'Deactivate' : 'Activate'}</Button></div></td></tr>)}
       {!loading && services.length === 0 && <tr><td colSpan={6} className="p-8 text-center text-slate-500">No celebration services have been added. Create one to get started.</td></tr>}{loading && <tr><td colSpan={6} className="p-8 text-center text-slate-500">Loading services…</td></tr>}
     </tbody></table></div>
     {!loading && pagination.total > 0 && <div className="mt-4 flex flex-wrap items-center justify-between gap-3 text-sm text-slate-600"><p>Showing {(pagination.page - 1) * pagination.limit + 1}–{Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total} services</p><div className="flex items-center gap-2"><Button type="button" size="sm" variant="outline" disabled={pagination.page <= 1} onClick={() => setPage((current) => current - 1)}>Previous</Button><span aria-live="polite">Page {pagination.page} of {pagination.totalPages}</span><Button type="button" size="sm" variant="outline" disabled={pagination.page >= pagination.totalPages} onClick={() => setPage((current) => current + 1)}>Next</Button></div></div>}

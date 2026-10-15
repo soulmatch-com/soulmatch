@@ -14,7 +14,9 @@ type RouteRateLimitConfig = {
 }
 
 export function getClientNetworkIdentifier(request: NextRequest) {
-  const forwarded = request.headers.get('x-vercel-forwarded-for') ?? request.headers.get('x-forwarded-for')
+  // Vercel strips/replaces this header at its trusted edge. Other deployments
+  // must not treat client-controlled forwarding headers as an identity source.
+  const forwarded = process.env.VERCEL === '1' ? request.headers.get('x-vercel-forwarded-for') : null
   return forwarded?.split(',')[0]?.trim() || 'unknown-network'
 }
 

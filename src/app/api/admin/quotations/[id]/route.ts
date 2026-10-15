@@ -3,15 +3,13 @@ import { z } from 'zod'
 import { requireActiveAdmin } from '@/lib/admin-auth'
 import { createAdminClient } from '@/lib/supabase/admin'
 
-const statuses = ['draft', 'sent', 'accepted', 'rejected', 'expired'] as const
 const itemSchema = z.object({ serviceId: z.string().uuid(), quantity: z.number().int().min(1).max(10000), unitPrice: z.number().finite().min(0).max(99_999_999) })
 const updateSchema = z.object({
-  status: z.enum(statuses).optional(),
   leadIds: z.array(z.string().uuid()).max(50).optional(),
   validUntil: z.string().date().nullable().optional(),
   notes: z.string().trim().max(2000).nullable().optional(),
   items: z.array(itemSchema).min(1).max(100).optional(),
-}).refine((value) => value.status !== undefined || value.leadIds !== undefined || value.validUntil !== undefined || value.notes !== undefined || value.items !== undefined, 'No update provided')
+}).refine((value) => value.leadIds !== undefined || value.validUntil !== undefined || value.notes !== undefined || value.items !== undefined, 'No update provided')
 
 export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const authorization = await requireActiveAdmin()
@@ -20,7 +18,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
   let body: unknown
   try { body = await request.json() } catch { return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 }) }
   const parsed = updateSchema.safeParse(body)
-  if (!parsed.success) return NextResponse.json({ error: 'Please check the quotation update' }, { status: 400 })
+  if (!parsed.success) return NextResponse.json({ error: 'Please check the quotation update. Status changes use lifecycle actions.' }, { status: 400 })
   const supabase = createAdminClient()
   const { data: existingQuotation, error: existingQuotationError } = await supabase.from('quotations').select('*').eq('id', id).maybeSingle()
   if (existingQuotationError) return NextResponse.json({ error: 'Unable to load quotation' }, { status: 500 })
@@ -36,7 +34,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     if (servicesError || (services?.length ?? 0) !== parsed.data.items.length) return NextResponse.json({ error: 'One or more selected services could not be found' }, { status: 400 })
   }
   const { error: transactionError } = await supabase.rpc('update_admin_quotation', {
-    p_quotation_id: id, p_status: parsed.data.status ?? null,
+    p_quotation_id: id, p_status: null,
     p_set_valid_until: parsed.data.validUntil !== undefined, p_valid_until: parsed.data.validUntil ?? null,
     p_set_notes: parsed.data.notes !== undefined, p_notes: parsed.data.notes ?? null,
     p_replace_items: parsed.data.items !== undefined,

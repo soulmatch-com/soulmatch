@@ -1,13 +1,15 @@
 "use client";
 
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { History } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { QuotationBookingAction } from "@/components/admin/QuotationBookingAction";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -21,7 +23,7 @@ type Service = {
 type Quotation = {
   id: string;
   quotation_number: string;
-  status: "draft" | "sent" | "accepted" | "rejected" | "expired";
+  status: "draft" | "sent" | "accepted" | "rejected" | "expired" | "cancelled";
   valid_until: string | null;
   notes: string | null;
   total_amount: number;
@@ -45,7 +47,7 @@ type Lead = {
 };
 type QuotationLead = { quotation_id: string; lead_id: string };
 
-const statuses = ["draft", "sent", "accepted", "rejected", "expired"] as const;
+const statuses = ["draft", "sent", "accepted", "rejected", "expired", "cancelled"] as const;
 const money = new Intl.NumberFormat("en-IN", {
   style: "currency",
   currency: "INR",
@@ -237,10 +239,10 @@ export function QuotationManager({ quotationId, initialLeadId, returnTo }: { quo
     setSaving(true);
     setError("");
     try {
-      const response = await fetch(`/api/admin/quotations/${quotationId}`, {
+      const response = await fetch(`/api/admin/quotations/${quotationId}/lifecycle`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status }),
+        body: JSON.stringify({ toStatus: status }),
       });
       const data = await response.json();
       if (!response.ok)
@@ -518,6 +520,7 @@ export function QuotationManager({ quotationId, initialLeadId, returnTo }: { quo
           </Button>
         </div>
       </form>
+      {quotationId && <><QuotationBookingAction quotationId={quotationId} status={quotations.find((candidate) => candidate.id === quotationId)?.status || ''} /><QuotationLifecycle quotationId={quotationId} quotation={quotations.find((candidate) => candidate.id === quotationId) || null} /></>}
       <div className="mt-6 flex items-center justify-between border-t pt-5">
         <div>
           <h3 className="text-sm font-semibold text-slate-800">
@@ -635,4 +638,23 @@ export function QuotationManager({ quotationId, initialLeadId, returnTo }: { quo
       </Dialog>
     </section>
   );
+}
+
+function QuotationLifecycle({ quotationId, quotation }: { quotationId: string; quotation: Quotation | null }) {
+  const [activity, setActivity] = useState<Array<{ id: string; event_type: string; previous_status: string | null; new_status: string | null; created_at: string }>>([])
+  const [deliveries, setDeliveries] = useState<Array<{ id: string; recipient_name: string; recipient_contact: string; channel: string; delivered_at: string }>>([])
+  const [error, setError] = useState(''); const [saving, setSaving] = useState(false); const [action, setAction] = useState<string | null>(null); const [validUntil, setValidUntil] = useState(''); const [recipientName, setRecipientName] = useState(''); const [recipientContact, setRecipientContact] = useState(''); const [channel, setChannel] = useState('manual')
+  const [actions, setActions] = useState<string[]>([]); const [effectiveStatus, setEffectiveStatus] = useState('')
+  const triggerRef = useRef<HTMLButtonElement | null>(null)
+  const closeDialog = () => { setAction(null); queueMicrotask(() => triggerRef.current?.focus()) }
+  const load = () => fetch(`/api/admin/quotations/${quotationId}/lifecycle`).then(async (response) => { const data = await response.json(); if (!response.ok) throw new Error(data.error); setActivity(data.activity); setDeliveries(data.deliveries); setActions(data.allowedActions || []); setEffectiveStatus(data.effectiveStatus || data.quotation.status) }).catch(() => setError('Quotation activity could not be loaded.'))
+  useEffect(() => { void load() }, [quotationId])
+  async function submit() { if (!action) return; if (action === 'delivery' && (!recipientName || !recipientContact)) return setError('Recipient name and contact are required.'); if (action === 'draft' && !validUntil) return setError('A renewed validity date is required.'); setSaving(true); setError(''); try { const response = await fetch(action === 'delivery' ? `/api/admin/quotations/${quotationId}/deliveries` : `/api/admin/quotations/${quotationId}/lifecycle`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(action === 'delivery' ? { recipientName, recipientContact, channel, notes: null } : { toStatus: action, reopenValidUntil: action === 'draft' ? validUntil : null }) }); const data = await response.json().catch(() => ({})); if (!response.ok) { if (response.status === 409) await load(); throw new Error(data.error || `Unable to save lifecycle action (${response.status}).`) }; setAction(null); await load() } catch (err) { setError(err instanceof Error ? err.message : 'Unable to save lifecycle action.') } finally { setSaving(false) } }
+  if (!quotation) return null
+  const actionLabel = (status: string) => {
+    if (status === 'draft' && effectiveStatus === 'expired') return 'Reopen'
+    if (status === 'accepted') return 'Approve'
+    return title(status)
+  }
+  return <section className="mt-6 border-t pt-5"><h3 className="text-sm font-semibold text-slate-800">Lifecycle</h3><p className="mt-1 text-sm text-slate-600">Status: <strong>{title(effectiveStatus || quotation.status)}</strong></p>{error && <p role="alert" className="mt-3 text-sm text-rose-700">{error}</p>}<div className="mt-3 flex flex-wrap gap-2">{actions.map(status => <Button key={status} ref={status === 'sent' || status === 'draft' ? triggerRef : undefined} type="button" size="sm" variant="outline" disabled={saving} onClick={(event) => { triggerRef.current = event.currentTarget; setAction(status) }}>{actionLabel(status)}</Button>)}<Button type="button" size="sm" variant="outline" disabled={saving} onClick={(event) => { triggerRef.current = event.currentTarget; setAction('delivery') }}>Record manual delivery</Button></div><div className="mt-4 space-y-2 text-sm text-slate-600">{activity.map((event) => <p key={event.id}>{new Date(event.created_at).toLocaleString()} — {title(event.event_type.replace('_', ' '))}</p>)}{deliveries.map((delivery) => <p key={delivery.id}>Manually recorded delivery to {delivery.recipient_name} ({delivery.recipient_contact})</p>)}</div><Dialog open={!!action} onOpenChange={(open) => !saving && !open && closeDialog()}><DialogContent><DialogHeader><DialogTitle>{action === 'delivery' ? 'Record manual delivery' : `${actionLabel(action || '')} ${quotation.quotation_number}`}</DialogTitle><DialogDescription>{action === 'delivery' ? 'This records a manual handoff; it does not send a message.' : 'Confirm this lifecycle change.'}</DialogDescription></DialogHeader>{error && <p role="alert" className="text-sm text-rose-700">{error}</p>}{action === 'draft' && <label className="text-sm text-slate-700">Renewed validity date<input aria-label="Renewed validity date" type="date" value={validUntil} onChange={e => setValidUntil(e.target.value)} className="mt-1 h-9 w-full rounded border px-2" /></label>}{action === 'delivery' && <div className="space-y-2"><input placeholder="Recipient name" value={recipientName} onChange={e=>setRecipientName(e.target.value)} className="h-9 w-full rounded border px-2"/><input placeholder="Recipient contact" value={recipientContact} onChange={e=>setRecipientContact(e.target.value)} className="h-9 w-full rounded border px-2"/><select value={channel} onChange={e=>setChannel(e.target.value)} className="h-9 rounded border px-2"><option value="manual">Manual</option><option value="email">Email</option><option value="whatsapp">WhatsApp</option></select></div>}<DialogFooter><Button variant="outline" disabled={saving} onClick={closeDialog}>Cancel</Button><Button disabled={saving} onClick={()=>void submit()}>{saving ? 'Saving…' : 'Confirm'}</Button></DialogFooter></DialogContent></Dialog></section>
 }

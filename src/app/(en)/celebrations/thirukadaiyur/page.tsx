@@ -10,6 +10,7 @@ import { IndependentServiceNotice } from '@/components/celebrations/IndependentS
 import { CelebrationContactActions } from '@/components/celebrations/CelebrationContactActions'
 import { GalleryGrid } from '@/components/celebrations/GalleryGrid'
 import { loadCelebrationServices } from '@/lib/celebrations/page-data'
+export const dynamic = 'force-dynamic'
 import { homepageGalleryPreviewItems } from '@/lib/celebrations/gallery'
 
 const url = 'https://mythirumanam.in/'

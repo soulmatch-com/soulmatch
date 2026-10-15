@@ -174,7 +174,9 @@ test('V2 submits through the existing API, Turnstile and rate-limit path', async
     read('src/lib/celebrations/client-submission.ts'),
     read('src/app/api/celebrations/enquiries/route.ts'),
   ])
-  assert.match(review, /submitCelebrationEnquiry\(built\.payload, botToken\)/)
+  assert.match(review, /idempotencyKeyRef\.current \?\?= crypto\.randomUUID\(\)/)
+  assert.match(review, /submitCelebrationEnquiry\(\{ \.\.\.built\.payload, subscribeToUpdates \}, botToken, fetch, idempotencyKeyRef\.current\)/)
+  assert.match(client, /Idempotency-Key/)
   assert.match(review, /TurnstileChallenge/)
   assert.match(client, /\/api\/celebrations\/enquiries/)
   assert.match(route, /checkCelebrationEnquiryRateLimit/)

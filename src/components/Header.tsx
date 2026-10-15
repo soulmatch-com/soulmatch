@@ -74,7 +74,7 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-50 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 shadow-sm">
-      <nav className="container mx-auto px-4 py-3">
+      <nav className="container mx-auto px-4 py-0">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           {/* Left Section: Logo */}
           <Link href="/" className="flex shrink-0 items-center rounded-md transition-opacity hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-700">
@@ -83,9 +83,9 @@ export default function Header() {
               alt="MyThirumanam"
               width={1690}
               height={859}
-              sizes="(min-width: 1024px) 220px, (min-width: 640px) 216px, 210px"
+              sizes="(min-width: 1024px) 216px, (min-width: 640px) 214px, 210px"
               priority
-              className="h-auto w-[210px] sm:w-[216px] lg:w-[220px]"
+              className="h-auto w-[210px] sm:w-[214px] lg:w-[216px]"
             />
           </Link>
 

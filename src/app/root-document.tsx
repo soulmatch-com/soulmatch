@@ -14,9 +14,7 @@ export function RootDocument({
 }>) {
   return (
     <html lang={language}>
-      <head>
-        <link rel="icon" href="/icon.png" type="image/png" />
-      </head>
+      <head />
       <body
         className="antialiased"
         suppressHydrationWarning

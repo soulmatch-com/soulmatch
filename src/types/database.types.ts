@@ -344,6 +344,7 @@ export interface Database {
           event_date: string | null
           event_type: '60th-marriage' | '70th-marriage' | '80th-marriage' | null
           event_session: 'one_session' | 'two_sessions' | null
+          package_type: 'basic' | 'premium' | null
           total_members: number | null
           assigned_admin_id: string | null
           next_follow_up_at: string | null
@@ -363,6 +364,7 @@ export interface Database {
           event_date?: string | null
           event_type?: '60th-marriage' | '70th-marriage' | '80th-marriage' | null
           event_session?: 'one_session' | 'two_sessions' | null
+          package_type?: 'basic' | 'premium' | null
           total_members?: number | null
           assigned_admin_id?: string | null
           next_follow_up_at?: string | null
@@ -382,6 +384,7 @@ export interface Database {
           event_date?: string | null
           event_type?: '60th-marriage' | '70th-marriage' | '80th-marriage' | null
           event_session?: 'one_session' | 'two_sessions' | null
+          package_type?: 'basic' | 'premium' | null
           total_members?: number | null
           assigned_admin_id?: string | null
           next_follow_up_at?: string | null
@@ -396,9 +399,9 @@ export interface Database {
         Update: { id?: string; lead_id?: string; admin_id?: string | null; body?: string; created_at?: string }
       }
       quotations: {
-        Row: { id: string; quotation_number: string; status: 'draft' | 'sent' | 'accepted' | 'rejected' | 'expired'; currency: 'INR'; valid_until: string | null; notes: string | null; total_amount: number; created_by: string | null; created_at: string; updated_at: string }
-        Insert: { id?: string; quotation_number: string; status?: 'draft' | 'sent' | 'accepted' | 'rejected' | 'expired'; currency?: 'INR'; valid_until?: string | null; notes?: string | null; total_amount?: number; created_by?: string | null; created_at?: string; updated_at?: string }
-        Update: { id?: string; quotation_number?: string; status?: 'draft' | 'sent' | 'accepted' | 'rejected' | 'expired'; currency?: 'INR'; valid_until?: string | null; notes?: string | null; total_amount?: number; created_by?: string | null; created_at?: string; updated_at?: string }
+        Row: { id: string; quotation_number: string; status: 'draft' | 'sent' | 'accepted' | 'rejected' | 'expired' | 'cancelled'; currency: 'INR'; valid_until: string | null; notes: string | null; total_amount: number; created_by: string | null; created_at: string; updated_at: string; status_changed_at: string }
+        Insert: { id?: string; quotation_number: string; status?: 'draft' | 'sent' | 'accepted' | 'rejected' | 'expired' | 'cancelled'; currency?: 'INR'; valid_until?: string | null; notes?: string | null; total_amount?: number; created_by?: string | null; created_at?: string; updated_at?: string; status_changed_at?: string }
+        Update: { id?: string; quotation_number?: string; status?: 'draft' | 'sent' | 'accepted' | 'rejected' | 'expired' | 'cancelled'; currency?: 'INR'; valid_until?: string | null; notes?: string | null; total_amount?: number; created_by?: string | null; created_at?: string; updated_at?: string; status_changed_at?: string }
       }
       quotation_items: {
         Row: { id: string; quotation_id: string; celebration_service_id: string; service_code: string; service_name: string; quantity: number; unit_price: number; line_total: number; created_at: string }
@@ -744,6 +747,8 @@ export interface Database {
         Args: { p_quotation_id: string; p_status: string | null; p_set_valid_until: boolean; p_valid_until: string | null; p_set_notes: boolean; p_notes: string | null; p_replace_items: boolean; p_items: Json | null; p_replace_leads: boolean; p_lead_ids?: string[] }
         Returns: string
       }
+      transition_admin_quotation: { Args: { p_quotation_id: string; p_to_status: string; p_admin_id: string; p_reopen_valid_until?: string | null }; Returns: string }
+      record_admin_quotation_delivery: { Args: { p_quotation_id: string; p_recipient_name: string; p_recipient_contact: string; p_channel: string; p_notes: string | null; p_admin_id: string }; Returns: string }
       queue_notification_campaign: {
         Args: { p_campaign_id: string; p_queued_by?: string | null }
         Returns: { status: string; campaign_id: string; recipient_count: number }[]

@@ -1,7 +1,21 @@
 import { NextResponse, type NextRequest } from 'next/server'
-import { updateSession } from './src/lib/supabase/middleware'
+import { updateSession } from './lib/supabase/middleware'
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
+  if (request.nextUrl.pathname.startsWith('/api/admin/')) {
+    if (!['GET', 'HEAD', 'OPTIONS'].includes(request.method)) {
+      const origin = request.headers.get('origin')
+      const configuredOrigin = process.env.NEXT_PUBLIC_APP_URL
+      // Browser cookie mutations must carry an Origin. Non-browser automation
+      // can opt in only outside production; production fails closed.
+      if (process.env.NODE_ENV === 'production' && (!configuredOrigin || !origin || origin !== configuredOrigin)) return NextResponse.json({ error: 'Cross-origin request rejected' }, { status: 403, headers: { 'Cache-Control': 'no-store' } })
+      if (origin && configuredOrigin && origin !== configuredOrigin) return NextResponse.json({ error: 'Cross-origin request rejected' }, { status: 403, headers: { 'Cache-Control': 'no-store' } })
+    }
+    // `NextResponse.next().headers.set()` only affects the middleware
+    // continuation in this runtime. Pass the response header explicitly so it
+    // is retained on the API response returned by the route handler.
+    return NextResponse.next({ headers: { 'Cache-Control': 'no-store' } })
+  }
   // Public pages do not require a user lookup.  Avoiding the Supabase Auth
   // round trip here keeps these crawlable pages eligible for a fast response.
   if (isPublicRequest(request.nextUrl.pathname)) {

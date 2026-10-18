@@ -7,6 +7,7 @@ import { CeremonyGrid } from '@/components/celebrations/CeremonyGrid'
 import { PlanningSteps } from '@/components/celebrations/PlanningSteps'
 import { JsonLd } from '@/components/seo/JsonLd'
 import { loadCelebrationServices } from '@/lib/celebrations/page-data'
+export const dynamic = 'force-dynamic'
 import { IndependentServiceNotice } from '@/components/celebrations/IndependentServiceNotice'
 
 const url = 'https://mythirumanam.in/about'

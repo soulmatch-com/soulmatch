@@ -6,12 +6,13 @@ export type EnquirySubmissionResult =
   | { ok: false; kind: 'validation'; errors: Record<string, string[]> }
   | { ok: false; kind: 'too-large' | 'rate-limited' | 'challenge' | 'verification-unavailable' | 'server' | 'network' | 'invalid-response' }
 
-export async function submitCelebrationEnquiry(values: CelebrationEnquiryApiInput, botTokenOrRequest?: string | typeof fetch, request: typeof fetch = fetch): Promise<EnquirySubmissionResult> {
+export async function submitCelebrationEnquiry(values: CelebrationEnquiryApiInput, botTokenOrRequest?: string | typeof fetch, request: typeof fetch = fetch, idempotencyKey?: string): Promise<EnquirySubmissionResult> {
   try {
     const botToken = typeof botTokenOrRequest === 'string' ? botTokenOrRequest : undefined
     if (typeof botTokenOrRequest === 'function') request = botTokenOrRequest
     const headers: Record<string, string> = { 'Content-Type': 'application/json' }
     if (botToken) headers['X-Celebration-Bot-Token'] = botToken
+    if (idempotencyKey) headers['Idempotency-Key'] = idempotencyKey
     const response = await request('/api/celebrations/enquiries', { method: 'POST', headers, body: JSON.stringify(values) })
     const result = await response.json().catch(() => ({})) as ApiResponse
     if (response.status === 400) return { ok: false, kind: 'validation', errors: result.errors ?? {} }

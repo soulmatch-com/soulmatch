@@ -1,0 +1,2 @@
+import{NextResponse}from'next/server';import{requireActiveAdmin}from'@/lib/admin-auth';import{createAdminClient}from'@/lib/supabase/admin'
+export async function GET(){const a=await requireActiveAdmin();if('response'in a)return a.response;const{data,error}=await createAdminClient().from('admins').select('id,email,role').eq('is_active',true).order('email');if(error)return NextResponse.json({error:'Unable to load administrators'},{status:500});return NextResponse.json({admins:data??[]})}

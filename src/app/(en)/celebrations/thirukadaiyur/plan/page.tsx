@@ -4,6 +4,7 @@ import { CelebrationEnquiryForm } from '@/components/celebrations/CelebrationEnq
 import { PlanV2Flow } from '@/components/celebrations/PlanV2Flow'
 import { getCeremony, isCeremonySlug } from '@/lib/celebrations'
 import { loadCelebrationServices } from '@/lib/celebrations/page-data'
+export const dynamic = 'force-dynamic'
 import { celebrationPlanV2Enabled } from '@/lib/celebrations/plan-v2'
 
 const url = 'https://mythirumanam.in/plan'

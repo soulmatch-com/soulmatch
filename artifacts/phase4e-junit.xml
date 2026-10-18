@@ -1,0 +1,102 @@
+<testsuites id="" name="" tests="38" failures="0" skipped="0" errors="0" time="182.045145">
+<testsuite name="admin-auth.spec.ts" timestamp="2026-10-14T09:22:47.494Z" hostname="" tests="2" failures="0" skipped="0" time="1.241" errors="0">
+<testcase name="normal admin login creates an HttpOnly session and protected APIs reject anonymous access" classname="admin-auth.spec.ts" time="1.222">
+</testcase>
+<testcase name="inactive administrators cannot create an admin session" classname="admin-auth.spec.ts" time="0.019">
+</testcase>
+</testsuite>
+<testsuite name="e2e-1-booking-completion-acceptance.spec.ts" timestamp="2026-10-14T09:22:47.494Z" hostname="" tests="1" failures="0" skipped="0" time="4.521" errors="0">
+<testcase name="Scenario H1 completes a booking through the authenticated direct-button lifecycle" classname="e2e-1-booking-completion-acceptance.spec.ts" time="4.521">
+</testcase>
+</testsuite>
+<testsuite name="e2e-1-booking-creation-acceptance.spec.ts" timestamp="2026-10-14T09:22:47.494Z" hostname="" tests="3" failures="0" skipped="0" time="13.124" errors="0">
+<testcase name="Scenario D creates exactly one booking from an accepted quotation through the authenticated UI" classname="e2e-1-booking-creation-acceptance.spec.ts" time="5.157">
+</testcase>
+<testcase name="Scenario D hides booking creation for draft and sent quotations and rejects stale invalid creation" classname="e2e-1-booking-creation-acceptance.spec.ts" time="4.895">
+</testcase>
+<testcase name="Scenario D handles creation failures, conflicts, and loading without false success" classname="e2e-1-booking-creation-acceptance.spec.ts" time="3.072">
+</testcase>
+</testsuite>
+<testsuite name="e2e-1-booking-lifecycle-recovery-acceptance.spec.ts" timestamp="2026-10-14T09:22:47.494Z" hostname="" tests="6" failures="0" skipped="0" time="35.496" errors="0">
+<testcase name="Scenario H3 recovers from lifecycle 400 validation" classname="e2e-1-booking-lifecycle-recovery-acceptance.spec.ts" time="6.614">
+</testcase>
+<testcase name="Scenario H3 recovers from lifecycle 409 invalid transition" classname="e2e-1-booking-lifecycle-recovery-acceptance.spec.ts" time="6.677">
+</testcase>
+<testcase name="Scenario H3 recovers from lifecycle 500 server error" classname="e2e-1-booking-lifecycle-recovery-acceptance.spec.ts" time="6.627">
+</testcase>
+<testcase name="Scenario H3 recovers from an aborted lifecycle request without false success" classname="e2e-1-booking-lifecycle-recovery-acceptance.spec.ts" time="5.742">
+</testcase>
+<testcase name="Scenario H3 prevents duplicate direct lifecycle submission while pending" classname="e2e-1-booking-lifecycle-recovery-acceptance.spec.ts" time="3.979">
+</testcase>
+<testcase name="Scenario H3 enforces authorization, invalid actions, and direct-control accessibility" classname="e2e-1-booking-lifecycle-recovery-acceptance.spec.ts" time="5.857">
+</testcase>
+</testsuite>
+<testsuite name="e2e-1-cross-module-integrity-acceptance.spec.ts" timestamp="2026-10-14T09:22:47.494Z" hostname="" tests="1" failures="0" skipped="0" time="4.986" errors="0">
+<testcase name="Scenario H2 preserves cross-module history and financial snapshots through authenticated completion" classname="e2e-1-cross-module-integrity-acceptance.spec.ts" time="4.986">
+</testcase>
+</testsuite>
+<testsuite name="e2e-1-customer-payments-acceptance.spec.ts" timestamp="2026-10-14T09:22:47.494Z" hostname="" tests="11" failures="0" skipped="0" time="47.259" errors="0">
+<testcase name="Scenario G records customer receipts in the authenticated UI and preserves financial snapshots" classname="e2e-1-customer-payments-acceptance.spec.ts" time="4.374">
+</testcase>
+<testcase name="Scenario G settles, corrects, authorizes and idempotently protects the append-only ledger" classname="e2e-1-customer-payments-acceptance.spec.ts" time="3.846">
+</testcase>
+<testcase name="Scenario G refund and reversal dialogs validate, cancel, retain focus and append corrections" classname="e2e-1-customer-payments-acceptance.spec.ts" time="5.266">
+</testcase>
+<testcase name="Scenario G payment HTTP 500 recovery" classname="e2e-1-customer-payments-acceptance.spec.ts" time="4.407">
+</testcase>
+<testcase name="Scenario G refund HTTP 400 recovery retains the dialog and commits one real retry" classname="e2e-1-customer-payments-acceptance.spec.ts" time="4.258">
+</testcase>
+<testcase name="Scenario G refund HTTP 409 recovery refreshes financial state and commits one real retry" classname="e2e-1-customer-payments-acceptance.spec.ts" time="4.167">
+</testcase>
+<testcase name="Scenario G reversal HTTP 500 recovery retains the dialog and commits one real retry" classname="e2e-1-customer-payments-acceptance.spec.ts" time="4.25">
+</testcase>
+<testcase name="Scenario G reversal network-abort recovery retains the dialog and commits one real retry" classname="e2e-1-customer-payments-acceptance.spec.ts" time="4.335">
+</testcase>
+<testcase name="Scenario G record payment prevents duplicate submission while the mutation is pending" classname="e2e-1-customer-payments-acceptance.spec.ts" time="4.051">
+</testcase>
+<testcase name="Scenario G refund prevents duplicate submission while the mutation is pending" classname="e2e-1-customer-payments-acceptance.spec.ts" time="4.184">
+</testcase>
+<testcase name="Scenario G reversal prevents duplicate submission while the mutation is pending" classname="e2e-1-customer-payments-acceptance.spec.ts" time="4.121">
+</testcase>
+</testsuite>
+<testsuite name="e2e-1-enquiry-lead.spec.ts" timestamp="2026-10-14T09:22:47.494Z" hostname="" tests="1" failures="0" skipped="0" time="10.014" errors="0">
+<testcase name="E2E-1A public enquiry creates one linked CRM lead and renders its original details for an authenticated admin" classname="e2e-1-enquiry-lead.spec.ts" time="10.014">
+<system-out>
+<![CDATA[[E2E-1A] fixture cleanup completed
+]]>
+</system-out>
+</testcase>
+</testsuite>
+<testsuite name="e2e-1-event-planning-acceptance.spec.ts" timestamp="2026-10-14T09:22:47.494Z" hostname="" tests="5" failures="0" skipped="0" time="29.513" errors="0">
+<testcase name="Scenario E manages a generated checklist and booking task through the authenticated UI" classname="e2e-1-event-planning-acceptance.spec.ts" time="5.198">
+</testcase>
+<testcase name="Scenario E applies booking task filters on the server using Asia/Kolkata business dates" classname="e2e-1-event-planning-acceptance.spec.ts" time="5.134">
+</testcase>
+<testcase name="Scenario E recovers from edit failures and rejects a genuine stale browser edit" classname="e2e-1-event-planning-acceptance.spec.ts" time="6.041">
+</testcase>
+<testcase name="Scenario E enforces active assignment, booking-service ownership, and lifecycle eligibility" classname="e2e-1-event-planning-acceptance.spec.ts" time="7.795">
+</testcase>
+<testcase name="Scenario E edit/create failures recover and loading prevents duplicate submission" classname="e2e-1-event-planning-acceptance.spec.ts" time="5.345">
+</testcase>
+</testsuite>
+<testsuite name="e2e-1-quotation-lifecycle-acceptance.spec.ts" timestamp="2026-10-14T09:22:47.494Z" hostname="" tests="6" failures="0" skipped="0" time="20.371" errors="0">
+<testcase name="E2E-1B handles a genuine stale lifecycle transition conflict and refreshes allowed actions" classname="e2e-1-quotation-lifecycle-acceptance.spec.ts" time="4.037">
+</testcase>
+<testcase name="E2E-1C lifecycle dialog traps focus, dismisses safely, returns focus, and prevents duplicate submit" classname="e2e-1-quotation-lifecycle-acceptance.spec.ts" time="3.115">
+</testcase>
+<testcase name="E2E-1D handles 400 validation error without false success and permits retry" classname="e2e-1-quotation-lifecycle-acceptance.spec.ts" time="3.275">
+</testcase>
+<testcase name="E2E-1D handles 500 server error without false success and permits retry" classname="e2e-1-quotation-lifecycle-acceptance.spec.ts" time="2.978">
+</testcase>
+<testcase name="E2E-1D handles an aborted lifecycle request without a stuck dialog" classname="e2e-1-quotation-lifecycle-acceptance.spec.ts" time="2.925">
+</testcase>
+<testcase name="E2E-1E derives expiry, rejects invalid renewal, reopens with a future date, and preserves snapshots" classname="e2e-1-quotation-lifecycle-acceptance.spec.ts" time="4.041">
+</testcase>
+</testsuite>
+<testsuite name="e2e-1-vendor-coordination-acceptance.spec.ts" timestamp="2026-10-14T09:22:47.494Z" hostname="" tests="2" failures="0" skipped="0" time="14.412" errors="0">
+<testcase name="Scenario F browser: catalogue, assignment, audit lifecycle and financial isolation" classname="e2e-1-vendor-coordination-acceptance.spec.ts" time="6.455">
+</testcase>
+<testcase name="Scenario F browser: stale edit, failures, ownership, and no duplicate writes" classname="e2e-1-vendor-coordination-acceptance.spec.ts" time="7.957">
+</testcase>
+</testsuite>
+</testsuites>

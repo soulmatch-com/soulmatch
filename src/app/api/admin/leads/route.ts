@@ -8,6 +8,7 @@ const sources = ['website', 'instagram', 'whatsapp', 'call', 'referral', 'other'
 const statuses = leadStatuses
 const eventTypes = ['60th-marriage', '70th-marriage', '80th-marriage'] as const
 const eventSessions = ['one_session', 'two_sessions'] as const
+const packageTypes = ['basic', 'premium'] as const
 
 const createLeadSchema = z.object({
   source: z.enum(sources),
@@ -18,6 +19,7 @@ const createLeadSchema = z.object({
   eventDate: z.string().date().optional().or(z.literal('')),
   eventType: z.enum(eventTypes).optional().or(z.literal('')),
   eventSession: z.enum(eventSessions).optional().or(z.literal('')),
+  packageType: z.enum(packageTypes).optional().or(z.literal('')),
   totalMembers: z.coerce.number().int().min(1).max(10000).optional().or(z.literal('')),
   status: z.enum(statuses).default('new'),
   nextFollowUpAt: z.string().datetime().optional().nullable(),
@@ -83,6 +85,7 @@ export async function POST(request: NextRequest) {
     event_date: input.eventDate || null,
     event_type: input.eventType || null,
     event_session: input.eventSession || null,
+    package_type: input.packageType || null,
     total_members: input.totalMembers === '' || input.totalMembers === undefined ? null : input.totalMembers,
     next_follow_up_at: input.nextFollowUpAt ?? null,
   }).select('*').single()

@@ -7,6 +7,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 const statuses = leadStatuses
 const eventTypes = ['60th-marriage', '70th-marriage', '80th-marriage'] as const
 const eventSessions = ['one_session', 'two_sessions'] as const
+const packageTypes = ['basic', 'premium'] as const
 const updateSchema = z.object({
   status: z.enum(statuses).optional(),
   nextFollowUpAt: z.string().datetime().nullable().optional(),
@@ -14,6 +15,7 @@ const updateSchema = z.object({
   eventDate: z.string().date().nullable().optional(),
   eventType: z.enum(eventTypes).nullable().optional(),
   eventSession: z.enum(eventSessions).nullable().optional(),
+  packageType: z.enum(packageTypes).nullable().optional(),
   totalMembers: z.number().int().min(1).max(10000).nullable().optional(),
   lostReason: z.string().trim().max(500).nullable().optional(),
 })
@@ -60,6 +62,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     ...(input.eventDate !== undefined ? { event_date: input.eventDate } : {}),
     ...(input.eventType !== undefined ? { event_type: input.eventType } : {}),
     ...(input.eventSession !== undefined ? { event_session: input.eventSession } : {}),
+    ...(input.packageType !== undefined ? { package_type: input.packageType } : {}),
     ...(input.totalMembers !== undefined ? { total_members: input.totalMembers } : {}),
     ...(input.lostReason !== undefined ? { lost_reason: input.lostReason } : {}),
   }

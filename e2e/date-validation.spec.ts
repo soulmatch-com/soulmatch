@@ -21,7 +21,7 @@ const basePayload = {
   travellingFrom: 'Chennai',
   arrangementPreference: 'need-guidance',
   contactName: 'Synthetic Contact',
-  mobile: '+10000000000',
+  mobile: '+919876543210',
   email: '',
   relationship: 'Family Member',
   preferredContactMethod: 'phone',
@@ -41,7 +41,8 @@ for (const viewport of viewports) {
     const bounds = getCelebrationDateBounds(fixedDate)
 
     await page.goto('/plan', { waitUntil: 'domcontentloaded' })
-    await page.getByRole('radio', { name: /Sashtiapthapoorthi/ }).check()
+    await page.getByRole('radio', { name: '60th Marriage' }).check()
+    await page.getByRole('button', { name: 'Select Basic' }).click()
     await page.getByRole('button', { name: 'Continue' }).click()
 
     await expect(page.getByLabel('Husband Date of Birth')).toHaveAttribute('min', bounds.minDateOfBirth)
@@ -55,7 +56,7 @@ for (const viewport of viewports) {
     await page.getByLabel('Wife Date of Birth').fill('2000-01-01')
     await page.getByRole('button', { name: 'Continue' }).click()
     await expect(page.getByText('Husband must be at least 18 years old.')).toBeVisible()
-    await expect(page.locator('#couple-heading')).toBeVisible()
+    await expect(page.locator('#plan-v2-couple-details')).toBeVisible()
 
     await page.getByLabel('Husband Date of Birth').fill('2000-01-01')
     await page.getByRole('button', { name: 'Continue' }).click()

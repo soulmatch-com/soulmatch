@@ -5,7 +5,7 @@ export async function proxy(request: NextRequest) {
   if (request.nextUrl.pathname.startsWith('/api/admin/')) {
     if (!['GET', 'HEAD', 'OPTIONS'].includes(request.method)) {
       const origin = request.headers.get('origin')
-      const configuredOrigin = process.env.NEXT_PUBLIC_APP_URL
+      const configuredOrigin = normalizedOrigin(process.env.NEXT_PUBLIC_APP_URL)
       // Browser cookie mutations must carry an Origin. Non-browser automation
       // can opt in only outside production; production fails closed.
       if (process.env.NODE_ENV === 'production' && (!configuredOrigin || !origin || origin !== configuredOrigin)) return NextResponse.json({ error: 'Cross-origin request rejected' }, { status: 403, headers: { 'Cache-Control': 'no-store' } })
@@ -23,6 +23,15 @@ export async function proxy(request: NextRequest) {
   }
 
   return await updateSession(request)
+}
+
+function normalizedOrigin(value: string | undefined) {
+  if (!value) return undefined
+  try {
+    return new URL(value).origin
+  } catch {
+    return undefined
+  }
 }
 
 function isPublicRequest(pathname: string) {

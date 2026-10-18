@@ -344,6 +344,7 @@ export interface Database {
           event_date: string | null
           event_type: '60th-marriage' | '70th-marriage' | '80th-marriage' | null
           event_session: 'one_session' | 'two_sessions' | null
+          package_type: 'basic' | 'premium' | null
           total_members: number | null
           assigned_admin_id: string | null
           next_follow_up_at: string | null
@@ -363,6 +364,7 @@ export interface Database {
           event_date?: string | null
           event_type?: '60th-marriage' | '70th-marriage' | '80th-marriage' | null
           event_session?: 'one_session' | 'two_sessions' | null
+          package_type?: 'basic' | 'premium' | null
           total_members?: number | null
           assigned_admin_id?: string | null
           next_follow_up_at?: string | null
@@ -382,6 +384,7 @@ export interface Database {
           event_date?: string | null
           event_type?: '60th-marriage' | '70th-marriage' | '80th-marriage' | null
           event_session?: 'one_session' | 'two_sessions' | null
+          package_type?: 'basic' | 'premium' | null
           total_members?: number | null
           assigned_admin_id?: string | null
           next_follow_up_at?: string | null

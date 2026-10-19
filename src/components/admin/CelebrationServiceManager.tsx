@@ -6,13 +6,13 @@ import { Button } from '@/components/ui/button'
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 
-type Service = { id: string; code: string; name: string; description: string | null; icon: string | null; location: string; is_active: boolean; display_order: number }
-type ServiceDraft = { name: string; description: string; icon: string; location: string; displayOrder: string; isActive: boolean }
+type Service = { id: string; code: string; name: string; description: string | null; icon: string | null; location: string; is_active: boolean; display_order: number; show_description_in_quotation: boolean }
+type ServiceDraft = { name: string; description: string; icon: string; location: string; displayOrder: string; isActive: boolean; showDescriptionInQuotation: boolean }
 type NewServiceDraft = ServiceDraft & { code: string }
 type Pagination = { page: number; limit: number; total: number; totalPages: number }
 
-const emptyNewService: NewServiceDraft = { code: '', name: '', description: '', icon: '', location: 'thirukadaiyur', displayOrder: '0', isActive: true }
-const draftOf = (service: Service): ServiceDraft => ({ name: service.name, description: service.description || '', icon: service.icon || '', location: service.location, displayOrder: String(service.display_order), isActive: service.is_active })
+const emptyNewService: NewServiceDraft = { code: '', name: '', description: '', icon: '', location: 'thirukadaiyur', displayOrder: '0', isActive: true, showDescriptionInQuotation: true }
+const draftOf = (service: Service): ServiceDraft => ({ name: service.name, description: service.description || '', icon: service.icon || '', location: service.location, displayOrder: String(service.display_order), isActive: service.is_active, showDescriptionInQuotation: service.show_description_in_quotation ?? true })
 const sortServices = (services: Service[]) => [...services].sort((a, b) => a.display_order - b.display_order || a.name.localeCompare(b.name))
 const iconActionTooltip = 'relative after:pointer-events-none after:absolute after:right-0 after:top-full after:z-20 after:mt-2 after:hidden after:whitespace-nowrap after:rounded after:bg-slate-900 after:px-2 after:py-1 after:text-xs after:font-medium after:text-white after:shadow-md after:content-[attr(data-tooltip)] hover:after:block focus-visible:after:block'
 
@@ -31,6 +31,7 @@ function ServiceFormFields({ draft, onChange, includeCode = false }: ServiceForm
       <label className="text-sm font-medium text-slate-700">Icon (optional)<input value={draft.icon} onChange={(event) => onChange('icon', event.target.value)} maxLength={80} placeholder="e.g. utensils" className="mt-1.5 h-10 w-full rounded-md border border-slate-300 px-3" /></label>
     </div>
     <label className="block text-sm font-medium text-slate-700">Description<textarea value={draft.description} onChange={(event) => onChange('description', event.target.value)} maxLength={1000} rows={4} className="mt-1.5 w-full rounded-md border border-slate-300 p-3" /></label>
+    <label className="flex items-center gap-2 text-sm font-medium text-slate-700"><input type="checkbox" checked={draft.showDescriptionInQuotation} onChange={(event) => onChange('showDescriptionInQuotation', event.target.checked)} className="h-4 w-4 rounded border-slate-300" />Display this description in quotation PDFs</label>
     <label className="flex items-center gap-2 text-sm font-medium text-slate-700"><input type="checkbox" checked={draft.isActive} onChange={(event) => onChange('isActive', event.target.checked)} className="h-4 w-4 rounded border-slate-300" />Active — available for enquiries and quotations</label>
   </div>
 }

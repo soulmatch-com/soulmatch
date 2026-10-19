@@ -3,7 +3,7 @@ import { z } from 'zod'
 import { requireActiveAdmin } from '@/lib/admin-auth'
 import { createAdminClient } from '@/lib/supabase/admin'
 
-const itemSchema = z.object({ serviceId: z.string().uuid(), quantity: z.number().int().min(1).max(10000), unitPrice: z.number().finite().min(0).max(99_999_999) })
+const itemSchema = z.object({ serviceId: z.string().uuid(), quantity: z.number().int().min(1).max(10000), unitPrice: z.number().finite().min(0).max(99_999_999), descriptionOverride: z.string().trim().max(1000).nullable().optional() })
 const updateSchema = z.object({
   leadIds: z.array(z.string().uuid()).max(50).optional(),
   validUntil: z.string().date().nullable().optional(),
@@ -42,6 +42,10 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     p_replace_leads: parsed.data.leadIds !== undefined, p_lead_ids: parsed.data.leadIds ?? [],
   })
   if (transactionError) return NextResponse.json({ error: 'Unable to update quotation' }, { status: 500 })
+  if (parsed.data.items) {
+    const overrideResults = await Promise.all(parsed.data.items.map((item) => supabase.from('quotation_items').update({ description_override: item.descriptionOverride || null }).eq('quotation_id', id).eq('celebration_service_id', item.serviceId)))
+    if (overrideResults.some((result) => result.error)) return NextResponse.json({ error: 'Unable to update quotation descriptions' }, { status: 500 })
+  }
   const { data, error } = await supabase.from('quotations').select('*').eq('id', id).maybeSingle()
   if (error) return NextResponse.json({ error: 'Unable to load updated quotation' }, { status: 500 })
   if (!data) return NextResponse.json({ error: 'Quotation not found' }, { status: 404 })

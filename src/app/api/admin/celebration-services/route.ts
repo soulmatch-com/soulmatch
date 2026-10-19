@@ -11,6 +11,7 @@ const serviceSchema = z.object({
   location: z.string().trim().min(1).max(120),
   displayOrder: z.number().int().min(0).max(10000).default(0),
   isActive: z.boolean().default(true),
+  showDescriptionInQuotation: z.boolean().default(true),
 })
 
 const parsePositiveInteger = (value: string | null, fallback: number, maximum: number) => {
@@ -58,7 +59,7 @@ export async function POST(request: NextRequest) {
   const parsed = serviceSchema.safeParse(body)
   if (!parsed.success) return NextResponse.json({ error: 'Please check the service details', details: parsed.error.flatten().fieldErrors }, { status: 400 })
   const input = parsed.data
-  const { data, error } = await createAdminClient().from('celebration_services').insert({ code: input.code, name: input.name, description: input.description || null, icon: input.icon || null, location: input.location, display_order: input.displayOrder, is_active: input.isActive }).select('*').single()
+  const { data, error } = await createAdminClient().from('celebration_services').insert({ code: input.code, name: input.name, description: input.description || null, icon: input.icon || null, location: input.location, display_order: input.displayOrder, is_active: input.isActive, show_description_in_quotation: input.showDescriptionInQuotation }).select('*').single()
   if (error?.code === '23505') return NextResponse.json({ error: 'A service with this code already exists' }, { status: 409 })
   if (error || !data) return NextResponse.json({ error: 'Unable to create celebration service' }, { status: 500 })
   return NextResponse.json({ service: data }, { status: 201 })

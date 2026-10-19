@@ -3,7 +3,7 @@ import { z } from 'zod'
 import { requireActiveAdmin } from '@/lib/admin-auth'
 import { createAdminClient } from '@/lib/supabase/admin'
 
-const itemSchema = z.object({ serviceId: z.string().uuid(), quantity: z.number().int().min(1).max(10000), unitPrice: z.number().finite().min(0).max(99_999_999) })
+const itemSchema = z.object({ serviceId: z.string().uuid(), quantity: z.number().int().min(1).max(10000), unitPrice: z.number().finite().min(0).max(99_999_999), descriptionOverride: z.string().trim().max(1000).nullable().optional() })
 const createQuotationSchema = z.object({
   validUntil: z.string().date().nullable().optional(),
   notes: z.string().trim().max(2000).nullable().optional(),
@@ -25,7 +25,7 @@ export async function GET() {
   const supabase = createAdminClient()
   const [{ data: quotations, error: quotationsError }, { data: services, error: servicesError }, { data: leads, error: leadsError }] = await Promise.all([
     supabase.from('quotations').select('*').order('created_at', { ascending: false }),
-    supabase.from('celebration_services').select('id, code, name, description, display_order').eq('is_active', true).order('display_order', { ascending: true }),
+    supabase.from('celebration_services').select('id, code, name, description, show_description_in_quotation, display_order').eq('is_active', true).order('display_order', { ascending: true }),
     supabase.from('leads').select('id, contact_name, mobile, email').neq('status', 'expired').order('created_at', { ascending: false }).limit(200),
   ])
   if (quotationsError || servicesError || leadsError) return NextResponse.json({ error: 'Unable to load quotations' }, { status: 500 })
@@ -59,6 +59,8 @@ export async function POST(request: NextRequest) {
     p_lead_ids: parsed.data.leadIds,
   })
   if (transactionError || !quotationId) return NextResponse.json({ error: 'Unable to save quotation details' }, { status: 500 })
+  const overrideResults = await Promise.all(parsed.data.items.map((item) => supabase.from('quotation_items').update({ description_override: item.descriptionOverride || null }).eq('quotation_id', quotationId).eq('celebration_service_id', item.serviceId)))
+  if (overrideResults.some((result) => result.error)) return NextResponse.json({ error: 'Unable to save quotation descriptions' }, { status: 500 })
   const [quotationResult, itemsResult, linksResult] = await Promise.all([
     supabase.from('quotations').select('*').eq('id', quotationId).maybeSingle(),
     supabase.from('quotation_items').select('*').eq('quotation_id', quotationId).order('created_at', { ascending: true }),

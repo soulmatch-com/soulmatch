@@ -8,6 +8,7 @@ import { requireActiveAdmin } from '@/lib/admin-auth'
 import { createAdminClient } from '@/lib/supabase/admin'
 
 export const runtime = 'nodejs'
+export const dynamic = 'force-dynamic'
 
 const pageWidth = 595.28
 const pageHeight = 841.89
@@ -114,11 +115,18 @@ export async function GET(_: Request, { params }: { params: Promise<{ id: string
   const supabase = createAdminClient()
   const [{ data: quotation, error: quotationError }, { data: items, error: itemsError }, { data: links, error: linksError }] = await Promise.all([
     supabase.from('quotations').select('id, quotation_number, valid_until, notes, total_amount, created_at').eq('id', id).maybeSingle(),
-    supabase.from('quotation_items').select('service_name, quantity, unit_price, line_total').eq('quotation_id', id).order('created_at', { ascending: true }),
+    supabase.from('quotation_items').select('celebration_service_id, service_name, description_override, quantity, unit_price, line_total').eq('quotation_id', id).order('created_at', { ascending: true }),
     supabase.from('quotation_leads').select('lead_id').eq('quotation_id', id),
   ])
   if (quotationError || itemsError || linksError) return NextResponse.json({ error: 'Unable to load quotation details' }, { status: 500 })
   if (!quotation) return NextResponse.json({ error: 'Quotation not found' }, { status: 404 })
+
+  const selectedServiceIds = (items ?? []).map((item) => item.celebration_service_id)
+  const { data: selectedServices, error: selectedServicesError } = selectedServiceIds.length
+    ? await supabase.from('celebration_services').select('id, description, show_description_in_quotation').in('id', selectedServiceIds)
+    : { data: [], error: null }
+  if (selectedServicesError) return NextResponse.json({ error: 'Unable to load selected service descriptions' }, { status: 500 })
+  const servicesById = new Map((selectedServices ?? []).map((service) => [service.id, service]))
 
   const leadIds = (links ?? []).map((link) => link.lead_id)
   const { data: leads, error: leadsError } = leadIds.length
@@ -179,8 +187,10 @@ export async function GET(_: Request, { params }: { params: Promise<{ id: string
   text('Amount (INR)', amountLeft + 30, y - 10, 7, bold, rgb(1, 1, 1))
   y -= 14
   for (const [index, item] of (items ?? []).entries()) {
-    const particulars = item.quantity > 1 ? `${item.service_name} (${numberFormatter.format(item.unit_price)} x ${item.quantity})` : item.service_name
-    const particularsLines = wrap(particulars, 46)
+    const serviceName = item.quantity > 1 ? `${item.service_name} (${numberFormatter.format(item.unit_price)} x ${item.quantity})` : item.service_name
+    const service = servicesById.get(item.celebration_service_id)
+    const description = service?.show_description_in_quotation ? (item.description_override ?? service.description)?.trim() : null
+    const particularsLines = wrap(`${serviceName}${description ? ` (${description})` : ''}`, 46)
     const rowHeight = Math.max(14, particularsLines.length * 9 + 4)
     page.drawRectangle({ x: tableLeft, y: y - rowHeight, width: tableWidth, height: rowHeight, color: index % 2 ? rgb(1, 0.99, 0.96) : rgb(1, 1, 1), borderColor: border, borderWidth: 0.5 })
     line(particularsLeft, y, particularsLeft, y - rowHeight, border)

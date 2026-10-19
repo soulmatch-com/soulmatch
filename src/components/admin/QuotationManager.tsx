@@ -19,6 +19,7 @@ type Service = {
   code: string;
   name: string;
   description: string | null;
+  show_description_in_quotation: boolean;
 };
 type Quotation = {
   id: string;
@@ -34,11 +35,12 @@ type QuotationItem = {
   quotation_id: string;
   celebration_service_id: string;
   service_name: string;
+  description_override: string | null;
   quantity: number;
   unit_price: number;
   line_total: number;
 };
-type DraftItem = { serviceId: string; quantity: string; unitPrice: string };
+type DraftItem = { serviceId: string; quantity: string; unitPrice: string; descriptionOverride: string };
 type Lead = {
   id: string;
   contact_name: string;
@@ -92,7 +94,7 @@ export function QuotationManager({ quotationId, initialLeadId, returnTo }: { quo
           setLeads((current) => current.some((lead) => lead.id === context.lead.id) ? current : [context.lead, ...current]);
           setLeadIds([context.lead.id]);
           const active = new Set(data.services.map((service: Service) => service.id));
-          setDraftItems((context.enquiryServices || []).filter((service: { service_id: string }) => active.has(service.service_id)).map((service: { service_id: string }) => ({ serviceId: service.service_id, quantity: "1", unitPrice: "" })));
+          setDraftItems((context.enquiryServices || []).filter((service: { service_id: string }) => active.has(service.service_id)).map((service: { service_id: string }) => ({ serviceId: service.service_id, quantity: "1", unitPrice: "", descriptionOverride: data.services.find((catalogueService: Service) => catalogueService.id === service.service_id)?.description || "" })));
         }
         if (quotationId) {
           const quotation = data.quotations.find(
@@ -122,6 +124,7 @@ export function QuotationManager({ quotationId, initialLeadId, returnTo }: { quo
                 serviceId: item.celebration_service_id,
                 quantity: String(item.quantity),
                 unitPrice: String(item.unit_price),
+                descriptionOverride: (item.description_override ?? data.services.find((service: Service) => service.id === item.celebration_service_id)?.description) || "",
               })),
           );
         }
@@ -155,6 +158,7 @@ export function QuotationManager({ quotationId, initialLeadId, returnTo }: { quo
         serviceId: selectedServiceId,
         quantity: selectedQuantity,
         unitPrice: selectedUnitPrice,
+        descriptionOverride: services.find((service) => service.id === selectedServiceId)?.description || "",
       },
     ]);
     setSelectedServiceId("");
@@ -168,7 +172,7 @@ export function QuotationManager({ quotationId, initialLeadId, returnTo }: { quo
   }
   function changeItem(
     serviceId: string,
-    field: "quantity" | "unitPrice",
+    field: "quantity" | "unitPrice" | "descriptionOverride",
     value: string,
   ) {
     setDraftItems((current) =>
@@ -200,6 +204,7 @@ export function QuotationManager({ quotationId, initialLeadId, returnTo }: { quo
           serviceId: item.serviceId,
           quantity: Number(item.quantity),
           unitPrice: Number(item.unitPrice),
+          descriptionOverride: item.descriptionOverride || null,
         })),
       };
       const response = await fetch(
@@ -369,11 +374,7 @@ export function QuotationManager({ quotationId, initialLeadId, returnTo }: { quo
                         <p className="font-medium text-slate-900">
                           {service.name}
                         </p>
-                        {service.description && (
-                          <p className="mt-1 text-xs text-slate-500">
-                            {service.description}
-                          </p>
-                        )}
+                        {service.show_description_in_quotation && <label className="mt-2 block text-xs text-slate-600">Quotation description (this quotation only)<textarea value={item.descriptionOverride} onChange={(event) => changeItem(service.id, "descriptionOverride", event.target.value)} maxLength={1000} rows={2} className="mt-1 w-full rounded-md border border-slate-300 p-2 text-sm text-slate-700" /></label>}
                       </div>
                       <label>
                         <span className="sr-only">Cost for {service.name}</span>
@@ -602,17 +603,17 @@ export function QuotationManager({ quotationId, initialLeadId, returnTo }: { quo
                 <ul className="mt-3 divide-y text-sm text-slate-700">
                   {items
                     .filter((item) => item.quotation_id === quotation.id)
-                    .map((item) => (
-                      <li
-                        key={item.id}
-                        className="flex justify-between gap-3 py-2"
-                      >
+                    .map((item) => {
+                      const service = services.find((candidate) => candidate.id === item.celebration_service_id);
+                      const description = service?.show_description_in_quotation ? item.description_override ?? service.description : null;
+                      return <li key={item.id} className="flex justify-between gap-3 py-2">
                         <span>
-                          {item.service_name} × {item.quantity}
+                          <span className="block">{item.service_name} × {item.quantity}</span>
+                          {description && <span className="mt-1 block text-xs text-slate-500">({description})</span>}
                         </span>
                         <span>{money.format(item.line_total)}</span>
-                      </li>
-                    ))}
+                      </li>;
+                    })}
                 </ul>
                 <p className="mt-4 text-sm text-slate-700">
                   <span className="font-medium">Linked leads:</span>{" "}

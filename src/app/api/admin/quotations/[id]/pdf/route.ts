@@ -95,6 +95,10 @@ function sessionName(value: 'one_session' | 'two_sessions' | null) {
   return value === 'one_session' ? '1 Session' : value === 'two_sessions' ? '2 Sessions' : 'Not provided'
 }
 
+function packageName(value: 'basic' | 'premium' | null) {
+  return value === 'basic' ? 'Basic' : value === 'premium' ? 'Premium' : 'Not provided'
+}
+
 function wrap(text: string, maxCharacters: number) {
   const words = text.trim().split(/\s+/)
   const lines: string[] = []
@@ -130,7 +134,7 @@ export async function GET(_: Request, { params }: { params: Promise<{ id: string
 
   const leadIds = (links ?? []).map((link) => link.lead_id)
   const { data: leads, error: leadsError } = leadIds.length
-    ? await supabase.from('leads').select('id, contact_name, event_type, event_date, event_session, total_members').in('id', leadIds)
+    ? await supabase.from('leads').select('id, contact_name, event_type, event_date, event_session, package_type, total_members').in('id', leadIds)
     : { data: [], error: null }
   if (leadsError) return NextResponse.json({ error: 'Unable to load quotation lead details' }, { status: 500 })
 
@@ -178,7 +182,7 @@ export async function GET(_: Request, { params }: { params: Promise<{ id: string
   detail('Prepared On', compactDate(quotation.created_at.slice(0, 10)), 212, 267, 697)
   detail('Session', sessionName(primaryLead?.event_session ?? null), 36, 78, 684)
   detail('Number of Peoples', primaryLead?.total_members ? String(primaryLead.total_members) : 'Not provided', 212, 302, 684)
-  detail('Package', 'Premium', 36, 82, 671)
+  detail('Package', packageName(primaryLead?.package_type ?? null), 36, 82, 671)
   let y = 643
   page.drawRectangle({ x: tableLeft, y: y - 14, width: tableWidth, height: 14, color: brand })
   text('No.', tableLeft + (numberColumn - bold.widthOfTextAtSize('No.', 7)) / 2, y - 10, 7, bold, rgb(1, 1, 1))

@@ -62,7 +62,19 @@ export const ceremonies: CeremonyContent[] = [
     thirukadaiyur:
       "Families may choose Thirukadaiyur for its long association with prayers for wellbeing and longevity. Venue, temple and ceremony arrangements should be planned around local requirements and the family's guidance.",
     considerations: ['Confirm the preferred date with family and priest', 'Choose a home, temple or marriage-hall setting', 'Plan guest meals, travel and accommodation', 'Allow comfortable timing for the celebrating couple'],
-    faqs: sharedFaqs,
+    faqs: [
+      ...sharedFaqs,
+      {
+        question: 'Can you help plan a Thirukadaiyur 60th marriage?',
+        answer:
+          'Yes. MyThirumanam can help families request ceremony-related coordination, hospitality, stay, meals, travel and other arrangements for a 60th marriage celebration in Thirukadaiyur. Details are confirmed during planning and remain subject to availability.',
+      },
+      {
+        question: 'Is MyThirumanam an official Thirukadaiyur temple website?',
+        answer:
+          'No. MyThirumanam is an independent celebration-planning service and is not an official or authorised temple website. Temple rituals, availability and requirements should be confirmed with the relevant temple authorities and the family’s chosen priest.',
+      },
+    ],
   },
   {
     slug: '70th-marriage',

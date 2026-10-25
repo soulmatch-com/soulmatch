@@ -404,9 +404,9 @@ export interface Database {
         Update: { id?: string; quotation_number?: string; status?: 'draft' | 'sent' | 'accepted' | 'rejected' | 'expired' | 'cancelled'; currency?: 'INR'; valid_until?: string | null; notes?: string | null; total_amount?: number; created_by?: string | null; created_at?: string; updated_at?: string; status_changed_at?: string }
       }
       quotation_items: {
-        Row: { id: string; quotation_id: string; celebration_service_id: string; service_code: string; service_name: string; quantity: number; unit_price: number; line_total: number; created_at: string }
-        Insert: { id?: string; quotation_id: string; celebration_service_id: string; service_code: string; service_name: string; quantity?: number; unit_price: number; line_total: number; created_at?: string }
-        Update: { id?: string; quotation_id?: string; celebration_service_id?: string; service_code?: string; service_name?: string; quantity?: number; unit_price?: number; line_total?: number; created_at?: string }
+        Row: { id: string; quotation_id: string; celebration_service_id: string; service_code: string; service_name: string; quantity: number; unit_price: number; line_total: number; item_order: number; created_at: string }
+        Insert: { id?: string; quotation_id: string; celebration_service_id: string; service_code: string; service_name: string; quantity?: number; unit_price: number; line_total: number; item_order: number; created_at?: string }
+        Update: { id?: string; quotation_id?: string; celebration_service_id?: string; service_code?: string; service_name?: string; quantity?: number; unit_price?: number; line_total?: number; item_order?: number; created_at?: string }
       }
       quotation_leads: {
         Row: { quotation_id: string; lead_id: string; created_at: string }

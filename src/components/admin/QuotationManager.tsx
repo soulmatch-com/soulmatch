@@ -557,7 +557,25 @@ export function QuotationManager({ quotationId, initialLeadId, returnTo }: { quo
           </Button>
         </div>
       </form>
-      {quotationId && <><QuotationBookingAction quotationId={quotationId} status={quotations.find((candidate) => candidate.id === quotationId)?.status || ''} /><QuotationLifecycle quotationId={quotationId} quotation={quotations.find((candidate) => candidate.id === quotationId) || null} /></>}
+      {quotationId && <>
+        <QuotationBookingAction quotationId={quotationId} status={quotations.find((candidate) => candidate.id === quotationId)?.status || ''} />
+        <QuotationLifecycle quotationId={quotationId} quotation={quotations.find((candidate) => candidate.id === quotationId) || null} />
+        <section className="mt-6 border-t border-rose-200 pt-5">
+          <h3 className="text-sm font-semibold text-rose-900">Delete quotation</h3>
+          <p className="mt-1 text-sm text-rose-800">This permanently removes the quotation and its related history. Quotations linked to a booking cannot be deleted.</p>
+          <Button
+            type="button"
+            className="mt-3"
+            size="sm"
+            variant="destructive"
+            disabled={deletingQuotation || !quotations.some((quotation) => quotation.id === quotationId)}
+            onClick={() => setQuotationToDelete(quotations.find((quotation) => quotation.id === quotationId) || null)}
+          >
+            <Trash2 className="mr-1 h-4 w-4" />
+            Delete quotation
+          </Button>
+        </section>
+      </>}
       <div className="mt-6 flex items-center justify-between border-t pt-5">
         <div>
           <h3 className="text-sm font-semibold text-slate-800">

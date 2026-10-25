@@ -23,7 +23,26 @@ const numberFormatter = new Intl.NumberFormat('en-IN', { minimumFractionDigits: 
 const poojas: Array<[string, string]> = [['கஜ பூஜை', 'Gaja Pooja'], ['கோ பூஜை', 'Go Pooja (Cow Worship)'], ['குதிரைக்கு பூஜை', 'Kuthiraikku Pooja'], ['விநாயகர் தரிசனம்', 'Vinayagar Darshan'], ['சாமி தரிசனம்', 'Saami Dharisanam'], ['சங்கல்பம் – குடும்ப உறுப்பினர்களின் நட்சத்திர விவர பூஜை', 'Sankalpam – family nakshatra details'], ['கலச பூஜை – 27 சங்கல்பத்தின் ஆவாஹனம்', 'Kalasa Pooja – 27 Sankalpams']]
 const homams: Array<[string, string]> = [['கணபதி ஹோமம்', 'Ganapathi Homam'], ['நவகிரஹ ஹோமம்', 'Navagraha Homam'], ['மிருத்யுஞ்ஜய ஹோமம்', 'Mrityunjaya Homam'], ['ஆயுள் ஹோமம்', 'Ayul Homam'], ['தன்வந்திரி ஹோமம்', 'Dhanvantari Homam'], ['சுதர்சன ஹோமம்', 'Sudarshana Homam'], ['துர்கா ஹோமம்', 'Durga Homam'], ['ஷஷ்டி ஹோமம்', 'Shasti Homam'], ['அஷ்ட லக்ஷ்மி ஹோமம்', 'Ashta Lakshmi Homam'], ['அய்யப்பன் ஹோமம்', 'Ayyappan Homam'], ['ஆஞ்சநேயர் ஹோமம்', 'Anjaneyar Homam'], ['குலதெய்வ ஹோமம்', 'Kula Deivam Homam'], ['நட்சத்திர ஹோமம்', 'Nakshatra Homam']]
 
-function addCeremonyPage(pdf: PDFDocument, logo: Awaited<ReturnType<PDFDocument['embedPng']>>, regular: PDFFont, bold: PDFFont, serifBold: PDFFont, tamil: PDFFont, ceremony: string) {
+function addFamilyNotesContinuation(pdf: PDFDocument, logo: Awaited<ReturnType<PDFDocument['embedPng']>>, regular: PDFFont, bold: PDFFont, serifBold: PDFFont, tamil: PDFFont, noteLines: string[]) {
+  for (let offset = 0; offset < noteLines.length; offset += 52) {
+    const page = pdf.addPage([pageWidth, pageHeight])
+    const text = (value: string, x: number, atY: number, size = 10, font = regular, color = slate) => page.drawText(value, { x, y: atY, size, font, color })
+    const centered = (value: string, atY: number, size: number, font = regular, color = slate) => text(value, (pageWidth - font.widthOfTextAtSize(value, size)) / 2, atY, size, font, color)
+    const logoWidth = 108
+    const logoHeight = logoWidth * logo.height / logo.width
+    page.drawImage(logo, { x: 36, y: 790, width: logoWidth, height: logoHeight })
+    centered('QUOTATION', 804, 16, serifBold, brand)
+    centered('NOTES: TERMS TO BRING (CONTINUED)', 750, 12, serifBold, brand)
+    let y = 724
+    for (const line of noteLines.slice(offset, offset + 52)) {
+      text(line, 42, y, 7, tamil, blue)
+      y -= 13
+    }
+    centered('MyThirumanam  |  www.mythirumanam.in  |  +91 78453 05728', 14, 6.5, bold, brand)
+  }
+}
+
+function addCeremonyPage(pdf: PDFDocument, logo: Awaited<ReturnType<PDFDocument['embedPng']>>, regular: PDFFont, bold: PDFFont, serifBold: PDFFont, tamil: PDFFont, ceremony: string, familyNotes: string | null) {
   const page = pdf.addPage([pageWidth, pageHeight])
   const text = (value: string, x: number, atY: number, size = 10, font = regular, color = slate) => page.drawText(value, { x, y: atY, size, font, color })
   const centered = (value: string, atY: number, size: number, font = regular, color = slate) => text(value, (pageWidth - font.widthOfTextAtSize(value, size)) / 2, atY, size, font, color)
@@ -72,9 +91,25 @@ function addCeremonyPage(pdf: PDFDocument, logo: Awaited<ReturnType<PDFDocument[
   const afterPooja = drawTable('Pooja / Ceremony', poojas, 680, 'Ritual / பூஜை', 'Description')
   const afterHomam = drawTable('Homam Details', homams, afterPooja - 34, 'ஹோமம்', 'Homam')
   const notesY = Math.max(95, afterHomam - 66)
+  const bilingualTerm = (english: string, tamilValue: string, atY: number) => {
+    const prefix = `•  ${english} (`
+    const prefixX = tableLeft + 18
+    text(prefix, prefixX, atY, 8, regular, blue)
+    const tamilX = prefixX + regular.widthOfTextAtSize(prefix, 8)
+    text(tamilValue, tamilX, atY, 8, tamil, blue)
+    text(')', tamilX + tamil.widthOfTextAtSize(tamilValue, 8), atY, 8, regular, blue)
+  }
   text('Notes: Terms to Bring', tableLeft + 1, notesY, 11, serifBold, brand)
-  text('➜  Muhurtha Veshti & Pudavaigal (முகூர்த்த வேஷ்டி & புடவைகள்)', tableLeft + 18, notesY - 16, 8, tamil, blue)
-  text('➜  Mangalyam (மாங்கல்யம்)', tableLeft + 18, notesY - 30, 8, tamil, blue)
+  // The arrow glyph is unavailable in Noto Sans Tamil. Draw Tamil separately
+  // so the embedded Tamil font handles its shaping and encoding exclusively.
+  bilingualTerm('Muhurtha Veshti & Pudavaigal', 'முகூர்த்த வேஷ்டி & புடவைகள்', notesY - 16)
+  bilingualTerm('Mangalyam', 'மாங்கல்யம்', notesY - 30)
+  const familyNoteLines = familyNotes ? wrap(familyNotes, 92) : []
+  if (familyNoteLines.length) {
+    const firstPageLines = familyNoteLines.slice(0, 9)
+    firstPageLines.forEach((note, index) => text(`${index === 0 ? '•  ' : '   '}${note}`, tableLeft + 18, notesY - 47 - index * 10, 7, tamil, blue))
+    addFamilyNotesContinuation(pdf, logo, regular, bold, serifBold, tamil, familyNoteLines.slice(firstPageLines.length))
+  }
   centered('MyThirumanam  |  www.mythirumanam.in  |  +91 78453 05728', 14, 6.5, bold, brand)
 }
 
@@ -119,7 +154,7 @@ export async function GET(_: Request, { params }: { params: Promise<{ id: string
   const supabase = createAdminClient()
   const [{ data: quotation, error: quotationError }, { data: items, error: itemsError }, { data: links, error: linksError }] = await Promise.all([
     supabase.from('quotations').select('id, quotation_number, valid_until, notes, total_amount, created_at').eq('id', id).maybeSingle(),
-    supabase.from('quotation_items').select('celebration_service_id, service_name, description_override, quantity, unit_price, line_total').eq('quotation_id', id).order('created_at', { ascending: true }),
+    supabase.from('quotation_items').select('celebration_service_id, service_name, description_override, quantity, unit_price, line_total').eq('quotation_id', id).order('item_order', { ascending: true }),
     supabase.from('quotation_leads').select('lead_id').eq('quotation_id', id),
   ])
   if (quotationError || itemsError || linksError) return NextResponse.json({ error: 'Unable to load quotation details' }, { status: 500 })
@@ -222,7 +257,6 @@ export async function GET(_: Request, { params }: { params: Promise<{ id: string
     'Any additional requirements will be charged separately.',
     'Rates are subject to change based on availability and final arrangements.',
     'Kindly confirm the quotation to proceed with the booking.',
-    ...(quotation.notes ? wrap(quotation.notes, 90) : []),
   ]
   for (const term of terms.slice(0, 5)) { text(`• ${term}`, tableLeft + 7, y, 6.5); y -= 9 }
   text('Prepared By: MyThirumanam', tableLeft + 6, 56, 7, bold, brand)
@@ -232,7 +266,7 @@ export async function GET(_: Request, { params }: { params: Promise<{ id: string
   line(342, 43, 445, 43, slate)
   centered('MyThirumanam  |  www.mythirumanam.in  |  +91 78453 05728', 14, 6.5, bold, brand)
 
-  addCeremonyPage(pdf, logo, regular, bold, serifBold, tamil, eventName(primaryLead?.event_type ?? null).replace('th Marriage', 'TH'))
+  addCeremonyPage(pdf, logo, regular, bold, serifBold, tamil, eventName(primaryLead?.event_type ?? null).replace('th Marriage', 'TH'), quotation.notes)
 
   const bytes = await pdf.save()
   const body = new Uint8Array(bytes).buffer

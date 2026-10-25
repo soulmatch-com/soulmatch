@@ -31,7 +31,7 @@ export async function GET() {
   if (quotationsError || servicesError || leadsError) return NextResponse.json({ error: 'Unable to load quotations' }, { status: 500 })
   const quotationIds = (quotations ?? []).map((quotation) => quotation.id)
   const [itemsResult, linksResult] = quotationIds.length ? await Promise.all([
-    supabase.from('quotation_items').select('*').in('quotation_id', quotationIds).order('created_at', { ascending: true }),
+    supabase.from('quotation_items').select('*').in('quotation_id', quotationIds).order('item_order', { ascending: true }),
     supabase.from('quotation_leads').select('quotation_id, lead_id').in('quotation_id', quotationIds),
   ]) : [{ data: [], error: null }, { data: [], error: null }]
   if (itemsResult.error || linksResult.error) return NextResponse.json({ error: 'Unable to load quotation details' }, { status: 500 })
@@ -63,7 +63,7 @@ export async function POST(request: NextRequest) {
   if (overrideResults.some((result) => result.error)) return NextResponse.json({ error: 'Unable to save quotation descriptions' }, { status: 500 })
   const [quotationResult, itemsResult, linksResult] = await Promise.all([
     supabase.from('quotations').select('*').eq('id', quotationId).maybeSingle(),
-    supabase.from('quotation_items').select('*').eq('quotation_id', quotationId).order('created_at', { ascending: true }),
+    supabase.from('quotation_items').select('*').eq('quotation_id', quotationId).order('item_order', { ascending: true }),
     supabase.from('quotation_leads').select('*').eq('quotation_id', quotationId),
   ])
   if (quotationResult.error || !quotationResult.data || itemsResult.error || linksResult.error) return NextResponse.json({ error: 'Unable to load saved quotation' }, { status: 500 })

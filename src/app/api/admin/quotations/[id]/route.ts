@@ -52,3 +52,23 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
   const { data: links } = await supabase.from('quotation_leads').select('quotation_id, lead_id').eq('quotation_id', id)
   return NextResponse.json({ quotation: data, links: links ?? [] })
 }
+
+export async function DELETE(_: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const authorization = await requireActiveAdmin()
+  if ('response' in authorization) return authorization.response
+
+  const { id } = await params
+  const supabase = createAdminClient()
+  const { count, error: bookingError } = await supabase
+    .from('celebration_bookings')
+    .select('id', { count: 'exact', head: true })
+    .eq('quotation_id', id)
+  if (bookingError) return NextResponse.json({ error: 'Unable to check quotation bookings' }, { status: 500 })
+  if (count) return NextResponse.json({ error: 'A quotation used to create a booking cannot be deleted.' }, { status: 409 })
+
+  const { data, error } = await supabase.from('quotations').delete().eq('id', id).select('id').maybeSingle()
+  if (error?.code === '23503') return NextResponse.json({ error: 'A quotation linked to a booking cannot be deleted.' }, { status: 409 })
+  if (error) return NextResponse.json({ error: 'Unable to delete quotation' }, { status: 500 })
+  if (!data) return NextResponse.json({ error: 'Quotation not found' }, { status: 404 })
+  return NextResponse.json({ ok: true })
+}

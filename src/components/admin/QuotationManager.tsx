@@ -2,7 +2,7 @@
 
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { History } from "lucide-react";
+import { History, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { QuotationBookingAction } from "@/components/admin/QuotationBookingAction";
 import {
@@ -13,6 +13,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 type Service = {
   id: string;
@@ -76,6 +86,8 @@ export function QuotationManager({ quotationId, initialLeadId, returnTo }: { quo
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+  const [quotationToDelete, setQuotationToDelete] = useState<Quotation | null>(null);
+  const [deletingQuotation, setDeletingQuotation] = useState(false);
 
   useEffect(() => {
     Promise.all([fetch("/api/admin/quotations"), initialLeadId ? fetch(`/api/admin/leads/${initialLeadId}`) : Promise.resolve(null)])
@@ -263,6 +275,30 @@ export function QuotationManager({ quotationId, initialLeadId, returnTo }: { quo
       );
     } finally {
       setSaving(false);
+    }
+  }
+  async function deleteQuotation() {
+    if (!quotationToDelete) return;
+    setDeletingQuotation(true);
+    setError("");
+    try {
+      const response = await fetch(`/api/admin/quotations/${quotationToDelete.id}`, { method: "DELETE" });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(data.error || "Unable to delete quotation.");
+      setQuotations((current) => current.filter((quotation) => quotation.id !== quotationToDelete.id));
+      setItems((current) => current.filter((item) => item.quotation_id !== quotationToDelete.id));
+      setLinks((current) => current.filter((link) => link.quotation_id !== quotationToDelete.id));
+      const deletedId = quotationToDelete.id;
+      setQuotationToDelete(null);
+      if (quotationId === deletedId) {
+        setIsHistoryOpen(false);
+        router.replace("/admin/quotations");
+        router.refresh();
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Unable to delete quotation.");
+    } finally {
+      setDeletingQuotation(false);
     }
   }
   return (
@@ -598,6 +634,16 @@ export function QuotationManager({ quotationId, initialLeadId, returnTo }: { quo
                         Download PDF
                       </a>
                     </Button>
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="destructive"
+                      disabled={deletingQuotation}
+                      onClick={() => setQuotationToDelete(quotation)}
+                    >
+                      <Trash2 className="mr-1 h-4 w-4" />
+                      Delete
+                    </Button>
                   </div>
                 </div>
                 <ul className="mt-3 divide-y text-sm text-slate-700">
@@ -637,6 +683,22 @@ export function QuotationManager({ quotationId, initialLeadId, returnTo }: { quo
           </div>
         </DialogContent>
       </Dialog>
+      <AlertDialog open={quotationToDelete !== null} onOpenChange={(open) => !deletingQuotation && !open && setQuotationToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete this quotation?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This permanently removes {quotationToDelete?.quotation_number} and its service lines, linked leads, delivery records, and activity history. Quotations linked to a booking cannot be deleted.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deletingQuotation}>Cancel</AlertDialogCancel>
+            <AlertDialogAction disabled={deletingQuotation} onClick={() => void deleteQuotation()}>
+              {deletingQuotation ? "Deleting…" : "Delete quotation"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </section>
   );
 }

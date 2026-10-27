@@ -123,7 +123,7 @@ function PlanV2Success({ enquiryReference, onStartAnother }: { enquiryReference:
           <Link href="/" className="inline-flex min-h-12 items-center justify-center rounded-xl bg-amber-800 px-5 font-bold text-white hover:bg-amber-900 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-amber-700">
             Back to Home
           </Link>
-          <Link href="/celebrations" className="inline-flex min-h-12 items-center justify-center rounded-xl border border-amber-700 px-5 font-bold text-amber-800 hover:bg-amber-50 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-amber-700">
+          <Link href="/" className="inline-flex min-h-12 items-center justify-center rounded-xl border border-amber-700 px-5 font-bold text-amber-800 hover:bg-amber-50 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-amber-700">
             View Celebration Guides
           </Link>
           <button type="button" onClick={onStartAnother} className="inline-flex min-h-12 items-center justify-center rounded-xl border border-amber-700 px-5 font-bold text-amber-800 hover:bg-amber-50 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-amber-700">

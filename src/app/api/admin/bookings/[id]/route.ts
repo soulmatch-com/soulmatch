@@ -18,7 +18,18 @@ export async function GET(_: NextRequest, { params }: { params: Promise<{ id: st
   if (!booking) return NextResponse.json({ error: 'Booking not found' }, { status: 404 })
   const transitions: Record<string, string[]> = { pending_confirmation: ['confirmed', 'cancelled'], confirmed: ['planning', 'cancelled'], planning: ['ready', 'cancelled'], ready: ['completed', 'cancelled'], completed: [], cancelled: [] }
   const unavailableQuotationIds = new Set([...(bookedQuotations ?? []).map((item) => item.quotation_id), ...(additionalQuotations ?? []).map((item) => item.quotation_id)])
-  const eligibleAdditionalQuotations = (acceptedQuotations ?? []).filter((quotation) => !unavailableQuotationIds.has(quotation.id))
+  let eligibleAdditionalQuotations = (acceptedQuotations ?? []).filter((quotation) => !unavailableQuotationIds.has(quotation.id))
+  const bookingLeadIds = (bookingLeads ?? []).map((link) => link.lead_id)
+  if (bookingLeadIds.length && eligibleAdditionalQuotations.length) {
+    const { data: sharedLeadLinks, error: sharedLeadLinksError } = await supabase
+      .from('quotation_leads')
+      .select('quotation_id')
+      .in('quotation_id', eligibleAdditionalQuotations.map((quotation) => quotation.id))
+      .in('lead_id', bookingLeadIds)
+    if (sharedLeadLinksError) return NextResponse.json({ error: 'Unable to load eligible quotation leads' }, { status: 500 })
+    const sharedLeadQuotationIds = new Set((sharedLeadLinks ?? []).map((link) => link.quotation_id))
+    eligibleAdditionalQuotations = eligibleAdditionalQuotations.filter((quotation) => sharedLeadQuotationIds.has(quotation.id))
+  }
   return NextResponse.json({ booking, services: services ?? [], activities: activities ?? [], leads: bookingLeads ?? [], additionalQuotations: additionalQuotations ?? [], eligibleAdditionalQuotations, allowedTransitions: transitions[booking.status] ?? [] })
 }
 

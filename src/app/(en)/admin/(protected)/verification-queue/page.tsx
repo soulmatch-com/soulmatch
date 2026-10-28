@@ -203,7 +203,7 @@ export default function VerificationQueuePage() {
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => router.push(`/profile/${profile.user_id}`)}
+                          onClick={() => router.push(`/admin/profiles/${profile.id}`)}
                         >
                           <Eye className="w-4 h-4 mr-2" />
                           View Full Profile

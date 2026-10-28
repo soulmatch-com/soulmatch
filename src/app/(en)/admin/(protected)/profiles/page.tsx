@@ -33,14 +33,24 @@ export default function AdminProfilesPage() {
   const [filter, setFilter] = useState<'all' | 'verified' | 'unverified'>('all')
   const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
+  const [hasHydrated, setHasHydrated] = useState(false)
+
+  // The admin store is persisted in localStorage, which is unavailable during
+  // server rendering. Defer the auth-dependent tree until after the initial
+  // client render so it matches the server output.
+  useEffect(() => {
+    setHasHydrated(true)
+  }, [])
 
   useEffect(() => {
+    if (!hasHydrated) return
+
     if (!isAuthenticated()) {
       router.push('/admin/login')
     } else {
       fetchProfiles()
     }
-  }, [isAuthenticated, router, filter, page])
+  }, [hasHydrated, isAuthenticated, router, filter, page])
 
   const fetchProfiles = async () => {
     setIsLoading(true)
@@ -117,7 +127,7 @@ export default function AdminProfilesPage() {
     }
   }
 
-  if (!isAuthenticated()) {
+  if (!hasHydrated || !isAuthenticated()) {
     return null
   }
 
@@ -239,7 +249,7 @@ export default function AdminProfilesPage() {
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => router.push(`/profile/${profile.user_id}`)}
+                          onClick={() => router.push(`/admin/profiles/${profile.id}`)}
                         >
                           <Eye className="w-4 h-4 mr-1" />
                           View

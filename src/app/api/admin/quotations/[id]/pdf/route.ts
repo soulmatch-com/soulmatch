@@ -3,7 +3,7 @@ import path from 'node:path'
 import { NextResponse } from 'next/server'
 import 'regenerator-runtime/runtime'
 import fontkit from '@pdf-lib/fontkit'
-import { PDFDocument, PDFFont, StandardFonts, rgb } from 'pdf-lib'
+import { PDFDocument, PDFFont, PDFImage, StandardFonts, rgb } from 'pdf-lib'
 import { requireActiveAdmin } from '@/lib/admin-auth'
 import { createAdminClient } from '@/lib/supabase/admin'
 
@@ -185,8 +185,32 @@ export async function GET(_: Request, { params }: { params: Promise<{ id: string
   const logo = await pdf.embedPng(logoBytes)
   const tamilFontBytes = await readFile(path.join(process.cwd(), 'public/brand/NotoSansTamil.ttf'))
   const tamil = await pdf.embedFont(tamilFontBytes, { subset: true })
+  const emojiImages = new Map<string, PDFImage>([
+    ['🪔', await pdf.embedPng(await readFile(path.join(process.cwd(), 'public/brand/emoji/diya.png')))],
+    ['🙏', await pdf.embedPng(await readFile(path.join(process.cwd(), 'public/brand/emoji/prayer.png')))],
+    ['🏛', await pdf.embedPng(await readFile(path.join(process.cwd(), 'public/brand/emoji/hall.png')))],
+    ['🏛️', await pdf.embedPng(await readFile(path.join(process.cwd(), 'public/brand/emoji/hall.png')))],
+    ['🛕', await pdf.embedPng(await readFile(path.join(process.cwd(), 'public/brand/emoji/temple.png')))],
+    ['🎶', await pdf.embedPng(await readFile(path.join(process.cwd(), 'public/brand/emoji/music.png')))],
+  ])
   const page = pdf.addPage([pageWidth, pageHeight])
   const text = (value: string, x: number, atY: number, size = 10, font = regular, color = slate) => page.drawText(value, { x, y: atY, size, font, color })
+  const particularsText = (value: string, x: number, atY: number, size = 7) => {
+    let cursor = x
+    for (const segment of value.split(/(🪔|🙏|🏛️?|🛕|🎶)/u)) {
+      const emoji = emojiImages.get(segment)
+      if (emoji) {
+        page.drawImage(emoji, { x: cursor, y: atY - 1, width: size + 1, height: size + 1 })
+        cursor += size + 2
+        continue
+      }
+      // Built-in PDF fonts cannot encode arbitrary emoji. Known quotation emojis
+      // are rendered as images above; unsupported ones are omitted safely.
+      const safeSegment = segment.replace(/\p{Extended_Pictographic}|\uFE0F|\u200D/gu, '')
+      text(safeSegment, cursor, atY, size)
+      cursor += regular.widthOfTextAtSize(safeSegment, size)
+    }
+  }
   const line = (x1: number, y1: number, x2: number, y2: number, color = border) => page.drawLine({ start: { x: x1, y: y1 }, end: { x: x2, y: y2 }, thickness: 0.75, color })
   const centered = (value: string, atY: number, size: number, font = regular, color = slate) => text(value, (pageWidth - font.widthOfTextAtSize(value, size)) / 2, atY, size, font, color)
   const primaryLead = leads?.[0]
@@ -235,7 +259,7 @@ export async function GET(_: Request, { params }: { params: Promise<{ id: string
     line(particularsLeft, y, particularsLeft, y - rowHeight, border)
     line(amountLeft, y, amountLeft, y - rowHeight, border)
     text(String(index + 1), tableLeft + 25 - regular.widthOfTextAtSize(String(index + 1), 7) / 2, y - 10, 7)
-    particularsLines.forEach((particularLine, lineIndex) => text(particularLine, particularsLeft + 6, y - 10 - lineIndex * 9, 7))
+    particularsLines.forEach((particularLine, lineIndex) => particularsText(particularLine, particularsLeft + 6, y - 10 - lineIndex * 9))
     const amount = numberFormatter.format(item.line_total)
     text(amount, tableLeft + tableWidth - 7 - regular.widthOfTextAtSize(amount, 7), y - 10, 7)
     y -= rowHeight

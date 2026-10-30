@@ -80,7 +80,7 @@ test('Gallery shares the approved route, layout chrome and reusable celebration 
 
 test('Gallery is public, indexable and uses conservative metadata', async () => {
   const page = await read('src/app/(en)/gallery/page.tsx')
-  assert.match(page, /const url = 'https:\/\/mythirumanam\.in\/gallery'/)
+  assert.match(page, /const url = 'https:\/\/mythirumanam\.com\/gallery'/)
   assert.match(page, /alternates: \{ canonical: url \}/)
   assert.match(page, /robots: \{ index: true, follow: true \}/)
   assert.match(page, /siteName: 'MyThirumanam'/)

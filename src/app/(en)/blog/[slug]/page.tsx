@@ -46,7 +46,7 @@ export default async function EnglishBlogArticlePage({ params }: { params: Promi
     <>
       <JsonLd data={[
         { '@context': 'https://schema.org', '@type': 'Article', headline: result.article.title, description: result.article.description, datePublished: result.article.publishedAt, ...(result.article.updatedAt ? { dateModified: result.article.updatedAt } : {}), mainEntityOfPage: url, inLanguage: 'en', publisher: { '@type': 'Organization', name: 'MyThirumanam' } },
-        { '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: [{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://mythirumanam.in/' }, { '@type': 'ListItem', position: 2, name: 'Blog', item: 'https://mythirumanam.in/blog' }, { '@type': 'ListItem', position: 3, name: result.article.title, item: url }] },
+        { '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: [{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://mythirumanam.com/' }, { '@type': 'ListItem', position: 2, name: 'Blog', item: 'https://mythirumanam.com/blog' }, { '@type': 'ListItem', position: 3, name: result.article.title, item: url }] },
       ]} />
       <BlogArticlePage article={result.article} alternateArticle={tamilArticle} />
     </>

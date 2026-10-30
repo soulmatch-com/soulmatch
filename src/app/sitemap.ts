@@ -2,7 +2,7 @@ import type { MetadataRoute } from 'next'
 import { getPublicBlogEntriesForSitemap } from '@/lib/blog/public-blog-source'
 import type { PublicBlogSourceSitemapEntry } from '@/lib/blog/public-blog-source'
 
-const origin = 'https://mythirumanam.in'
+const origin = 'https://mythirumanam.com'
 const staticPaths = ['/', '/60th-marriage', '/70th-marriage', '/80th-marriage', '/matrimony', '/about', '/gallery', '/terms', '/privacy', '/contact', '/blog', '/ta/blog']
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {

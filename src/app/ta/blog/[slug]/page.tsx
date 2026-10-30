@@ -48,7 +48,7 @@ export default async function TamilBlogArticlePage({ params }: { params: Promise
     <div lang="ta">
       <JsonLd data={[
         { '@context': 'https://schema.org', '@type': 'Article', headline: result.article.title, description: result.article.description, datePublished: result.article.publishedAt, ...(result.article.updatedAt ? { dateModified: result.article.updatedAt } : {}), mainEntityOfPage: url, inLanguage: 'ta', publisher: { '@type': 'Organization', name: 'MyThirumanam' } },
-        { '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: [{ '@type': 'ListItem', position: 1, name: 'முகப்பு', item: 'https://mythirumanam.in/' }, { '@type': 'ListItem', position: 2, name: 'விழா வழிகாட்டிகள்', item: 'https://mythirumanam.in/ta/blog' }, { '@type': 'ListItem', position: 3, name: result.article.title, item: url }] },
+        { '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: [{ '@type': 'ListItem', position: 1, name: 'முகப்பு', item: 'https://mythirumanam.com/' }, { '@type': 'ListItem', position: 2, name: 'விழா வழிகாட்டிகள்', item: 'https://mythirumanam.com/ta/blog' }, { '@type': 'ListItem', position: 3, name: result.article.title, item: url }] },
       ]} />
       <BlogArticlePage article={result.article} alternateArticle={englishArticle} />
     </div>

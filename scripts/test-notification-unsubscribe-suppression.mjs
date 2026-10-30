@@ -79,7 +79,7 @@ test('worker skips an actively suppressed subscriber without provider delivery',
   const outcomes = []
   const repository = {
     async claimJobs() { return [{ id: 'job-1', campaignId, subscriberId, channel: 'email', attemptCount: 0 }] },
-    async getCampaign() { return { id: campaignId, campaignType: 'blog_publication', locale: 'en', channel: 'email', status: 'queued', subject: 'New Guide', preheader: null, headline: 'Guide', summary: null, targetUrl: 'https://mythirumanam.in/blog/guide' } },
+    async getCampaign() { return { id: campaignId, campaignType: 'blog_publication', locale: 'en', channel: 'email', status: 'queued', subject: 'New Guide', preheader: null, headline: 'Guide', summary: null, targetUrl: 'https://mythirumanam.com/blog/guide' } },
     async getSubscriber() { return { id: subscriberId, email: 'person@example.com', subscribedLocales: ['en'], status: 'subscribed' } },
     async recordOutcome(id, outcome) { outcomes.push({ id, ...outcome }) },
   }

@@ -82,5 +82,5 @@ test('rendered metadata serves only the new icon family and local app manifest',
   expect(appleIcon.width).toBe(appleIcon.height)
   expect(appleIcon.width).toBe(180)
   await page.goto('/gallery')
-  await expect(page.locator('meta[property="og:image"]')).toHaveAttribute('content', 'https://mythirumanam.in/icon.png')
+  await expect(page.locator('meta[property="og:image"]')).toHaveAttribute('content', 'https://mythirumanam.com/icon.png')
 })

@@ -13,7 +13,7 @@ import { loadCelebrationServices } from '@/lib/celebrations/page-data'
 export const dynamic = 'force-dynamic'
 import { homepageGalleryPreviewItems } from '@/lib/celebrations/gallery'
 
-const url = 'https://mythirumanam.in/'
+const url = 'https://mythirumanam.com/'
 const socialImage = {
   url: '/brand/mythirumanam-logo.png',
   width: 1690,

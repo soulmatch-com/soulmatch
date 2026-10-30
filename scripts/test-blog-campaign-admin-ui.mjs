@@ -65,8 +65,8 @@ test('Blog bridge loads and validates the requested published locale before invo
   assert.match(bridge, /const translation = locale === 'en' \? blog\.english : blog\.tamil/)
   assert.match(bridge, /if \(!translation\) throw new Error\('Blog translation not found\.'\)/)
   assert.match(bridge, /requestPublishedBlogCampaignDraft\(/)
-  assert.match(bridge, /https:\/\/mythirumanam\.in\/blog\/\$\{source\.slug\}/)
-  assert.match(bridge, /https:\/\/mythirumanam\.in\/ta\/blog\/\$\{source\.slug\}/)
+  assert.match(bridge, /https:\/\/mythirumanam\.com\/blog\/\$\{source\.slug\}/)
+  assert.match(bridge, /https:\/\/mythirumanam\.com\/ta\/blog\/\$\{source\.slug\}/)
 })
 
 test('preview is protected, noindex, source-owned, and reads stored notification snapshot', () => {

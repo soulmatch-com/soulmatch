@@ -12,13 +12,13 @@ import {
 const root = new URL('../', import.meta.url)
 const read = (path) => readFile(new URL(path, root), 'utf8')
 const slug = '60th-marriage-thirukadaiyur'
-const englishUrl = 'https://mythirumanam.in/blog/60th-marriage-thirukadaiyur'
-const tamilUrl = 'https://mythirumanam.in/ta/blog/60th-marriage-thirukadaiyur'
+const englishUrl = 'https://mythirumanam.com/blog/60th-marriage-thirukadaiyur'
+const tamilUrl = 'https://mythirumanam.com/ta/blog/60th-marriage-thirukadaiyur'
 
 function assertAbsoluteHttps(url) {
   const parsed = new URL(url)
   assert.equal(parsed.protocol, 'https:')
-  assert.equal(parsed.hostname, 'mythirumanam.in')
+  assert.equal(parsed.hostname, 'mythirumanam.com')
 }
 
 test('English and Tamil route groups render distinct root document languages', async () => {
@@ -74,7 +74,7 @@ test('article metadata pages use the shared blog alternate helper', async () => 
 
 test('contact page has one canonical Metadata API source', async () => {
   const contact = await read('src/app/(en)/contact/page.tsx')
-  assert.match(contact, /const url = 'https:\/\/mythirumanam\.in\/contact'/)
+  assert.match(contact, /const url = 'https:\/\/mythirumanam\.com\/contact'/)
   assert.match(contact, /alternates: \{ canonical: url \}/)
   assert.equal((contact.match(/canonical/g) ?? []).length, 1)
 })
@@ -96,10 +96,10 @@ test('plan noindex, sitemap and robots SEO behavior is preserved', async () => {
   const robotsConfig = robots()
 
   assert.match(plan, /robots: \{ index: false, follow: true \}/)
-  assert.equal(sitemapUrls.includes('https://mythirumanam.in/plan'), false)
+  assert.equal(sitemapUrls.includes('https://mythirumanam.com/plan'), false)
   assert.ok(sitemapUrls.includes(englishUrl))
   assert.ok(sitemapUrls.includes(tamilUrl))
-  assert.equal(robotsConfig.sitemap, 'https://mythirumanam.in/sitemap.xml')
+  assert.equal(robotsConfig.sitemap, 'https://mythirumanam.com/sitemap.xml')
   assert.deepEqual(robotsConfig.rules.allow, ['/'])
   assert.ok(!JSON.stringify(robotsConfig).includes('noindex'))
 })

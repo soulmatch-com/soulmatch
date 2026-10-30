@@ -36,7 +36,7 @@ test('About services use the server loader and no hard-coded fallback', async ()
 
 test('About metadata and AboutPage JSON-LD are canonical', async () => {
   const source = await read('src/app/(en)/about/page.tsx')
-  assert.match(source, /const url = 'https:\/\/mythirumanam\.in\/about'/)
+  assert.match(source, /const url = 'https:\/\/mythirumanam\.com\/about'/)
   assert.match(source, /alternates: \{ canonical: url \}/)
   assert.match(source, /siteName: 'MyThirumanam'/)
   assert.match(source, /'@type': 'AboutPage'/)
@@ -44,8 +44,8 @@ test('About metadata and AboutPage JSON-LD are canonical', async () => {
 
 test('About is present in sitemap and plan remains excluded', () => {
   const urls = sitemap().map(({ url }) => url)
-  assert.ok(urls.includes('https://mythirumanam.in/about'))
-  assert.equal(urls.includes('https://mythirumanam.in/plan'), false)
+  assert.ok(urls.includes('https://mythirumanam.com/about'))
+  assert.equal(urls.includes('https://mythirumanam.com/plan'), false)
 })
 
 test('About contains Tamil language semantics and no unsupported claims', async () => {

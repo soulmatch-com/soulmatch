@@ -3,7 +3,7 @@ import type { Metadata } from 'next'
 import type { CmsBlogLocale } from '@/lib/blog/cms-types'
 import type { PublicBlogArticle, PublicBlogLocaleAvailability } from '@/lib/blog/public-blog-types'
 
-const siteUrl = 'https://mythirumanam.in'
+const siteUrl = 'https://mythirumanam.com'
 
 export function getPublicCmsBlogPath(locale: CmsBlogLocale, slug: string) {
   return locale === 'en' ? `/blog/${slug}` : `/ta/blog/${slug}`

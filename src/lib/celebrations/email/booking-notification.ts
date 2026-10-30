@@ -77,7 +77,7 @@ export async function sendBookingNotification(input: { enquiryId: string; enquir
   const boundary = 'mythirumanam-notification'
   const fromHeader = formatSenderAddress(from)
   const fromEmail = extractEmailAddress(from)
-  const messageId = `<celebration-${input.enquiryId}@mythirumanam.in>`
+  const messageId = `<celebration-${input.enquiryId}@mythirumanam.com>`
   const mime = [`From: ${fromHeader}`, `Sender: ${fromEmail}`, `Reply-To: ${fromHeader}`, `To: ${to}`, `Date: ${new Date().toUTCString()}`, `Message-ID: ${messageId}`, `Subject: ${encodeMimeHeader(message.subject)}`, 'MIME-Version: 1.0', `Content-Type: multipart/alternative; boundary="${boundary}"`, '', `--${boundary}`, 'Content-Type: text/plain; charset=UTF-8', '', message.text, `--${boundary}`, 'Content-Type: text/html; charset=UTF-8', '', message.html, `--${boundary}--`].join('\r\n')
   const raw = Buffer.from(mime, 'utf8').toString('base64url')
   const response = await fetch('https://gmail.googleapis.com/gmail/v1/users/me/messages/send', { method: 'POST', headers: { Authorization: `Bearer ${tokenResult.access_token}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ raw }) })

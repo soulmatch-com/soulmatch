@@ -3,7 +3,8 @@ import type { ReactNode } from 'react'
 import Link from 'next/link'
 
 function safeHref(value: string) {
-  return /^(\/|https:\/\/mythirumanam\.in\/)/.test(value) ? value : null
+  // Older published content can still contain an absolute .in link; that host redirects to .com.
+  return /^(\/|https:\/\/mythirumanam\.(?:com|in)\/)/.test(value) ? value : null
 }
 
 function inline(text: string) {

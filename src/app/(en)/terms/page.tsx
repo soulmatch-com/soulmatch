@@ -4,7 +4,7 @@ import { CelebrationBreadcrumbs } from '@/components/celebrations/CelebrationBre
 import { JsonLd } from '@/components/seo/JsonLd'
 import { IndependentServiceNotice } from '@/components/celebrations/IndependentServiceNotice'
 
-const url = 'https://mythirumanam.in/terms'
+const url = 'https://mythirumanam.com/terms'
 const title = 'Terms & Conditions | MyThirumanam'
 const description = 'Read the terms governing MyThirumanam celebration planning enquiries, service arrangements, third-party services and booking confirmations.'
 

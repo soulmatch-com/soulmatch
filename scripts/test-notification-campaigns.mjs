@@ -8,7 +8,7 @@ import { blogCampaignRequestSchema } from '../src/modules/notifications/campaign
 const timestamp = '2026-09-24T12:00:00.000Z'
 const id = '11111111-1111-4111-8111-111111111111'
 const actor = '22222222-2222-4222-8222-222222222222'
-const request = (overrides = {}) => ({ blogId: id, locale: 'en', slug: 'planning-guide', title: 'Planning Guide', excerpt: 'A practical guide for families.', publicUrl: 'https://mythirumanam.in/blog/planning-guide', publishedAt: timestamp, ...overrides })
+const request = (overrides = {}) => ({ blogId: id, locale: 'en', slug: 'planning-guide', title: 'Planning Guide', excerpt: 'A practical guide for families.', publicUrl: 'https://mythirumanam.com/blog/planning-guide', publishedAt: timestamp, ...overrides })
 
 class MemoryCampaignRepository {
   records = []
@@ -33,14 +33,14 @@ test('valid English blog campaign creates a draft email snapshot with determinis
   assert.deepEqual(repository.records[0], {
     id: '1', campaignType: 'blog_publication', sourceType: 'blog', sourceId: id, locale: 'en', channel: 'email',
     subject: 'New Guide: Planning Guide', preheader: 'A practical guide for families.', headline: 'Planning Guide',
-    summary: 'A practical guide for families.', targetUrl: 'https://mythirumanam.in/blog/planning-guide', sourcePublishedAt: timestamp, status: 'draft',
+    summary: 'A practical guide for families.', targetUrl: 'https://mythirumanam.com/blog/planning-guide', sourcePublishedAt: timestamp, status: 'draft',
     createdBy: actor, createdAt: timestamp, updatedAt: timestamp,
   })
 })
 
 test('valid Tamil blog campaign uses the Tamil deterministic subject', async () => {
   const repository = new MemoryCampaignRepository()
-  await new CampaignService(repository, () => timestamp).createBlogCampaignDraft(request({ locale: 'ta', title: 'திட்டமிடல் வழிகாட்டி', publicUrl: 'https://mythirumanam.in/ta/blog/planning-guide' }), actor)
+  await new CampaignService(repository, () => timestamp).createBlogCampaignDraft(request({ locale: 'ta', title: 'திட்டமிடல் வழிகாட்டி', publicUrl: 'https://mythirumanam.com/ta/blog/planning-guide' }), actor)
   assert.equal(repository.records[0].subject, 'புதிய வழிகாட்டி: திட்டமிடல் வழிகாட்டி')
 })
 
@@ -66,7 +66,7 @@ test('preheader is safely capped while target URL and source identifier remain s
   await new CampaignService(repository, () => timestamp).createBlogCampaignDraft(request({ excerpt }), actor)
   assert.equal(repository.records[0].preheader.length, 160)
   assert.equal(repository.records[0].sourceId, id)
-  assert.equal(repository.records[0].targetUrl, 'https://mythirumanam.in/blog/planning-guide')
+  assert.equal(repository.records[0].targetUrl, 'https://mythirumanam.com/blog/planning-guide')
 })
 
 test('migration enforces snapshot constraints, unique duplicate protection, RLS, and no Blog foreign key', () => {
@@ -89,8 +89,8 @@ test('Blog bridge alone depends on notification and preserves published-only/no-
   const publication = readFileSync(new URL('../src/lib/blog/admin-blog-repository.ts', import.meta.url), 'utf8')
   assert.match(bridge, /source\.status !== 'published'/)
   assert.match(bridge, /source\.locale !== 'en' && source\.locale !== 'ta'/)
-  assert.match(bridge, /https:\/\/mythirumanam\.in\/blog\/\$\{source\.slug\}/)
-  assert.match(bridge, /https:\/\/mythirumanam\.in\/ta\/blog\/\$\{source\.slug\}/)
+  assert.match(bridge, /https:\/\/mythirumanam\.com\/blog\/\$\{source\.slug\}/)
+  assert.match(bridge, /https:\/\/mythirumanam\.com\/ta\/blog\/\$\{source\.slug\}/)
   assert.match(bridge, /@\/modules\/notifications\/campaigns/)
   const publishOperation = publication.slice(publication.indexOf('export async function publishBlogTranslation'), publication.indexOf('export async function unpublishBlogTranslation'))
   assert.doesNotMatch(publishOperation, /campaign|requestPublishedBlogCampaignDraft|createAuthorizedBlogCampaignDraft/i)

@@ -29,15 +29,15 @@ for (const viewport of viewports) {
     await expect(page.locator('body')).not.toContainText('à®')
 
     await expect(page).toHaveTitle('Thirukadaiyur Celebration Gallery | MyThirumanam')
-    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', 'https://mythirumanam.in/gallery')
+    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', 'https://mythirumanam.com/gallery')
     await expect(page.locator('meta[name="description"]')).toHaveAttribute('content', 'Explore celebration moments and arrangements for 60th, 70th and 80th marriage ceremonies in Thirukadaiyur with MyThirumanam.')
     await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'index, follow')
-    await expect(page.locator('meta[property="og:url"]')).toHaveAttribute('content', 'https://mythirumanam.in/gallery')
+    await expect(page.locator('meta[property="og:url"]')).toHaveAttribute('content', 'https://mythirumanam.com/gallery')
     await expect(page.locator('meta[property="og:site_name"]')).toHaveAttribute('content', 'MyThirumanam')
-    await expect(page.locator('meta[property="og:image"]')).toHaveAttribute('content', 'https://mythirumanam.in/icon.png')
+    await expect(page.locator('meta[property="og:image"]')).toHaveAttribute('content', 'https://mythirumanam.com/icon.png')
     const schema = JSON.parse(await page.locator('script[type="application/ld+json"]').textContent() ?? '{}')
     expect(schema['@type']).toBe('CollectionPage')
-    expect(schema.url).toBe('https://mythirumanam.in/gallery')
+    expect(schema.url).toBe('https://mythirumanam.com/gallery')
     expect(Object.keys(schema).sort()).toEqual(['@context', '@type', 'description', 'name', 'url'])
 
     for (const name of ['Sign In', 'Get Started', 'Create Profile']) {

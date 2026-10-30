@@ -16,6 +16,10 @@ const nextConfig: NextConfig = {
   },
   async redirects() {
     return [
+      // Keep links to the former .in domain working while all public URLs use .com.
+      { source: '/:path*', has: [{ type: 'host', value: 'mythirumanam.in' }], destination: 'https://mythirumanam.com/:path*', permanent: true },
+      { source: '/:path*', has: [{ type: 'host', value: 'www.mythirumanam.in' }], destination: 'https://mythirumanam.com/:path*', permanent: true },
+      { source: '/:path*', has: [{ type: 'host', value: 'www.mythirumanam.com' }], destination: 'https://mythirumanam.com/:path*', permanent: true },
       { source: '/celebrations', destination: '/', permanent: true },
       { source: '/celebrations/thirukadaiyur', destination: '/', permanent: true },
       { source: '/celebrations/thirukadaiyur/60th-marriage', destination: '/60th-marriage', permanent: true },

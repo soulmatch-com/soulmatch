@@ -75,7 +75,7 @@ export function AdminLoginForm() {
               <Input
                 id="admin-email"
                 type="email"
-                placeholder="admin@mythirumanam.in"
+                placeholder="admin@mythirumanam.com"
                 {...register('email')}
                 disabled={isLoading}
               />

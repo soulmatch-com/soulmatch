@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { Heart, Search, ShieldCheck, UserPlus } from 'lucide-react'
 
-const url = 'https://mythirumanam.in/matrimony'
+const url = 'https://mythirumanam.com/matrimony'
 export const metadata: Metadata = { title: 'Tamil Matrimony | MyThirumanam', description: 'Explore Tamil matrimonial profiles with profile creation, matching and search in a privacy-conscious, family-focused experience.', alternates: { canonical: url }, openGraph: { title: 'Tamil Matrimony | MyThirumanam', description: 'Explore Tamil matrimonial profiles with profile creation, matching and search in a privacy-conscious, family-focused experience.', url, siteName: 'MyThirumanam', type: 'website' } }
 
 const journeys = [[Search, 'Find Matches', 'Browse matrimonial profiles using the existing search and preference experience.', '/search'], [UserPlus, 'Create Profile', 'Create a matrimonial profile and share the details that guide relevant introductions.', '/signup'], [Heart, 'Member Login', 'Return to your account, interests and profile controls.', '/login']] as const

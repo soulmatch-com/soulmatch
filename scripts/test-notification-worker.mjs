@@ -12,7 +12,7 @@ const jobId = '22222222-2222-4222-8222-222222222222'
 const subscriberId = '33333333-3333-4333-8333-333333333333'
 const now = new Date('2026-09-24T12:00:00.000Z')
 
-const campaign = (overrides = {}) => ({ id: campaignId, campaignType: 'blog_publication', locale: 'en', channel: 'email', status: 'queued', subject: 'New Guide: Planning', preheader: 'Helpful guide', headline: 'Planning Guide', summary: 'Practical information for families.', targetUrl: 'https://mythirumanam.in/blog/planning-guide', ...overrides })
+const campaign = (overrides = {}) => ({ id: campaignId, campaignType: 'blog_publication', locale: 'en', channel: 'email', status: 'queued', subject: 'New Guide: Planning', preheader: 'Helpful guide', headline: 'Planning Guide', summary: 'Practical information for families.', targetUrl: 'https://mythirumanam.com/blog/planning-guide', ...overrides })
 const subscriber = (overrides = {}) => ({ id: subscriberId, email: 'person@example.com', subscribedLocales: ['en'], status: 'subscribed', ...overrides })
 
 class FakeRepository {
@@ -28,7 +28,7 @@ class FakeProvider {
   async send(message) { this.messages.push(message); return this.result }
 }
 
-const unsubscribeUrls = (value = 'https://mythirumanam.in/unsubscribe/test') => ({ async resolve() { return value } })
+const unsubscribeUrls = (value = 'https://mythirumanam.com/unsubscribe/test') => ({ async resolve() { return value } })
 const noSuppression = { async hasActiveSuppression() { return false } }
 
 test('English and Tamil templates render campaign snapshots, CTAs, and independent-service copy', () => {
@@ -36,9 +36,9 @@ test('English and Tamil templates render campaign snapshots, CTAs, and independe
   const tamil = renderBlogPublicationEmail(campaign({ locale: 'ta', headline: 'திட்டமிடல் வழிகாட்டி' }), 'https://example.test/unsubscribe')
   assert.match(english.html, /Planning Guide/)
   assert.match(english.html, /Read the Full Guide/)
-  assert.match(english.html, /https:\/\/mythirumanam\.in\/plan/)
+  assert.match(english.html, /https:\/\/mythirumanam\.com\/plan/)
   assert.match(english.html, /Independent celebration planning and coordination service\./)
-  assert.match(english.html, /https:\/\/mythirumanam\.in\/brand\/mythirumanam-logo\.png/)
+  assert.match(english.html, /https:\/\/mythirumanam\.com\/brand\/mythirumanam-logo\.png/)
   assert.match(english.html, /background:#681c24/)
   assert.match(tamil.html, /திட்டமிடல் வழிகாட்டி/)
   assert.match(tamil.html, /முழு வழிகாட்டியை படிக்கவும்/)

@@ -10,7 +10,7 @@ import { loadCelebrationServices } from '@/lib/celebrations/page-data'
 export const dynamic = 'force-dynamic'
 import { IndependentServiceNotice } from '@/components/celebrations/IndependentServiceNotice'
 
-const url = 'https://mythirumanam.in/about'
+const url = 'https://mythirumanam.com/about'
 const description = 'Learn how MyThirumanam helps families plan 60th, 70th and 80th marriage celebrations in Thirukadaiyur with flexible, family-focused support.'
 
 const tamilContent = {

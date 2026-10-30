@@ -23,6 +23,47 @@ const numberFormatter = new Intl.NumberFormat('en-IN', { minimumFractionDigits: 
 const poojas: Array<[string, string]> = [['கஜ பூஜை', 'Gaja Pooja'], ['கோ பூஜை', 'Go Pooja (Cow Worship)'], ['குதிரைக்கு பூஜை', 'Kuthiraikku Pooja'], ['விநாயகர் தரிசனம்', 'Vinayagar Darshan'], ['சாமி தரிசனம்', 'Saami Dharisanam'], ['சங்கல்பம் – குடும்ப உறுப்பினர்களின் நட்சத்திர விவர பூஜை', 'Sankalpam – family nakshatra details'], ['கலச பூஜை – 27 சங்கல்பத்தின் ஆவாஹனம்', 'Kalasa Pooja – 27 Sankalpams']]
 const homams: Array<[string, string]> = [['கணபதி ஹோமம்', 'Ganapathi Homam'], ['நவகிரஹ ஹோமம்', 'Navagraha Homam'], ['மிருத்யுஞ்ஜய ஹோமம்', 'Mrityunjaya Homam'], ['ஆயுள் ஹோமம்', 'Ayul Homam'], ['தன்வந்திரி ஹோமம்', 'Dhanvantari Homam'], ['சுதர்சன ஹோமம்', 'Sudarshana Homam'], ['துர்கா ஹோமம்', 'Durga Homam'], ['ஷஷ்டி ஹோமம்', 'Shasti Homam'], ['அஷ்ட லக்ஷ்மி ஹோமம்', 'Ashta Lakshmi Homam'], ['அய்யப்பன் ஹோமம்', 'Ayyappan Homam'], ['ஆஞ்சநேயர் ஹோமம்', 'Anjaneyar Homam'], ['குலதெய்வ ஹோமம்', 'Kula Deivam Homam'], ['நட்சத்திர ஹோமம்', 'Nakshatra Homam']]
 
+// Keep Tamil shaping in Noto Sans Tamil, while Latin text and punctuation use the
+// standard font. A family note can contain both scripts in the same sentence.
+const tamilRun = /([\u0B80-\u0BFF\u200C\u200D]+)/gu
+
+function textRuns(value: string) {
+  return value.split(tamilRun).filter(Boolean)
+}
+
+function isTamilRun(value: string) {
+  return /^[\u0B80-\u0BFF\u200C\u200D]+$/u.test(value)
+}
+
+function multilingualWidth(value: string, size: number, regular: PDFFont, tamil: PDFFont) {
+  return textRuns(value).reduce((width, run) => width + (isTamilRun(run) ? tamil : regular).widthOfTextAtSize(run, size), 0)
+}
+
+function multilingualWrap(value: string, maxWidth: number, size: number, regular: PDFFont, tamil: PDFFont) {
+  const lines: string[] = []
+  for (const paragraph of value.trim().split(/\r?\n/u)) {
+    let line = ''
+    for (const word of paragraph.split(/\s+/u)) {
+      const next = line ? `${line} ${word}` : word
+      if (line && multilingualWidth(next, size, regular, tamil) > maxWidth) {
+        lines.push(line)
+        line = word
+      } else line = next
+    }
+    if (line) lines.push(line)
+  }
+  return lines
+}
+
+function drawMultilingualText(draw: (value: string, x: number, atY: number, size: number, font: PDFFont, color: ReturnType<typeof rgb>) => void, value: string, x: number, atY: number, size: number, regular: PDFFont, tamil: PDFFont, color: ReturnType<typeof rgb>) {
+  let cursor = x
+  for (const run of textRuns(value)) {
+    const font = isTamilRun(run) ? tamil : regular
+    draw(run, cursor, atY, size, font, color)
+    cursor += font.widthOfTextAtSize(run, size)
+  }
+}
+
 function addFamilyNotesContinuation(pdf: PDFDocument, logo: Awaited<ReturnType<PDFDocument['embedPng']>>, regular: PDFFont, bold: PDFFont, serifBold: PDFFont, tamil: PDFFont, noteLines: string[]) {
   for (let offset = 0; offset < noteLines.length; offset += 52) {
     const page = pdf.addPage([pageWidth, pageHeight])
@@ -35,7 +76,7 @@ function addFamilyNotesContinuation(pdf: PDFDocument, logo: Awaited<ReturnType<P
     centered('NOTES: TERMS TO BRING (CONTINUED)', 750, 12, serifBold, brand)
     let y = 724
     for (const line of noteLines.slice(offset, offset + 52)) {
-      text(line, 42, y, 7, tamil, blue)
+      drawMultilingualText(text, line, 42, y, 7, regular, tamil, blue)
       y -= 13
     }
     centered('MyThirumanam  |  www.mythirumanam.com  |  +91 78453 05728', 14, 6.5, bold, brand)
@@ -104,10 +145,10 @@ function addCeremonyPage(pdf: PDFDocument, logo: Awaited<ReturnType<PDFDocument[
   // so the embedded Tamil font handles its shaping and encoding exclusively.
   bilingualTerm('Muhurtha Veshti & Pudavaigal', 'முகூர்த்த வேஷ்டி & புடவைகள்', notesY - 16)
   bilingualTerm('Mangalyam', 'மாங்கல்யம்', notesY - 30)
-  const familyNoteLines = familyNotes ? wrap(familyNotes, 92) : []
+  const familyNoteLines = familyNotes ? multilingualWrap(familyNotes, tableWidth - 36, 7, regular, tamil) : []
   if (familyNoteLines.length) {
     const firstPageLines = familyNoteLines.slice(0, 9)
-    firstPageLines.forEach((note, index) => text(`${index === 0 ? '•  ' : '   '}${note}`, tableLeft + 18, notesY - 47 - index * 10, 7, tamil, blue))
+    firstPageLines.forEach((note, index) => drawMultilingualText(text, `${index === 0 ? '•  ' : '   '}${note}`, tableLeft + 18, notesY - 47 - index * 10, 7, regular, tamil, blue))
     addFamilyNotesContinuation(pdf, logo, regular, bold, serifBold, tamil, familyNoteLines.slice(firstPageLines.length))
   }
   centered('MyThirumanam  |  www.mythirumanam.com  |  +91 78453 05728', 14, 6.5, bold, brand)

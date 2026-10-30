@@ -9,7 +9,7 @@ import { CelebrationCTA } from '@/components/celebrations/CelebrationCTA'
 import { IndependentServiceNotice } from '@/components/celebrations/IndependentServiceNotice'
 import { approvedCelebrationGalleryItems, celebrationGalleryItems, galleryBrandArtwork } from '@/lib/celebrations/gallery'
 
-const url = 'https://mythirumanam.in/gallery'
+const url = 'https://mythirumanam.com/gallery'
 const title = 'Thirukadaiyur Celebration Gallery | MyThirumanam'
 const description = 'View MyThirumanam gallery updates for milestone marriage celebrations in Thirukadaiyur, with approved celebration photographs added as they become available.'
 

@@ -25,7 +25,7 @@ export function buildPublishedBlogCampaignRequest(source: BlogCampaignSource): B
     slug: source.slug,
     title: source.title,
     excerpt: source.excerpt ?? null,
-    publicUrl: source.locale === 'en' ? `https://mythirumanam.in/blog/${source.slug}` : `https://mythirumanam.in/ta/blog/${source.slug}`,
+    publicUrl: source.locale === 'en' ? `https://mythirumanam.com/blog/${source.slug}` : `https://mythirumanam.com/ta/blog/${source.slug}`,
     publishedAt: source.publishedAt,
   }
 }

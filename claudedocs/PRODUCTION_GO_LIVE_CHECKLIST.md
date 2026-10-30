@@ -13,7 +13,7 @@ Required by current production code:
 | `SUPABASE_SERVICE_ROLE_KEY` | Server only | Production service-role key. Never expose to browser or Preview unless deliberately using the production DB. |
 | `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | Public | Production Turnstile site key. Do not use Cloudflare test keys. |
 | `TURNSTILE_SECRET_KEY` | Server only | Production Turnstile secret key. |
-| `TURNSTILE_ALLOWED_HOSTNAMES` | Server only | `mythirumanam.in`; include `www.mythirumanam.in` only if requests can originate there before redirect. |
+| `TURNSTILE_ALLOWED_HOSTNAMES` | Server only | `mythirumanam.com`; include `www.mythirumanam.com` only if requests can originate there before redirect. |
 | `UPSTASH_REDIS_REST_URL` | Server only | Upstash Redis REST URL for enquiry rate limiting. |
 | `UPSTASH_REDIS_REST_TOKEN` | Server only | Upstash Redis REST token. |
 | `CELEBRATION_RATE_LIMIT_SALT` | Server only | Strong random secret used to hash network identifiers. |
@@ -39,7 +39,7 @@ Optional or feature-dependent:
 | `ADMIN_SETUP_PASSWORD` | Server only | Do not configure when setup is disabled. |
 | `NEXT_PUBLIC_ADMIN_API_URL` | Public | Optional admin module override; default is `/api/admin`. |
 
-`NEXT_PUBLIC_APP_URL` is not currently read by application source, but if configured for deployment convention it must be `https://mythirumanam.in` in Production.
+`NEXT_PUBLIC_APP_URL` is not currently read by application source, but if configured for deployment convention it must be `https://mythirumanam.com` in Production.
 
 Use Vercel Production scope for production values. Development and Preview should use isolated non-production Supabase, Gmail, Turnstile, and Upstash resources unless production access is explicitly approved.
 
@@ -123,8 +123,8 @@ RPC contract checks:
 ## Turnstile Setup
 
 1. In Cloudflare, create or select the production Turnstile widget.
-2. Add `mythirumanam.in` as a production hostname.
-3. Add `www.mythirumanam.in` only if requests may submit from `www` before redirect.
+2. Add `mythirumanam.com` as a production hostname.
+3. Add `www.mythirumanam.com` only if requests may submit from `www` before redirect.
 4. Copy the site key to `NEXT_PUBLIC_TURNSTILE_SITE_KEY`.
 5. Copy the secret key to `TURNSTILE_SECRET_KEY`.
 6. Set `TURNSTILE_ALLOWED_HOSTNAMES` to the accepted hostname list.
@@ -161,12 +161,12 @@ Do not retry the RPC because email failed. The email body must not include DOB, 
 
 ## Vercel And Domain Setup
 
-Canonical production domain: `https://mythirumanam.in`.
+Canonical production domain: `https://mythirumanam.com`.
 
 1. Configure required Production environment variables.
-2. Attach `mythirumanam.in` to the Production deployment.
-3. Attach `www.mythirumanam.in` only as a redirect source.
-4. Configure `https://www.mythirumanam.in/*` -> `https://mythirumanam.in/*`, preserving path and query where supported.
+2. Attach `mythirumanam.com` to the Production deployment.
+3. Attach `www.mythirumanam.com`, `mythirumanam.in`, and `www.mythirumanam.in` as redirect sources.
+4. Configure `https://www.mythirumanam.com/*`, `https://mythirumanam.in/*`, and `https://www.mythirumanam.in/*` to redirect to `https://mythirumanam.com/*`, preserving path and query where supported.
 5. Confirm valid TLS certificates for all attached hosts.
 6. Confirm HTTP redirects to HTTPS.
 
@@ -180,7 +180,7 @@ Canonical production domain: `https://mythirumanam.in`.
 6. Configure Upstash.
 7. Configure Gmail OAuth notification variables.
 8. Configure required Vercel Production environment variables.
-9. Attach `mythirumanam.in` domain.
+9. Attach `mythirumanam.com` domain.
 10. Configure `www` redirect.
 11. Deploy production branch.
 12. Verify HTTPS.

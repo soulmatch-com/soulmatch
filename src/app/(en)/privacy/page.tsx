@@ -5,7 +5,7 @@ import { IndependentServiceNotice } from '@/components/celebrations/IndependentS
 import { JsonLd } from '@/components/seo/JsonLd'
 import { privacyPolicySections, tamilPrivacyIntroduction } from '@/lib/legal/privacy-policy'
 
-const url = 'https://mythirumanam.in/privacy'
+const url = 'https://mythirumanam.com/privacy'
 const description = 'Learn how MyThirumanam collects, uses and protects information provided for celebration planning and related services.'
 export const metadata: Metadata = { title: 'Privacy Policy | MyThirumanam', description, alternates: { canonical: url }, openGraph: { title: 'Privacy Policy | MyThirumanam', description, url, siteName: 'MyThirumanam', type: 'website' } }
 

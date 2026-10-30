@@ -67,11 +67,11 @@ test('listing and article routes have self-canonicals, reciprocal hreflang and x
   assert.ok(english)
   assert.ok(tamil)
   assert.deepEqual(getBlogArticleAlternates(english), {
-    canonical: 'https://mythirumanam.in/blog/60th-marriage-thirukadaiyur',
+    canonical: 'https://mythirumanam.com/blog/60th-marriage-thirukadaiyur',
     languages: {
-      en: 'https://mythirumanam.in/blog/60th-marriage-thirukadaiyur',
-      ta: 'https://mythirumanam.in/ta/blog/60th-marriage-thirukadaiyur',
-      'x-default': 'https://mythirumanam.in/blog/60th-marriage-thirukadaiyur',
+      en: 'https://mythirumanam.com/blog/60th-marriage-thirukadaiyur',
+      ta: 'https://mythirumanam.com/ta/blog/60th-marriage-thirukadaiyur',
+      'x-default': 'https://mythirumanam.com/blog/60th-marriage-thirukadaiyur',
     },
   })
   assert.deepEqual(getBlogArticleAlternates(tamil).languages, getBlogArticleAlternates(english).languages)
@@ -86,11 +86,11 @@ test('Article and BreadcrumbList structured data are language and URL accurate',
   assert.match(englishArticle, /'@type': 'Article'/)
   assert.match(englishArticle, /inLanguage: 'en'/)
   assert.match(englishArticle, /'@type': 'BreadcrumbList'/)
-  assert.match(englishArticle, /item: 'https:\/\/mythirumanam\.in\/blog'/)
+  assert.match(englishArticle, /item: 'https:\/\/mythirumanam\.com\/blog'/)
   assert.match(tamilArticle, /'@type': 'Article'/)
   assert.match(tamilArticle, /inLanguage: 'ta'/)
   assert.match(tamilArticle, /'@type': 'BreadcrumbList'/)
-  assert.match(tamilArticle, /item: 'https:\/\/mythirumanam\.in\/ta\/blog'/)
+  assert.match(tamilArticle, /item: 'https:\/\/mythirumanam\.com\/ta\/blog'/)
   assert.doesNotMatch(englishArticle + tamilArticle, /FAQPage|AggregateRating|Review|Offer/)
 })
 
@@ -132,7 +132,7 @@ test('blog content avoids unsupported packages, pricing, trust claims, external 
   const combined = (await Promise.all(files.map(read))).join('\n')
   assert.doesNotMatch(combined, unsupportedClaims)
   assert.doesNotMatch(combined, unsafeTempleWording)
-  assert.doesNotMatch(combined, /iraivi|googleusercontent|unsplash|pexels|pixabay|stock photo|http:\/\/|https:\/\/(?!schema\.org|mythirumanam\.in)/i)
+  assert.doesNotMatch(combined, /iraivi|googleusercontent|unsplash|pexels|pixabay|stock photo|http:\/\/|https:\/\/(?!schema\.org|mythirumanam\.com)/i)
   assert.doesNotMatch(combined, /heroImage|image:\s*\{|\.jpg|\.jpeg|\.webp/)
 })
 
@@ -166,7 +166,7 @@ test('only published articles enter sitemap and blog listings', () => {
   assert.equal(getBlogListingPath('ta'), '/ta/blog')
   assert.ok(publishedPaths.includes('/blog/sashtiapthapoorthi-in-thirukadaiyur'))
   assert.ok(publishedPaths.includes('/ta/blog/sashtiapthapoorthi-in-thirukadaiyur'))
-  assert.equal(getBlogUrl(getPublishedBlogArticle('en', slug)), 'https://mythirumanam.in/blog/60th-marriage-thirukadaiyur')
+  assert.equal(getBlogUrl(getPublishedBlogArticle('en', slug)), 'https://mythirumanam.com/blog/60th-marriage-thirukadaiyur')
 })
 
 test('Sashtiapthapoorthi pair has approved SEO, route, product and safety content', () => {
@@ -181,11 +181,11 @@ test('Sashtiapthapoorthi pair has approved SEO, route, product and safety conten
   assert.equal(getBlogPath(english), '/blog/sashtiapthapoorthi-in-thirukadaiyur')
   assert.equal(getBlogPath(tamil), '/ta/blog/sashtiapthapoorthi-in-thirukadaiyur')
   assert.deepEqual(getBlogArticleAlternates(english), {
-    canonical: 'https://mythirumanam.in/blog/sashtiapthapoorthi-in-thirukadaiyur',
+    canonical: 'https://mythirumanam.com/blog/sashtiapthapoorthi-in-thirukadaiyur',
     languages: {
-      en: 'https://mythirumanam.in/blog/sashtiapthapoorthi-in-thirukadaiyur',
-      ta: 'https://mythirumanam.in/ta/blog/sashtiapthapoorthi-in-thirukadaiyur',
-      'x-default': 'https://mythirumanam.in/blog/sashtiapthapoorthi-in-thirukadaiyur',
+      en: 'https://mythirumanam.com/blog/sashtiapthapoorthi-in-thirukadaiyur',
+      ta: 'https://mythirumanam.com/ta/blog/sashtiapthapoorthi-in-thirukadaiyur',
+      'x-default': 'https://mythirumanam.com/blog/sashtiapthapoorthi-in-thirukadaiyur',
     },
   })
   const englishContent = JSON.stringify(english)
@@ -214,8 +214,8 @@ test('today’s Sashtiapthapoorthi pair is complete, indexable and publication-r
   assert.equal(tamil.description, 'திருக்கடையூரில் சஷ்டியப்தபூர்த்தி அல்லது 60வது திருமணத்தை திட்டமிடுகிறீர்களா? விருந்தினர் எண்ணிக்கை, அமர்வுகள், உணவு, தங்குமிடம், பயணம் மற்றும் விழா ஏற்பாடுகள் குறித்து குடும்பங்கள் தெரிந்துகொள்ள வேண்டியவற்றை அறியுங்கள்.')
   assert.equal(english.title, 'Sashtiapthapoorthi in Thirukadaiyur – What Families Should Know')
   assert.equal(tamil.title, 'திருக்கடையூரில் சஷ்டியப்தபூர்த்தி – குடும்பங்கள் தெரிந்துகொள்ள வேண்டியவை')
-  assert.equal(getBlogArticleAlternates(english).canonical, 'https://mythirumanam.in/blog/sashtiapthapoorthi-in-thirukadaiyur')
-  assert.equal(getBlogArticleAlternates(tamil).canonical, 'https://mythirumanam.in/ta/blog/sashtiapthapoorthi-in-thirukadaiyur')
+  assert.equal(getBlogArticleAlternates(english).canonical, 'https://mythirumanam.com/blog/sashtiapthapoorthi-in-thirukadaiyur')
+  assert.equal(getBlogArticleAlternates(tamil).canonical, 'https://mythirumanam.com/ta/blog/sashtiapthapoorthi-in-thirukadaiyur')
   assert.deepEqual(getBlogArticleAlternates(tamil).languages, getBlogArticleAlternates(english).languages)
 
   const englishBody = JSON.stringify(english)
@@ -269,8 +269,8 @@ test('session-planning pair keeps session, guests and plans independent without 
   assert.equal(tamil.seoTitle, 'திருக்கடையூர் 60வது திருமணம் – 1 அமர்வு vs 2 அமர்வுகள் | MyThirumanam')
   assert.equal(getBlogPath(english), '/blog/1-session-vs-2-sessions-thirukadaiyur-60th-marriage')
   assert.equal(getBlogPath(tamil), '/ta/blog/1-session-vs-2-sessions-thirukadaiyur-60th-marriage')
-  assert.equal(getBlogArticleAlternates(english).canonical, 'https://mythirumanam.in/blog/1-session-vs-2-sessions-thirukadaiyur-60th-marriage')
-  assert.equal(getBlogArticleAlternates(tamil).canonical, 'https://mythirumanam.in/ta/blog/1-session-vs-2-sessions-thirukadaiyur-60th-marriage')
+  assert.equal(getBlogArticleAlternates(english).canonical, 'https://mythirumanam.com/blog/1-session-vs-2-sessions-thirukadaiyur-60th-marriage')
+  assert.equal(getBlogArticleAlternates(tamil).canonical, 'https://mythirumanam.com/ta/blog/1-session-vs-2-sessions-thirukadaiyur-60th-marriage')
   assert.deepEqual(getBlogArticleAlternates(english).languages, getBlogArticleAlternates(tamil).languages)
 
   const englishContent = JSON.stringify(english)

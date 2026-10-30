@@ -7,7 +7,7 @@ import { loadCelebrationServices } from '@/lib/celebrations/page-data'
 export const dynamic = 'force-dynamic'
 import { celebrationPlanV2Enabled } from '@/lib/celebrations/plan-v2'
 
-const url = 'https://mythirumanam.in/plan'
+const url = 'https://mythirumanam.com/plan'
 export const metadata: Metadata = { title: 'Plan a Thirukadaiyur Celebration | MyThirumanam', description: 'Begin planning a 60th, 70th or 80th marriage celebration at Thirukadaiyur.', alternates: { canonical: url }, robots: { index: false, follow: true } }
 
 export default async function PlanPage({ searchParams }: { searchParams: Promise<{ ceremony?: string }> }) {

@@ -10,7 +10,7 @@ import { CelebrationContactActions } from './CelebrationContactActions'
 import { JsonLd } from '@/components/seo/JsonLd'
 
 export function CeremonyPage({ ceremony, services, servicesFailed }: { ceremony: CeremonyContent; services: PublicCelebrationService[]; servicesFailed: boolean }) {
-  const pageUrl = `https://mythirumanam.in/${ceremony.slug}`
+  const pageUrl = `https://mythirumanam.com/${ceremony.slug}`
   const pageName = `${ceremony.title} in Thirukadaiyur – ${ceremony.traditionalName}`
   const packageDetails = ceremony.slug === '60th-marriage'
     ? {
@@ -33,7 +33,7 @@ export function CeremonyPage({ ceremony, services, servicesFailed }: { ceremony:
       { '@type': 'WebPage', name: pageName, url: pageUrl, description: ceremony.summary },
       { '@type': 'Service', name: `${ceremony.title} Planning in Thirukadaiyur`, serviceType: `${ceremony.title} celebration planning`, areaServed: 'Thirukadaiyur', url: pageUrl },
       { '@type': 'BreadcrumbList', itemListElement: [
-        { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://mythirumanam.in/' },
+        { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://mythirumanam.com/' },
         { '@type': 'ListItem', position: 2, name: ceremony.title, item: pageUrl },
       ] },
       { '@type': 'FAQPage', mainEntity: ceremony.faqs.map((faq) => ({

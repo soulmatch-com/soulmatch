@@ -10,13 +10,13 @@ const socialImage = {
 }
 
 export const rootMetadata: Metadata = {
-  metadataBase: new URL('https://mythirumanam.in'),
+  metadataBase: new URL('https://mythirumanam.com'),
   title,
   description,
   openGraph: {
     title,
     description,
-    url: 'https://mythirumanam.in',
+    url: 'https://mythirumanam.com',
     siteName: 'MyThirumanam',
     type: 'website',
     images: [socialImage],

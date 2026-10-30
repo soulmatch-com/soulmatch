@@ -7,18 +7,18 @@ import { getBlogListingUrl, getBlogPath, getPublishedBlogArticles } from '../src
 const root = new URL('../', import.meta.url)
 const read = (path) => readFile(new URL(path, root), 'utf8')
 const publicPages = [
-  ['src/app/(en)/celebrations/thirukadaiyur/page.tsx', 'https://mythirumanam.in/'],
-  ['src/app/(en)/celebrations/thirukadaiyur/60th-marriage/page.tsx', 'https://mythirumanam.in/60th-marriage'],
-  ['src/app/(en)/celebrations/thirukadaiyur/70th-marriage/page.tsx', 'https://mythirumanam.in/70th-marriage'],
-  ['src/app/(en)/celebrations/thirukadaiyur/80th-marriage/page.tsx', 'https://mythirumanam.in/80th-marriage'],
-  ['src/app/(en)/matrimony/page.tsx', 'https://mythirumanam.in/matrimony'],
-  ['src/app/(en)/about/page.tsx', 'https://mythirumanam.in/about'],
-  ['src/app/(en)/gallery/page.tsx', 'https://mythirumanam.in/gallery'],
-  ['src/app/(en)/terms/page.tsx', 'https://mythirumanam.in/terms'],
+  ['src/app/(en)/celebrations/thirukadaiyur/page.tsx', 'https://mythirumanam.com/'],
+  ['src/app/(en)/celebrations/thirukadaiyur/60th-marriage/page.tsx', 'https://mythirumanam.com/60th-marriage'],
+  ['src/app/(en)/celebrations/thirukadaiyur/70th-marriage/page.tsx', 'https://mythirumanam.com/70th-marriage'],
+  ['src/app/(en)/celebrations/thirukadaiyur/80th-marriage/page.tsx', 'https://mythirumanam.com/80th-marriage'],
+  ['src/app/(en)/matrimony/page.tsx', 'https://mythirumanam.com/matrimony'],
+  ['src/app/(en)/about/page.tsx', 'https://mythirumanam.com/about'],
+  ['src/app/(en)/gallery/page.tsx', 'https://mythirumanam.com/gallery'],
+  ['src/app/(en)/terms/page.tsx', 'https://mythirumanam.com/terms'],
 ]
 
 test('metadata base and concise Celebrations-first homepage title are configured', async () => {
-  assert.match(await read('src/app/root-metadata.ts'), /metadataBase: new URL\('https:\/\/mythirumanam\.in'\)/)
+  assert.match(await read('src/app/root-metadata.ts'), /metadataBase: new URL\('https:\/\/mythirumanam\.com'\)/)
   assert.match(await read(publicPages[0][0]), /Thirukadaiyur 60th, 70th & 80th Marriage \| MyThirumanam/)
 })
 
@@ -48,12 +48,12 @@ test('auth and private route groups are explicitly noindexed', async () => {
 test('sitemap contains only canonical public product pages', () => {
   const expectedUrls = [
     ...publicPages.map(([, url]) => url),
-    'https://mythirumanam.in/privacy',
-    'https://mythirumanam.in/contact',
+    'https://mythirumanam.com/privacy',
+    'https://mythirumanam.com/contact',
     getBlogListingUrl('en'),
-    ...getPublishedBlogArticles('en').map((article) => `https://mythirumanam.in${getBlogPath(article)}`),
+    ...getPublishedBlogArticles('en').map((article) => `https://mythirumanam.com${getBlogPath(article)}`),
     getBlogListingUrl('ta'),
-    ...getPublishedBlogArticles('ta').map((article) => `https://mythirumanam.in${getBlogPath(article)}`),
+    ...getPublishedBlogArticles('ta').map((article) => `https://mythirumanam.com${getBlogPath(article)}`),
   ]
   assert.deepEqual(sitemap().map(({ url }) => url), expectedUrls)
 })
@@ -63,7 +63,7 @@ test('homepage and ceremonies include safe structured data without claims or pri
   const ceremony = await read('src/components/celebrations/CeremonyPage.tsx')
   assert.match(homepage, /'@type': 'WebSite'/)
   for (const type of ['WebPage', 'Service', 'BreadcrumbList']) assert.ok(ceremony.includes(`'@type': '${type}'`))
-  assert.match(ceremony, /https:\/\/mythirumanam\.in\/\$\{ceremony\.slug\}/)
+  assert.match(ceremony, /https:\/\/mythirumanam\.com\/\$\{ceremony\.slug\}/)
   assert.doesNotMatch(`${homepage}\n${ceremony}`, /aggregateRating|Review|Offer|price|priceRange/)
 })
 

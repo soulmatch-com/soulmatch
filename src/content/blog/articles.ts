@@ -638,11 +638,11 @@ export function getBlogListingPath(locale: BlogLocale) {
 }
 
 export function getBlogUrl(article: Pick<BlogArticle, 'locale' | 'slug'>) {
-  return `https://mythirumanam.in${getBlogPath(article)}`
+  return `https://mythirumanam.com${getBlogPath(article)}`
 }
 
 export function getBlogListingUrl(locale: BlogLocale) {
-  return `https://mythirumanam.in${getBlogListingPath(locale)}`
+  return `https://mythirumanam.com${getBlogListingPath(locale)}`
 }
 
 export function getBlogArticleAlternates(article: BlogArticle) {

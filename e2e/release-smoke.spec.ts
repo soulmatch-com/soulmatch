@@ -589,11 +589,11 @@ test('legacy redirects, sitemap and robots resolve in the real browser', async (
 
 test('rendered SEO metadata and structured data use canonical short routes', async ({ page }) => {
   const pages = [
-    ['/', 'Thirukadaiyur 60th, 70th & 80th Marriage | MyThirumanam', 'https://mythirumanam.in'],
-    ['/60th-marriage', 'Thirukadaiyur 60th Marriage | Sashtiapthapoorthi', 'https://mythirumanam.in/60th-marriage'],
-    ['/70th-marriage', 'Thirukadaiyur 70th Marriage | Bheemaratha Shanthi', 'https://mythirumanam.in/70th-marriage'],
-    ['/80th-marriage', 'Thirukadaiyur 80th Marriage | Sathabhishekam', 'https://mythirumanam.in/80th-marriage'],
-    ['/matrimony', 'Tamil Matrimony | MyThirumanam', 'https://mythirumanam.in/matrimony'],
+    ['/', 'Thirukadaiyur 60th, 70th & 80th Marriage | MyThirumanam', 'https://mythirumanam.com'],
+    ['/60th-marriage', 'Thirukadaiyur 60th Marriage | Sashtiapthapoorthi', 'https://mythirumanam.com/60th-marriage'],
+    ['/70th-marriage', 'Thirukadaiyur 70th Marriage | Bheemaratha Shanthi', 'https://mythirumanam.com/70th-marriage'],
+    ['/80th-marriage', 'Thirukadaiyur 80th Marriage | Sathabhishekam', 'https://mythirumanam.com/80th-marriage'],
+    ['/matrimony', 'Tamil Matrimony | MyThirumanam', 'https://mythirumanam.com/matrimony'],
   ] as const
   for (const [path, title, canonical] of pages) {
     await visit(page, path)
@@ -638,11 +638,11 @@ test('About page renders services, bilingual content, canonical metadata, and re
     await expect(page.locator('section').filter({ hasText: 'Everything Your Family Needs' }).locator('li svg')).toHaveCount(14)
     await expect(page.locator('section').filter({ hasText: 'Family-Focused From the First Step' }).locator('article svg')).toHaveCount(4)
     await expect(page.locator('section').filter({ hasText: 'Simple Planning. Clear Next Steps.' }).locator('ol > li > span')).toHaveCount(4)
-    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', 'https://mythirumanam.in/about')
+    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', 'https://mythirumanam.com/about')
     await expect(page.locator('meta[property="og:site_name"]')).toHaveAttribute('content', 'MyThirumanam')
     const structuredData = JSON.parse(await page.locator('script[type="application/ld+json"]').textContent() ?? '{}')
     expect(structuredData['@type']).toBe('AboutPage')
-    expect(structuredData.url).toBe('https://mythirumanam.in/about')
+    expect(structuredData.url).toBe('https://mythirumanam.com/about')
     await expect(page.locator('footer').getByRole('link', { name: 'About Us' })).toHaveAttribute('href', '/about')
     await expectNoHorizontalOverflow(page)
   }

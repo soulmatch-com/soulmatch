@@ -100,7 +100,7 @@ export default function BlogEditorForm({ mode = 'create', blog }: BlogEditorForm
           <input id="slug" value={slug} disabled={slugLocked} onChange={(event) => setSlug(event.target.value)} placeholder="sashtiapthapoorthi-in-thirukadaiyur" aria-describedby="slug-help slug-error" className="mt-1.5 h-10 w-full rounded-md border border-slate-300 px-3 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900 disabled:cursor-not-allowed disabled:bg-slate-100" />
           <p id="slug-help" className="mt-1 text-xs text-slate-500">{slugLocked ? 'The slug cannot be changed after publication because it is the public article URL.' : 'This becomes the public article URL after publication.'}</p>
           {error && <p id="slug-error" role="alert" className="mt-2 text-sm text-red-700">{error}</p>}
-          <div className="mt-3 rounded-md bg-slate-50 p-3 text-xs text-slate-600"><p>Future public URL — English: https://mythirumanam.in/blog/{slug || '{slug}'}</p><p className="mt-1">Future public URL — Tamil: https://mythirumanam.in/ta/blog/{slug || '{slug}'}</p></div>
+          <div className="mt-3 rounded-md bg-slate-50 p-3 text-xs text-slate-600"><p>Future public URL — English: https://mythirumanam.com/blog/{slug || '{slug}'}</p><p className="mt-1">Future public URL — Tamil: https://mythirumanam.com/ta/blog/{slug || '{slug}'}</p></div>
         </div>
         <div>
           <label htmlFor="featured-image-url" className="text-sm font-medium text-slate-700">Featured Image URL <span className="font-normal text-slate-500">(optional)</span></label>

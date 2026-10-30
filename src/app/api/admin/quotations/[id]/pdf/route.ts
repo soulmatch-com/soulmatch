@@ -38,7 +38,7 @@ function addFamilyNotesContinuation(pdf: PDFDocument, logo: Awaited<ReturnType<P
       text(line, 42, y, 7, tamil, blue)
       y -= 13
     }
-    centered('MyThirumanam  |  www.mythirumanam.in  |  +91 78453 05728', 14, 6.5, bold, brand)
+    centered('MyThirumanam  |  www.mythirumanam.com  |  +91 78453 05728', 14, 6.5, bold, brand)
   }
 }
 
@@ -54,7 +54,7 @@ function addCeremonyPage(pdf: PDFDocument, logo: Awaited<ReturnType<PDFDocument[
   page.drawImage(logo, { x: 36, y: 790, width: logoWidth, height: logoHeight })
   centered('QUOTATION', 804, 16, serifBold, brand)
   centered(`${ceremony.toUpperCase()} MARRIAGE`, 788, 7, bold, gold)
-  text('Website : www.mythirumanam.in', 392, 810, 7.5, bold, brand)
+  text('Website : www.mythirumanam.com', 392, 810, 7.5, bold, brand)
   text('Contact : +91 78453 05728', 392, 796, 7.5, bold, brand)
   centered('RITUAL & CEREMONY DETAILS', 720, 15, serifBold, brand)
   page.drawRectangle({ x: tableLeft, y: 698, width: tableWidth, height: 14, color: cream, borderColor: gold, borderWidth: 0.75 })
@@ -110,7 +110,7 @@ function addCeremonyPage(pdf: PDFDocument, logo: Awaited<ReturnType<PDFDocument[
     firstPageLines.forEach((note, index) => text(`${index === 0 ? '•  ' : '   '}${note}`, tableLeft + 18, notesY - 47 - index * 10, 7, tamil, blue))
     addFamilyNotesContinuation(pdf, logo, regular, bold, serifBold, tamil, familyNoteLines.slice(firstPageLines.length))
   }
-  centered('MyThirumanam  |  www.mythirumanam.in  |  +91 78453 05728', 14, 6.5, bold, brand)
+  centered('MyThirumanam  |  www.mythirumanam.com  |  +91 78453 05728', 14, 6.5, bold, brand)
 }
 
 function compactDate(value: string | null) {
@@ -227,7 +227,7 @@ export async function GET(_: Request, { params }: { params: Promise<{ id: string
   page.drawImage(logo, { x: 36, y: 790, width: logoWidth, height: logoHeight })
   centered('QUOTATION', 804, 16, serifBold, brand)
   centered(`${eventName(primaryLead?.event_type ?? null).toUpperCase()} MARRIAGE`, 788, 7, bold, gold)
-  text('Website : www.mythirumanam.in', 392, 810, 7.5, bold, brand)
+  text('Website : www.mythirumanam.com', 392, 810, 7.5, bold, brand)
   text('Contact : +91 78453 05728', 392, 796, 7.5, bold, brand)
 
   centered(`${eventName(primaryLead?.event_type ?? null).toUpperCase()} / WEDDING ANNIVERSARY`, 728, 10, serifBold, brand)
@@ -288,7 +288,7 @@ export async function GET(_: Request, { params }: { params: Promise<{ id: string
   text(`Client: ${leadNames}`, 305, 56, 7, bold, brand)
   text('Signature:', 305, 45, 7, bold, brand)
   line(342, 43, 445, 43, slate)
-  centered('MyThirumanam  |  www.mythirumanam.in  |  +91 78453 05728', 14, 6.5, bold, brand)
+  centered('MyThirumanam  |  www.mythirumanam.com  |  +91 78453 05728', 14, 6.5, bold, brand)
 
   addCeremonyPage(pdf, logo, regular, bold, serifBold, tamil, eventName(primaryLead?.event_type ?? null).replace('th Marriage', 'TH'), quotation.notes)
 

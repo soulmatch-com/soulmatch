@@ -9,11 +9,6 @@
       "main": true
     }
   },
-  "build": {
-    "env": {
-      "NODE_VERSION": "22.x"
-    }
-  },
   "functions": {
     "app/**/*.{ts,tsx}": {
       "maxDuration": 10

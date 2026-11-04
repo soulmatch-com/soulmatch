@@ -342,6 +342,7 @@ export interface Database {
           email: string | null
           requirement_summary: string | null
           event_date: string | null
+          event_end_date: string | null
           event_type: '60th-marriage' | '70th-marriage' | '80th-marriage' | null
           event_session: 'one_session' | 'two_sessions' | null
           package_type: 'basic' | 'premium' | null
@@ -362,6 +363,7 @@ export interface Database {
           email?: string | null
           requirement_summary?: string | null
           event_date?: string | null
+          event_end_date?: string | null
           event_type?: '60th-marriage' | '70th-marriage' | '80th-marriage' | null
           event_session?: 'one_session' | 'two_sessions' | null
           package_type?: 'basic' | 'premium' | null
@@ -382,6 +384,7 @@ export interface Database {
           email?: string | null
           requirement_summary?: string | null
           event_date?: string | null
+          event_end_date?: string | null
           event_type?: '60th-marriage' | '70th-marriage' | '80th-marriage' | null
           event_session?: 'one_session' | 'two_sessions' | null
           package_type?: 'basic' | 'premium' | null

@@ -37,12 +37,12 @@ const coreServiceCodes = [
 export const celebrationPlanDefinitions = [
   {
     type: 'basic',
-    name: 'Basic Plan',
+    name: 'Standard Plan',
     tamilName: 'அடிப்படை ஏற்பாடு',
     subtitle: 'Traditional & Practical',
     shortDescription: 'A defined morning celebration plan with shared ceremony arrangements and practical family support.',
     version: celebrationPlanVersion,
-    preview: ['Pooja & Homam', 'Air-conditioned Hall', 'Breakfast & Lunch', 'Rooms for 10 Guests', 'Photography & Videography', 'Mangala Isai'],
+    preview: ['Pooja & Homam', 'Common Hall', 'Breakfast & Lunch', 'Rooms for 10 Guests', 'Photography & Videography', 'Mangala Isai'],
     includedServiceCodes: coreServiceCodes,
     sections: [
       { title: 'Pooja', items: ['Pooja and Homam with 16 Kalasam', 'Conducted in a common/shared space'] },

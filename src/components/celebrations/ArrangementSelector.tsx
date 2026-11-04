@@ -148,7 +148,7 @@ export function ArrangementSelector({
                 className="mt-7 min-h-12 w-full bg-amber-800 text-base hover:bg-amber-900 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-amber-700"
                 aria-pressed={selection.planType === plan.type}
               >
-                Select {plan.type === 'basic' ? 'Basic' : 'Premium'}
+                Select {plan.type === 'basic' ? 'Standard' : 'Premium'}
                 <ArrowRight aria-hidden="true" className="h-5 w-5" />
               </Button>
             </article>

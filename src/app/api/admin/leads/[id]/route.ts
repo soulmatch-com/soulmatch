@@ -13,6 +13,7 @@ const updateSchema = z.object({
   nextFollowUpAt: z.string().datetime().nullable().optional(),
   requirementSummary: z.string().trim().max(2000).nullable().optional(),
   eventDate: z.string().date().nullable().optional(),
+  eventEndDate: z.string().date().nullable().optional(),
   eventType: z.enum(eventTypes).nullable().optional(),
   eventSession: z.enum(eventSessions).nullable().optional(),
   packageType: z.enum(packageTypes).nullable().optional(),
@@ -49,10 +50,15 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
   if (!parsed.success) return NextResponse.json({ error: 'Please check the update' }, { status: 400 })
   const input = parsed.data
   const supabase = createAdminClient()
-  const { data: existing, error: existingError } = await supabase.from('leads').select('status, event_date').eq('id', id).maybeSingle()
+  const { data: existing, error: existingError } = await supabase.from('leads').select('status, event_date, event_end_date, event_session').eq('id', id).maybeSingle()
   if (existingError) return NextResponse.json({ error: 'Unable to load lead' }, { status: 500 })
   if (!existing) return NextResponse.json({ error: 'Lead not found' }, { status: 404 })
   const nextEventDate = input.eventDate === undefined ? existing.event_date : input.eventDate
+  const nextEventEndDate = input.eventEndDate === undefined ? existing.event_end_date : input.eventEndDate
+  const nextEventSession = input.eventSession === undefined ? existing.event_session : input.eventSession
+  if (nextEventEndDate && nextEventDate && nextEventEndDate <= nextEventDate) {
+    return NextResponse.json({ error: 'The to date must be after the event date.' }, { status: 400 })
+  }
   const requestedStatus = input.status ?? existing.status
   const nextStatus = isPastEventDate(nextEventDate) && expirableLeadStatuses.includes(requestedStatus as (typeof expirableLeadStatuses)[number]) ? 'expired' : input.status
   const update = {
@@ -60,8 +66,9 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     ...(input.nextFollowUpAt !== undefined ? { next_follow_up_at: input.nextFollowUpAt } : {}),
     ...(input.requirementSummary !== undefined ? { requirement_summary: input.requirementSummary } : {}),
     ...(input.eventDate !== undefined ? { event_date: input.eventDate } : {}),
+    ...(input.eventEndDate !== undefined ? { event_end_date: input.eventEndDate } : {}),
     ...(input.eventType !== undefined ? { event_type: input.eventType } : {}),
-    ...(input.eventSession !== undefined ? { event_session: input.eventSession } : {}),
+    ...(input.eventSession !== undefined ? { event_session: input.eventSession, ...(nextEventSession === 'one_session' ? { event_end_date: null } : {}) } : {}),
     ...(input.packageType !== undefined ? { package_type: input.packageType } : {}),
     ...(input.totalMembers !== undefined ? { total_members: input.totalMembers } : {}),
     ...(input.lostReason !== undefined ? { lost_reason: input.lostReason } : {}),

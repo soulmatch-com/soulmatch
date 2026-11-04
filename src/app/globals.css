@@ -208,3 +208,10 @@ body {
 .scrollbar-hide::-webkit-scrollbar {
   display: none;  /* Chrome, Safari and Opera */
 }
+
+@media (min-width: 640px) {
+  /* Keep the lead actions aligned with the lead heading, not its source label. */
+  .container.mx-auto.max-w-5xl > div.mt-5 > div:has(> a[href^="/admin/quotations/new?leadId="]) {
+    align-self: center;
+  }
+}

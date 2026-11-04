@@ -9,6 +9,9 @@ const eventTypes = ['60th-marriage', '70th-marriage', '80th-marriage'] as const
 const eventSessions = ['one_session', 'two_sessions'] as const
 const packageTypes = ['basic', 'premium'] as const
 const updateSchema = z.object({
+  contactName: z.string().trim().min(1).max(150).optional(),
+  mobile: z.string().trim().min(7).max(30).optional().or(z.literal('')),
+  email: z.string().trim().email().max(320).optional().or(z.literal('')),
   status: z.enum(statuses).optional(),
   nextFollowUpAt: z.string().datetime().nullable().optional(),
   requirementSummary: z.string().trim().max(2000).nullable().optional(),
@@ -61,7 +64,16 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
   }
   const requestedStatus = input.status ?? existing.status
   const nextStatus = isPastEventDate(nextEventDate) && expirableLeadStatuses.includes(requestedStatus as (typeof expirableLeadStatuses)[number]) ? 'expired' : input.status
+  const duplicateChecks = await Promise.all([
+    input.mobile ? supabase.from('leads').select('id, contact_name').eq('mobile', input.mobile).neq('id', id).limit(1) : Promise.resolve({ data: [] }),
+    input.email ? supabase.from('leads').select('id, contact_name').ilike('email', input.email).neq('id', id).limit(1) : Promise.resolve({ data: [] }),
+  ])
+  const duplicate = duplicateChecks[0].data?.[0] ?? duplicateChecks[1].data?.[0]
+  if (duplicate) return NextResponse.json({ error: `A lead already exists for ${duplicate.contact_name}`, leadId: duplicate.id }, { status: 409 })
   const update = {
+    ...(input.contactName !== undefined ? { contact_name: input.contactName } : {}),
+    ...(input.mobile !== undefined ? { mobile: input.mobile || null } : {}),
+    ...(input.email !== undefined ? { email: input.email.toLowerCase() || null } : {}),
     ...(nextStatus !== undefined ? { status: nextStatus } : {}),
     ...(input.nextFollowUpAt !== undefined ? { next_follow_up_at: input.nextFollowUpAt } : {}),
     ...(input.requirementSummary !== undefined ? { requirement_summary: input.requirementSummary } : {}),

@@ -28,6 +28,13 @@ function LocaleBadge({ label, status }: { label: 'EN' | 'TA'; status: 'draft' | 
   return <span className={`inline-flex rounded border px-2 py-1 text-xs font-medium ${style}`}>{label} {status === 'published' ? 'Published' : 'Draft'}</span>
 }
 
+function paginationItems(currentPage: number, totalPages: number) {
+  if (totalPages <= 7) return Array.from({ length: totalPages }, (_, index) => index + 1)
+  if (currentPage <= 4) return [1, 2, 3, 4, 5, 'ellipsis', totalPages] as const
+  if (currentPage >= totalPages - 3) return [1, 'ellipsis', totalPages - 4, totalPages - 3, totalPages - 2, totalPages - 1, totalPages] as const
+  return [1, 'ellipsis', currentPage - 1, currentPage, currentPage + 1, 'ellipsis-end', totalPages] as const
+}
+
 export default async function AdminBlogsPage({ searchParams }: { searchParams: SearchParams }) {
   const authorization = await requireActiveAdmin()
   if ('response' in authorization) redirect('/admin/login')
@@ -57,6 +64,7 @@ export default async function AdminBlogsPage({ searchParams }: { searchParams: S
   }
   const hasActiveFilters = Boolean(search || status !== 'all')
   const totalPages = result ? Math.max(1, Math.ceil(result.total / result.pageSize)) : 1
+  const pages = paginationItems(result?.page ?? page, totalPages)
 
   return (
     <div className="container mx-auto px-4 py-10">
@@ -122,7 +130,7 @@ export default async function AdminBlogsPage({ searchParams }: { searchParams: S
                   </tbody>
                 </table>
               </div>
-              {totalPages > 1 && <nav aria-label="Blog list pagination" className="mt-6 flex items-center justify-between border-t border-slate-100 pt-4"><Link aria-disabled={result.page <= 1} className={`inline-flex items-center gap-1 text-sm font-medium ${result.page <= 1 ? 'pointer-events-none text-slate-400' : 'text-slate-800 hover:underline'}`} href={makeHref(Math.max(1, result.page - 1))}><ChevronLeft className="h-4 w-4" />Previous</Link><span className="text-sm text-slate-600">Page {result.page} of {totalPages}</span><Link aria-disabled={result.page >= totalPages} className={`inline-flex items-center gap-1 text-sm font-medium ${result.page >= totalPages ? 'pointer-events-none text-slate-400' : 'text-slate-800 hover:underline'}`} href={makeHref(Math.min(totalPages, result.page + 1))}>Next<ChevronRight className="h-4 w-4" /></Link></nav>}
+              <nav aria-label="Blog list pagination" className="mt-6 flex flex-col gap-3 border-t border-slate-100 pt-4 sm:flex-row sm:items-center sm:justify-between"><p className="text-sm text-slate-600">{result.total} {result.total === 1 ? 'blog' : 'blogs'} · Page {result.page} of {totalPages}</p><div className="flex items-center gap-1"><Link aria-disabled={result.page <= 1} className={`inline-flex h-9 items-center gap-1 rounded-md px-2 text-sm font-medium ${result.page <= 1 ? 'pointer-events-none text-slate-400' : 'text-slate-800 hover:bg-slate-100'}`} href={makeHref(Math.max(1, result.page - 1))}><ChevronLeft className="h-4 w-4" /><span className="sr-only sm:not-sr-only">Previous</span></Link>{pages.map((item, index) => typeof item === 'number' ? <Link key={item} aria-current={item === result.page ? 'page' : undefined} className={`inline-flex h-9 min-w-9 items-center justify-center rounded-md px-2 text-sm font-medium ${item === result.page ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100'}`} href={makeHref(item)}>{item}</Link> : <span key={`${item}-${index}`} className="inline-flex h-9 min-w-5 items-center justify-center text-sm text-slate-500" aria-hidden="true">…</span>)}<Link aria-disabled={result.page >= totalPages} className={`inline-flex h-9 items-center gap-1 rounded-md px-2 text-sm font-medium ${result.page >= totalPages ? 'pointer-events-none text-slate-400' : 'text-slate-800 hover:bg-slate-100'}`} href={makeHref(Math.min(totalPages, result.page + 1))}><span className="sr-only sm:not-sr-only">Next</span><ChevronRight className="h-4 w-4" /></Link></div></nav>
             </>
           ) : null}
         </section>

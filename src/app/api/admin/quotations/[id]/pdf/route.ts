@@ -160,6 +160,11 @@ function compactDate(value: string | null) {
   return `${String(date.getUTCDate()).padStart(2, '0')}-${String(date.getUTCMonth() + 1).padStart(2, '0')}-${date.getUTCFullYear()}`
 }
 
+function eventDateRange(startDate: string | null, endDate: string | null, session: 'one_session' | 'two_sessions' | null) {
+  const start = compactDate(startDate)
+  return session === 'two_sessions' && endDate ? `${start} to ${compactDate(endDate)}` : start
+}
+
 function eventName(value: '60th-marriage' | '70th-marriage' | '80th-marriage' | null) {
   if (value === '60th-marriage') return '60th Marriage'
   if (value === '70th-marriage') return '70th Marriage'
@@ -210,7 +215,7 @@ export async function GET(_: Request, { params }: { params: Promise<{ id: string
 
   const leadIds = (links ?? []).map((link) => link.lead_id)
   const { data: leads, error: leadsError } = leadIds.length
-    ? await supabase.from('leads').select('id, contact_name, event_type, event_date, event_session, package_type, total_members').in('id', leadIds)
+    ? await supabase.from('leads').select('id, contact_name, event_type, event_date, event_end_date, event_session, package_type, total_members').in('id', leadIds)
     : { data: [], error: null }
   if (leadsError) return NextResponse.json({ error: 'Unable to load quotation lead details' }, { status: 500 })
 
@@ -278,10 +283,10 @@ export async function GET(_: Request, { params }: { params: Promise<{ id: string
   }
   detail('Event', eventName(primaryLead?.event_type ?? null), 36, 73, 710)
   detail('Venue', 'Thirukadaiyur', 212, 249, 710)
-  detail('Date', compactDate(primaryLead?.event_date ?? null), 36, 73, 697)
+  detail('Date', eventDateRange(primaryLead?.event_date ?? null, primaryLead?.event_end_date ?? null, primaryLead?.event_session ?? null), 36, 73, 697)
   detail('Prepared On', compactDate(quotation.created_at.slice(0, 10)), 212, 267, 697)
   detail('Session', sessionName(primaryLead?.event_session ?? null), 36, 78, 684)
-  detail('Number of Peoples', primaryLead?.total_members ? String(primaryLead.total_members) : 'Not provided', 212, 302, 684)
+  detail('Guest Count', primaryLead?.total_members ? String(primaryLead.total_members) : 'Not provided', 212, 302, 684)
   detail('Package', packageName(primaryLead?.package_type ?? null), 36, 82, 671)
   let y = 643
   page.drawRectangle({ x: tableLeft, y: y - 14, width: tableWidth, height: 14, color: brand })

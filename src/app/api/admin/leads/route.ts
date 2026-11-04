@@ -17,12 +17,20 @@ const createLeadSchema = z.object({
   email: z.string().trim().email().max(320).optional().or(z.literal('')),
   requirementSummary: z.string().trim().max(2000).optional().or(z.literal('')),
   eventDate: z.string().date().optional().or(z.literal('')),
+  eventEndDate: z.string().date().optional().or(z.literal('')),
   eventType: z.enum(eventTypes).optional().or(z.literal('')),
   eventSession: z.enum(eventSessions).optional().or(z.literal('')),
   packageType: z.enum(packageTypes).optional().or(z.literal('')),
   totalMembers: z.coerce.number().int().min(1).max(10000).optional().or(z.literal('')),
   status: z.enum(statuses).default('new'),
   nextFollowUpAt: z.string().datetime().optional().nullable(),
+}).superRefine((input, context) => {
+  if (input.eventSession === 'two_sessions' && !input.eventEndDate) {
+    context.addIssue({ code: 'custom', path: ['eventEndDate'], message: 'A to date is required for 2 sessions.' })
+  }
+  if (input.eventDate && input.eventEndDate && input.eventEndDate <= input.eventDate) {
+    context.addIssue({ code: 'custom', path: ['eventEndDate'], message: 'The to date must be after the event date.' })
+  }
 })
 
 export async function GET(request: NextRequest) {
@@ -83,6 +91,7 @@ export async function POST(request: NextRequest) {
     email: input.email || null,
     requirement_summary: input.requirementSummary || null,
     event_date: input.eventDate || null,
+    event_end_date: input.eventSession === 'two_sessions' ? input.eventEndDate || null : null,
     event_type: input.eventType || null,
     event_session: input.eventSession || null,
     package_type: input.packageType || null,

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { formatBookingDate } from "@/lib/utils";
 import {
   Dialog,
   DialogContent,
@@ -49,6 +50,7 @@ const emptyDraft: Draft = {
 };
 const inputClass = "mt-1.5 h-10 w-full rounded-md border border-slate-300 bg-white px-3 text-sm text-slate-900";
 const textareaClass = "mt-1.5 w-full rounded-md border border-slate-300 bg-white p-3 text-sm text-slate-900";
+const title = (value: string) => value.replaceAll("_", " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
 async function body(response: Response) {
   const value: Record<string, any> = await response.json().catch(() => ({}));
   if (!response.ok)
@@ -220,8 +222,8 @@ export function VendorCoordination({ bookingId }: { bookingId: string }) {
         : "No additional details";
   return (
     <section className="rounded-xl border bg-white p-5">
-      <div className="flex justify-between">
-        <h2 className="font-semibold">Vendor coordination</h2>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h2 className="font-semibold">Vendor Coordination</h2>
         <div className="flex gap-2">
           <Button
             size="sm"
@@ -250,11 +252,11 @@ export function VendorCoordination({ bookingId }: { bookingId: string }) {
         {assignments.map((x) => (
           <div className="py-3" key={x.id}>
             <b>{x.celebration_booking_services?.service_name_snapshot}</b> —{" "}
-            {x.event_vendors?.vendor_name || "Former vendor"} · {x.status}
+            {x.event_vendors?.vendor_name || "Former vendor"} · {title(x.status)}
             <p>
-              ₹{x.agreed_cost ?? "—"} · {x.scheduled_date || "No date"}
+              ₹{x.agreed_cost ?? "—"} · {x.scheduled_date ? formatBookingDate(x.scheduled_date) : "No date"}
             </p>
-            {x.status === "pending" && (
+            <div className="mt-2 flex flex-wrap gap-2">{x.status === "pending" && (
               <Button
                 size="sm"
                 variant="outline"
@@ -276,7 +278,7 @@ export function VendorCoordination({ bookingId }: { bookingId: string }) {
                     setAction({ a: x, to });
                   }}
                 >
-                  {to}
+                  {title(to)}
                 </Button>
               ))}
             {x.status === "confirmed" && (
@@ -289,7 +291,7 @@ export function VendorCoordination({ bookingId }: { bookingId: string }) {
               >
                 Cancel
               </Button>
-            )}
+            )}</div>
           </div>
         ))}
       </div>
@@ -303,12 +305,12 @@ export function VendorCoordination({ bookingId }: { bookingId: string }) {
         }}
       >
         <DialogContent className="max-h-[90vh] overflow-y-auto">
-          <DialogHeader><DialogTitle>Create vendor assignment</DialogTitle><DialogDescription>Link a vendor to one of this booking&apos;s services.</DialogDescription></DialogHeader>
+          <DialogHeader><DialogTitle>Create Vendor Assignment</DialogTitle><DialogDescription>Link a vendor to one of this booking&apos;s services.</DialogDescription></DialogHeader>
           <form className="space-y-5" onSubmit={(event) => { event.preventDefault(); void create(); }}>
             {dialogError && <p role="alert" className="rounded-md bg-rose-50 p-3 text-sm text-rose-800">{dialogError}</p>}
             <div className="grid gap-4 sm:grid-cols-2">
               <label className="text-sm font-medium text-slate-700">Vendor<select aria-label="Vendor" className={inputClass} value={draft.vendorId} onChange={(e) => setDraft({ ...draft, vendorId: e.target.value })}><option value="">Select vendor</option>{vendors.map((v) => <option value={v.id} key={v.id}>{v.vendor_name} — {v.category}</option>)}</select></label>
-              <label className="text-sm font-medium text-slate-700">Booking service<select aria-label="Booking service" className={inputClass} value={draft.bookingServiceId} onChange={(e) => setDraft({ ...draft, bookingServiceId: e.target.value })}><option value="">Select booking service</option>{services.map((s) => <option value={s.id} key={s.id}>{s.service_name_snapshot}</option>)}</select></label>
+              <label className="text-sm font-medium text-slate-700">Booking Service<select aria-label="Booking service" className={inputClass} value={draft.bookingServiceId} onChange={(e) => setDraft({ ...draft, bookingServiceId: e.target.value })}><option value="">Select booking service</option>{services.map((s) => <option value={s.id} key={s.id}>{s.service_name_snapshot}</option>)}</select></label>
             </div>
             <Fields value={draft} setValue={setDraft} />
             <DialogFooter><Button type="button" variant="outline" disabled={saving} onClick={() => { setCreating(false); close(); }}>Cancel</Button><Button disabled={saving} type="submit">{saving ? "Creating…" : "Create assignment"}</Button></DialogFooter>
@@ -326,7 +328,7 @@ export function VendorCoordination({ bookingId }: { bookingId: string }) {
       >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Edit assignment</DialogTitle>
+            <DialogTitle>Edit Assignment</DialogTitle>
           </DialogHeader>
           {edit && (
             <>
@@ -388,7 +390,7 @@ export function VendorCoordination({ bookingId }: { bookingId: string }) {
       >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{action?.to} vendor assignment</DialogTitle>
+            <DialogTitle>{title(action?.to || "")} Vendor Assignment</DialogTitle>
           </DialogHeader>
           {action && (
             <>
@@ -399,7 +401,7 @@ export function VendorCoordination({ bookingId }: { bookingId: string }) {
               <p>This updates only internal coordination status.</p>
               {dialogError && <p role="alert">{dialogError}</p>}
               <Button disabled={saving} onClick={() => void transition()}>
-                {saving ? "Saving…" : `Confirm ${action.to}`}
+                {saving ? "Saving…" : `Confirm ${title(action.to)}`}
               </Button>
             </>
           )}
@@ -411,12 +413,12 @@ export function VendorCoordination({ bookingId }: { bookingId: string }) {
       >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Coordination history</DialogTitle>
+            <DialogTitle>Coordination History</DialogTitle>
           </DialogHeader>
           {history?.map((x) => (
             <article key={x.id}>
-              <b>{x.event_type}</b> — {x.actorName} —{" "}
-              {new Date(x.created_at).toLocaleString()}
+              <b>{title(x.event_type)}</b> — {x.actorName} —{" "}
+              {formatBookingDate(x.created_at)}
               <p>{display(x.metadata)}</p>
             </article>
           ))}
@@ -435,11 +437,11 @@ function Fields({
   return (
     <div className="space-y-4">
       <div className="grid gap-4 sm:grid-cols-2">
-        <label className="text-sm font-medium text-slate-700">Agreed cost (₹)<input aria-label="Agreed cost" className={inputClass} type="number" min="0" value={value.agreedCost} onChange={(e) => setValue({ ...value, agreedCost: e.target.value })} /></label>
-        <label className="text-sm font-medium text-slate-700">Scheduled date<input aria-label="Scheduled date" className={inputClass} type="date" value={value.scheduledDate} onChange={(e) => setValue({ ...value, scheduledDate: e.target.value })} /></label>
+        <label className="text-sm font-medium text-slate-700">Agreed Cost (₹)<input aria-label="Agreed cost" className={inputClass} type="number" min="0" value={value.agreedCost} onChange={(e) => setValue({ ...value, agreedCost: e.target.value })} /></label>
+        <label className="text-sm font-medium text-slate-700">Scheduled Date<input aria-label="Scheduled date" className={inputClass} type="date" value={value.scheduledDate} onChange={(e) => setValue({ ...value, scheduledDate: e.target.value })} /></label>
       </div>
       <label className="block text-sm font-medium text-slate-700">Requirements<textarea aria-label="Requirements" className={textareaClass} rows={3} value={value.requirements} onChange={(e) => setValue({ ...value, requirements: e.target.value })} /></label>
-      <label className="block text-sm font-medium text-slate-700">Internal notes<textarea aria-label="Internal notes" className={textareaClass} rows={3} value={value.internalNotes} onChange={(e) => setValue({ ...value, internalNotes: e.target.value })} /></label>
+      <label className="block text-sm font-medium text-slate-700">Internal Notes<textarea aria-label="Internal notes" className={textareaClass} rows={3} value={value.internalNotes} onChange={(e) => setValue({ ...value, internalNotes: e.target.value })} /></label>
     </div>
   );
 }

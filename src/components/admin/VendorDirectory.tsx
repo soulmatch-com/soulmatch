@@ -161,36 +161,36 @@ export function VendorDirectory() {
             setEdit({ ...blank });
           }}
         >
-          Add vendor
+          Add Vendor
         </Button>
       </div>
       {error && <p role="alert">{error}</p>}
       <div className="mt-5 grid gap-3 rounded-lg border bg-slate-50 p-4 sm:grid-cols-2 lg:grid-cols-5">
         <div className="space-y-1.5">
-          <Label htmlFor="vendor-filter-name">Vendor name</Label>
+          <Label htmlFor="vendor-filter-name">Vendor Name</Label>
           <Input id="vendor-filter-name" aria-label="Search vendors" value={search} onChange={(e) => updateFilters(() => setSearch(e.target.value))} placeholder="Filter by name" />
         </div>
         <div className="space-y-1.5">
           <Label htmlFor="vendor-filter-category">Category</Label>
           <select id="vendor-filter-category" className="h-10 w-full rounded-md border border-slate-300 bg-white px-3 text-sm" aria-label="Vendor category" value={category} onChange={(e) => updateFilters(() => setCategory(e.target.value))}>
-            <option value="">All categories</option>
+            <option value="">All Categories</option>
             {categories.map((x) => <option key={x}>{x}</option>)}
           </select>
         </div>
         <div className="space-y-1.5">
-          <Label htmlFor="vendor-filter-contact">Contact person</Label>
-          <Input id="vendor-filter-contact" aria-label="Contact person" value={contactPerson} onChange={(e) => updateFilters(() => setContactPerson(e.target.value))} placeholder="Filter by contact" />
+          <Label htmlFor="vendor-filter-contact">Contact Person</Label>
+          <Input id="vendor-filter-contact" aria-label="Contact Person" value={contactPerson} onChange={(e) => updateFilters(() => setContactPerson(e.target.value))} placeholder="Filter by contact" />
         </div>
         <div className="space-y-1.5">
-          <Label htmlFor="vendor-filter-mobile">Mobile number</Label>
-          <Input id="vendor-filter-mobile" aria-label="Mobile number" value={mobile} onChange={(e) => updateFilters(() => setMobile(e.target.value))} placeholder="Filter by mobile" />
+          <Label htmlFor="vendor-filter-mobile">Mobile Number</Label>
+          <Input id="vendor-filter-mobile" aria-label="Mobile Number" value={mobile} onChange={(e) => updateFilters(() => setMobile(e.target.value))} placeholder="Filter by mobile" />
         </div>
         <div className="space-y-1.5">
           <Label htmlFor="vendor-filter-status">Status</Label>
           <select id="vendor-filter-status" className="h-10 w-full rounded-md border border-slate-300 bg-white px-3 text-sm" aria-label="Vendor status" value={active} onChange={(e) => updateFilters(() => setActive(e.target.value))}>
             <option value="true">Active</option>
             <option value="false">Inactive</option>
-            <option value="">All statuses</option>
+            <option value="">All Statuses</option>
           </select>
         </div>
       </div>
@@ -198,10 +198,10 @@ export function VendorDirectory() {
           <table className="w-full min-w-[760px] text-left text-sm">
             <thead className="bg-slate-50 text-slate-700">
               <tr>
-                <th scope="col" className="px-4 py-3 font-semibold">Vendor name</th>
+                <th scope="col" className="px-4 py-3 font-semibold">Vendor Name</th>
                 <th scope="col" className="px-4 py-3 font-semibold">Category</th>
-                <th scope="col" className="px-4 py-3 font-semibold">Contact person</th>
-                <th scope="col" className="px-4 py-3 font-semibold">Mobile number</th>
+                <th scope="col" className="px-4 py-3 font-semibold">Contact Person</th>
+                <th scope="col" className="px-4 py-3 font-semibold">Mobile Number</th>
                 <th scope="col" className="px-4 py-3 font-semibold">Status</th>
                 <th scope="col" className="px-4 py-3 font-semibold"><span className="sr-only">Actions</span></th>
               </tr>
@@ -272,7 +272,7 @@ export function VendorDirectory() {
       <Dialog open={!!edit} onOpenChange={(open) => !open && setEdit(null)}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{edit?.id ? "Edit vendor" : "Add vendor"}</DialogTitle>
+            <DialogTitle>{edit?.id ? "Edit Vendor" : "Add Vendor"}</DialogTitle>
             <DialogDescription>
               Add the vendor&apos;s core contact details. Fields marked required
               are needed to save the vendor.
@@ -283,7 +283,7 @@ export function VendorDirectory() {
               {error && <p role="alert">{error}</p>}
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-2">
-                  <Label htmlFor="vendor-name">Vendor name *</Label>
+                  <Label htmlFor="vendor-name">Vendor Name *</Label>
                   <Input id="vendor-name" aria-label="vendorName" autoComplete="organization" required value={edit.vendorName} onChange={(e) => setEdit({ ...edit, vendorName: e.target.value })} />
                 </div>
                 <div className="space-y-2">
@@ -291,15 +291,15 @@ export function VendorDirectory() {
                   <Input id="vendor-category" aria-label="category" required value={edit.category} onChange={(e) => setEdit({ ...edit, category: e.target.value })} />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="vendor-contact">Contact person</Label>
+                  <Label htmlFor="vendor-contact">Contact Person</Label>
                   <Input id="vendor-contact" aria-label="contactPerson" autoComplete="name" value={edit.contactPerson} onChange={(e) => setEdit({ ...edit, contactPerson: e.target.value })} />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="vendor-mobile">Mobile number</Label>
+                  <Label htmlFor="vendor-mobile">Mobile Number</Label>
                   <Input id="vendor-mobile" aria-label="mobile" autoComplete="tel" inputMode="tel" value={edit.mobile} onChange={(e) => setEdit({ ...edit, mobile: e.target.value })} />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="vendor-email">Email address</Label>
+                  <Label htmlFor="vendor-email">Email Address</Label>
                   <Input id="vendor-email" aria-label="email" autoComplete="email" type="email" value={edit.email} onChange={(e) => setEdit({ ...edit, email: e.target.value })} />
                 </div>
                 <div className="space-y-2">
@@ -308,11 +308,11 @@ export function VendorDirectory() {
                 </div>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="vendor-description">Service description</Label>
+                <Label htmlFor="vendor-description">Service Description</Label>
                 <Textarea id="vendor-description" aria-label="description" placeholder="Services offered, availability, or other customer-facing details" value={edit.description} onChange={(e) => setEdit({ ...edit, description: e.target.value })} />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="vendor-notes">Internal notes</Label>
+                <Label htmlFor="vendor-notes">Internal Notes</Label>
                 <Textarea id="vendor-notes" aria-label="internal notes" placeholder="Private operational notes (not shown to customers)" value={edit.internalNotes} onChange={(e) => setEdit({ ...edit, internalNotes: e.target.value })} />
               </div>
               <label className="flex items-center gap-2 text-sm font-medium">

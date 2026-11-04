@@ -15,6 +15,16 @@ export function formatDate(date: Date | string): string {
   })
 }
 
+/** Admin booking dates use an unambiguous, compact format: 03-Nov-2026. */
+export function formatBookingDate(value: Date | string): string {
+  const raw = typeof value === 'string' ? value : value.toISOString()
+  const isDateOnly = /^\d{4}-\d{2}-\d{2}$/.test(raw)
+  const date = isDateOnly ? new Date(`${raw}T00:00:00Z`) : new Date(raw)
+  return new Intl.DateTimeFormat('en-GB', {
+    day: '2-digit', month: 'short', year: 'numeric', timeZone: isDateOnly ? 'UTC' : 'Asia/Kolkata',
+  }).format(date).replace(/ /g, '-')
+}
+
 export function calculateAge(dateOfBirth: Date | string): number {
   const dob = typeof dateOfBirth === 'string'
     ? dateOfBirth.length >= 10 && /^\d{4}-\d{2}-\d{2}$/.test(dateOfBirth)

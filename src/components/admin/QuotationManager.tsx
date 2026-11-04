@@ -2,7 +2,7 @@
 
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { History, Trash2 } from "lucide-react";
+import { GripVertical, History, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { QuotationBookingAction } from "@/components/admin/QuotationBookingAction";
 import {
@@ -88,6 +88,8 @@ export function QuotationManager({ quotationId, initialLeadId, returnTo }: { quo
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const [quotationToDelete, setQuotationToDelete] = useState<Quotation | null>(null);
   const [deletingQuotation, setDeletingQuotation] = useState(false);
+  const [draggedServiceId, setDraggedServiceId] = useState<string | null>(null);
+  const [dropTargetServiceId, setDropTargetServiceId] = useState<string | null>(null);
 
   useEffect(() => {
     Promise.all([fetch("/api/admin/quotations"), initialLeadId ? fetch(`/api/admin/leads/${initialLeadId}`) : Promise.resolve(null)])
@@ -192,6 +194,18 @@ export function QuotationManager({ quotationId, initialLeadId, returnTo }: { quo
         item.serviceId === serviceId ? { ...item, [field]: value } : item,
       ),
     );
+  }
+  function moveService(draggedId: string, targetId: string) {
+    if (draggedId === targetId) return;
+    setDraftItems((current) => {
+      const fromIndex = current.findIndex((item) => item.serviceId === draggedId);
+      const targetIndex = current.findIndex((item) => item.serviceId === targetId);
+      if (fromIndex < 0 || targetIndex < 0) return current;
+      const next = [...current];
+      const [dragged] = next.splice(fromIndex, 1);
+      next.splice(targetIndex, 0, dragged);
+      return next;
+    });
   }
   function addLead(leadId: string) {
     if (leadId)
@@ -326,15 +340,17 @@ export function QuotationManager({ quotationId, initialLeadId, returnTo }: { quo
           </p>
         ) : (
           <div className="mt-3 overflow-x-auto">
-            <div className="min-w-[680px]">
-              <div className="grid grid-cols-[minmax(180px,1fr)_130px_100px_130px_100px] gap-3 px-3 pb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
+            <div className="min-w-[730px]">
+              <div className="grid grid-cols-[32px_minmax(180px,1fr)_130px_100px_130px_100px] gap-3 px-3 pb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
+                <span className="sr-only">Reorder</span>
                 <span>Service</span>
                 <span>Cost (₹)</span>
                 <span>Quantity</span>
                 <span>Total amount</span>
                 <span className="sr-only">Actions</span>
               </div>
-              <div className="grid grid-cols-[minmax(180px,1fr)_130px_100px_130px_100px] items-end gap-3 rounded-lg border border-dashed border-slate-300 bg-slate-50 p-3">
+              <div className="grid grid-cols-[32px_minmax(180px,1fr)_130px_100px_130px_100px] items-end gap-3 rounded-lg border border-dashed border-slate-300 bg-slate-50 p-3">
+                <span />
                 <select
                   value={selectedServiceId}
                   onChange={(event) => setSelectedServiceId(event.target.value)}
@@ -404,8 +420,36 @@ export function QuotationManager({ quotationId, initialLeadId, returnTo }: { quo
                   return (
                     <div
                       key={service.id}
-                      className="grid grid-cols-[minmax(180px,1fr)_130px_100px_130px_100px] items-end gap-3 rounded-lg border border-slate-200 p-3"
+                      onDragOver={(event) => {
+                        event.preventDefault();
+                        if (draggedServiceId && draggedServiceId !== service.id) setDropTargetServiceId(service.id);
+                      }}
+                      onDrop={(event) => {
+                        event.preventDefault();
+                        if (draggedServiceId) moveService(draggedServiceId, service.id);
+                        setDraggedServiceId(null);
+                        setDropTargetServiceId(null);
+                      }}
+                      className={`grid grid-cols-[32px_minmax(180px,1fr)_130px_100px_130px_100px] items-end gap-3 rounded-lg border p-3 transition-colors ${dropTargetServiceId === service.id ? "border-sky-500 bg-sky-50" : "border-slate-200"}`}
                     >
+                      <button
+                        type="button"
+                        draggable
+                        aria-label={`Drag ${service.name} to change its position`}
+                        title="Drag to reorder"
+                        onDragStart={(event) => {
+                          event.dataTransfer.effectAllowed = "move";
+                          event.dataTransfer.setData("text/plain", service.id);
+                          setDraggedServiceId(service.id);
+                        }}
+                        onDragEnd={() => {
+                          setDraggedServiceId(null);
+                          setDropTargetServiceId(null);
+                        }}
+                        className="mb-1 inline-flex h-9 w-8 cursor-grab items-center justify-center rounded-md text-slate-400 hover:bg-slate-100 hover:text-slate-700 active:cursor-grabbing"
+                      >
+                        <GripVertical aria-hidden="true" className="size-5" />
+                      </button>
                       <div className="pb-2">
                         <p className="font-medium text-slate-900">
                           {service.name}

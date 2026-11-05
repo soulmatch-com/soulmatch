@@ -8,9 +8,17 @@ const paymentSchema = z.object({ idempotencyKey: z.string().trim().min(8).max(16
 export async function GET(_: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const authorization = await requireActiveAdmin(); if ('response' in authorization) return authorization.response
   const { id } = await params; const db = createAdminClient()
-  const { data, error } = await db.from('booking_payment_records').select('id,payment_reference,transaction_type,original_payment_id,amount,currency,payment_method,payment_date,created_at').eq('booking_id', id).order('created_at', { ascending: false })
+  const { data, error } = await db.from('booking_payment_records').select('id,payment_reference,transaction_type,original_payment_id,amount,currency,payment_method,external_reference,payment_date,notes,created_at').eq('booking_id', id).order('created_at', { ascending: false })
   if (error) return NextResponse.json({ error: 'Unable to load payments' }, { status: 500 })
-  return NextResponse.json({ payments: data ?? [] })
+  const adjustments = new Map<string, number>()
+  for (const payment of data ?? []) {
+    if (payment.original_payment_id) adjustments.set(payment.original_payment_id, (adjustments.get(payment.original_payment_id) ?? 0) + Number(payment.amount))
+  }
+  return NextResponse.json({ payments: (data ?? []).map(payment => ({
+    ...payment,
+    canEdit: payment.transaction_type === 'receipt' && !adjustments.has(payment.id),
+    remainingAmount: payment.transaction_type === 'receipt' ? Math.max(0, Number(payment.amount) - (adjustments.get(payment.id) ?? 0)) : 0,
+  })) })
 }
 export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const authorization = await requireActiveAdmin(); if ('response' in authorization) return authorization.response

@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { formatBookingDate } from '@/lib/utils'
+import { subscribeToBookingUpdates } from '@/lib/admin/booking-updates'
 
 const money = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' })
 const idempotencyKey = () => crypto.randomUUID()
@@ -15,7 +16,7 @@ export function ExpenseTracking({ bookingId }: { bookingId: string }) {
   const [data, setData] = useState<Data | null>(null), [error, setError] = useState(''), [open, setOpen] = useState(false), [saving, setSaving] = useState(false)
   const [amount, setAmount] = useState(''), [category, setCategory] = useState(''), [assignment, setAssignment] = useState(''), [notes, setNotes] = useState('')
   const load = useCallback(async () => { const response = await fetch(`/api/admin/bookings/${bookingId}/expenses`), value = await response.json(); if (!response.ok) throw new Error(value.error); setData(value) }, [bookingId])
-  useEffect(() => { void load().catch(e => setError(e instanceof Error ? e.message : 'Unable to load expenses')) }, [load])
+  useEffect(() => { const refresh = () => { void load().catch(e => setError(e instanceof Error ? e.message : 'Unable to load expenses')) }; refresh(); return subscribeToBookingUpdates(bookingId, refresh) }, [bookingId, load])
   const close = () => { if (!saving) { setOpen(false); setAmount(''); setCategory(''); setAssignment(''); setNotes('') } }
   async function submit() { const value = Number(amount); if (!category.trim() || !Number.isFinite(value) || value <= 0) { setError('Enter a category and a positive amount.'); return }; setSaving(true); setError(''); try { const response = await fetch(`/api/admin/bookings/${bookingId}/expenses`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ idempotencyKey: idempotencyKey(), vendorAssignmentId: assignment || null, category, amount: value, expenseDate: new Date().toISOString().slice(0, 10), notes: notes || undefined }) }), result = await response.json(); if (!response.ok) throw new Error(result.error); await load(); close() } catch (e) { setError(e instanceof Error ? e.message : 'Unable to record expense') } finally { setSaving(false) } }
   // The form stays mounted for dialog exit animations; assignments can briefly be absent after a reload.

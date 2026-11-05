@@ -8,7 +8,7 @@ export async function GET(_: NextRequest, { params }: { params: Promise<{ id: st
   const [{ data: booking, error: bookingError }, { data: services, error: servicesError }, { data: activities, error: activitiesError }, { data: bookingLeads, error: leadsError }, { data: additionalQuotations, error: additionalQuotationsError }, { data: acceptedQuotations, error: acceptedQuotationsError }, { data: bookedQuotations, error: bookedQuotationsError }] = await Promise.all([
     supabase.from('celebration_bookings').select('*, quotations(id, quotation_number)').eq('id', id).maybeSingle(),
     supabase.from('celebration_booking_services').select('*').eq('booking_id', id).order('created_at'),
-    supabase.from('celebration_booking_activities').select('*').eq('booking_id', id).order('created_at', { ascending: false }),
+    supabase.from('celebration_booking_activities').select('*, admins(name, email)').eq('booking_id', id).order('created_at', { ascending: false }),
     supabase.from('celebration_booking_leads').select('lead_id, leads(id, contact_name, mobile, email, event_type, event_date)').eq('booking_id', id),
     supabase.from('celebration_booking_additional_quotations').select('quotation_id, linked_at, quotations(id, quotation_number, total_amount)').eq('booking_id', id).order('linked_at', { ascending: false }),
     supabase.from('quotations').select('id, quotation_number, total_amount').eq('status', 'accepted').order('created_at', { ascending: false }),
@@ -19,7 +19,11 @@ export async function GET(_: NextRequest, { params }: { params: Promise<{ id: st
   const transitions: Record<string, string[]> = { pending_confirmation: ['confirmed', 'cancelled'], confirmed: ['planning', 'cancelled'], planning: ['ready', 'cancelled'], ready: ['completed', 'cancelled'], completed: [], cancelled: [] }
   const unavailableQuotationIds = new Set([...(bookedQuotations ?? []).map((item) => item.quotation_id), ...(additionalQuotations ?? []).map((item) => item.quotation_id)])
   const eligibleAdditionalQuotations = (acceptedQuotations ?? []).filter((quotation) => !unavailableQuotationIds.has(quotation.id))
-  return NextResponse.json({ booking, services: services ?? [], activities: activities ?? [], leads: bookingLeads ?? [], additionalQuotations: additionalQuotations ?? [], eligibleAdditionalQuotations, allowedTransitions: transitions[booking.status] ?? [] })
+  const namedActivities = (activities ?? []).map(({ admins, ...activity }) => ({
+    ...activity,
+    actorName: admins?.name || admins?.email || (activity.admin_id ? 'Former administrator' : 'System / former administrator'),
+  }))
+  return NextResponse.json({ booking, services: services ?? [], activities: namedActivities, leads: bookingLeads ?? [], additionalQuotations: additionalQuotations ?? [], eligibleAdditionalQuotations, allowedTransitions: transitions[booking.status] ?? [] })
 }
 
 export async function DELETE(_: NextRequest, { params }: { params: Promise<{ id: string }> }) {

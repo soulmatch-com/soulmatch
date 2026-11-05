@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { formatBookingDate } from '@/lib/utils'
+import { subscribeToBookingUpdates } from '@/lib/admin/booking-updates'
 
 const money = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }); const title=(v:string)=>v.replaceAll('_',' ').replace(/\b\w/g,x=>x.toUpperCase())
 type Booking = { booking_reference: string; customer_name: string | null; ceremony_type: string | null; event_date: string | null; customer_contact: string | null; quoted_total: number; status: string; quotation_id: string; quotations: { quotation_number: string } | null }
@@ -14,7 +15,7 @@ export function BookingDetail({ id }: { id: string }) {
   const [detail, setDetail] = useState<Detail | null>(null), [error, setError] = useState(''), [saving, setSaving] = useState(false), [reason, setReason] = useState('')
   const controlsHeading = useRef<HTMLHeadingElement>(null)
   const load = useCallback(() => fetch(`/api/admin/bookings/${id}`).then(async response => { const data=await response.json(); if (!response.ok) throw new Error(data.error); setDetail(data) }).catch(err=>setError(err instanceof Error?err.message:'Unable to load booking.')), [id])
-  useEffect(()=>{ void load() }, [load])
+  useEffect(()=>{ void load(); return subscribeToBookingUpdates(id, () => { void load() }) }, [id, load])
   async function transition(toStatus: string) { if (toStatus === 'cancelled' && !reason.trim()) { setError('A cancellation reason is required.'); return } setSaving(true); setError(''); try { const response = await fetch(`/api/admin/bookings/${id}/lifecycle`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({toStatus, cancellationReason: toStatus === 'cancelled' ? reason : undefined}) }); const data=await response.json(); if (!response.ok) { if (response.status === 409) await load(); throw new Error(data.error) } await load(); setReason(''); requestAnimationFrame(() => controlsHeading.current?.focus()) } catch (err) { setError(err instanceof Error?err.message:'Unable to update booking.') } finally { setSaving(false) } }
   if (!detail && !error) return <p className="text-sm text-slate-500">Loading booking…</p>
   if (!detail) return <p role="alert" className="text-rose-700">{error}</p>

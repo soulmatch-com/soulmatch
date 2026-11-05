@@ -215,3 +215,27 @@ body {
     align-self: center;
   }
 }
+
+/* Event-planning task actions need their own flex group so adjacent controls do not touch. */
+.divide-y > div.flex.justify-between.py-3 {
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.divide-y > div.flex.justify-between.py-3 > span:first-child {
+  min-width: 0;
+}
+
+.divide-y > div.flex.justify-between.py-3 > span:last-child {
+  display: inline-flex;
+  flex-wrap: wrap;
+  flex: none;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.625rem;
+}
+
+.divide-y > div.flex.justify-between.py-3 > span:last-child > button {
+  flex: none;
+}

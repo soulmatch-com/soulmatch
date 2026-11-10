@@ -3,7 +3,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { FileDown, HandCoins, RotateCcw } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { BookingDialogContent } from '@/components/admin/BookingDialog'
+import { Dialog, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { PaymentEditor, type EditablePayment } from '@/components/admin/PaymentEditor'
 import { PaymentAuditHistory, type PaymentActivity } from '@/components/admin/PaymentAuditHistory'
 import { notifyBookingUpdated, subscribeToBookingUpdates } from '@/lib/admin/booking-updates'
@@ -35,7 +36,7 @@ export function CustomerPayments({bookingId}:{bookingId:string}){
    <Button size="sm" onClick={event=>{triggerRef.current=event.currentTarget;setMode('receipt')}}>Record Payment</Button>
   </div>
   {error&&<p role="alert" className="mt-3 text-sm text-rose-700">{error}</p>}
-  {summary ? <dl className="mt-4 grid grid-cols-2 gap-4 text-sm sm:grid-cols-3 xl:grid-cols-7">
+  {summary ? <dl className="mt-4 grid grid-cols-2 gap-4 text-sm sm:grid-cols-3 xl:grid-cols-4">
    {[['Booking Total',summary.booking_total],['Gross Received',summary.gross_received],['Refunded',summary.total_refunded],['Reversed',summary.total_reversed],['Net Received',summary.net_received],['Outstanding',summary.outstanding_balance]].map(([l,v])=><div key={String(l)}><dt className="text-slate-500">{l}</dt><dd className="font-medium">{money.format(Number(v))}</dd></div>)}
    <div><dt className="text-slate-500">Payment Status</dt><dd className="font-medium capitalize">{label(summary.payment_status)}</dd></div>
   </dl> : <p className="mt-3 text-sm">Loading Payment Summary…</p>}
@@ -48,7 +49,7 @@ export function CustomerPayments({bookingId}:{bookingId:string}){
    {currentPayments.length ? <div className="mt-2 divide-y">
     {currentPayments.map(payment => <div key={payment.id} data-testid="payment-history-row" className="flex flex-wrap items-center justify-between gap-3 py-3 text-sm">
      <div>
-      <div className="flex items-center gap-2">
+      <div className="flex flex-wrap items-center gap-2">
        <strong className="text-base text-slate-900">{money.format(Number(payment.amount))}</strong>
        {correctedReceipts.has(payment.id) && <span className="rounded bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-800">Edited</span>}
       </div>
@@ -57,16 +58,16 @@ export function CustomerPayments({bookingId}:{bookingId:string}){
      <div className="flex flex-wrap gap-2">
       {payment.transaction_type === 'receipt' && <>
        <PaymentEditor bookingId={bookingId} payment={payment}/>
-       <Button size="icon" className="h-9 w-9" variant="outline" aria-label="Refund" title="Refund" disabled={payment.remainingAmount<=0} onClick={event=>{triggerRef.current=event.currentTarget;setOriginal(payment);setMode('refund')}}><HandCoins aria-hidden="true" className="h-4 w-4" /></Button>
-       <Button size="icon" className="h-9 w-9" variant="outline" aria-label="Reverse" title="Reverse" disabled={payment.remainingAmount<=0} onClick={event=>{triggerRef.current=event.currentTarget;setOriginal(payment);setMode('reversal')}}><RotateCcw aria-hidden="true" className="h-4 w-4" /></Button>
+       <Button size="icon" className="size-11 xl:size-9" variant="outline" aria-label="Refund" title="Refund" disabled={payment.remainingAmount<=0} onClick={event=>{triggerRef.current=event.currentTarget;setOriginal(payment);setMode('refund')}}><HandCoins aria-hidden="true" className="h-4 w-4" /></Button>
+       <Button size="icon" className="size-11 xl:size-9" variant="outline" aria-label="Reverse" title="Reverse" disabled={payment.remainingAmount<=0} onClick={event=>{triggerRef.current=event.currentTarget;setOriginal(payment);setMode('reversal')}}><RotateCcw aria-hidden="true" className="h-4 w-4" /></Button>
       </>}
-      <a aria-label="Download PDF" title="Download PDF" className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-slate-300 text-slate-800 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2" href={`/api/admin/bookings/${bookingId}/payments/${payment.id}/receipt`}><FileDown aria-hidden="true" className="h-4 w-4" /></a>
+      <a aria-label="Download PDF" title="Download PDF" className="inline-flex size-11 items-center justify-center xl:size-9 rounded-md border border-slate-300 text-slate-800 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2" href={`/api/admin/bookings/${bookingId}/payments/${payment.id}/receipt`}><FileDown aria-hidden="true" className="h-4 w-4" /></a>
      </div>
     </div>)}
    </div> : <p className="mt-2 text-sm text-slate-500">No Payment Entries Recorded.</p>}
   </div>
   <Dialog open={mode!==null} onOpenChange={open=>!open&&close()}>
-   <DialogContent showCloseButton={false} onCloseAutoFocus={event=>{const trigger=triggerRef.current;if(trigger?.isConnected&&!trigger.disabled&&trigger.getClientRects().length){event.preventDefault();trigger.focus()}}}>
+   <BookingDialogContent showCloseButton={false} onCloseAutoFocus={event=>{const trigger=triggerRef.current;if(trigger?.isConnected&&!trigger.disabled&&trigger.getClientRects().length){event.preventDefault();trigger.focus()}}}>
     <DialogHeader>
      <DialogTitle>{mode==='receipt'?'Record payment':mode==='refund'?'Record refund':'Reverse payment'}</DialogTitle>
      <DialogDescription>{mode==='receipt'?'Record a verified customer receipt.':`This permanently appends a ${mode} against ${original?.payment_reference}. Confirm only after checking the original entry.`}</DialogDescription>
@@ -77,8 +78,8 @@ export function CustomerPayments({bookingId}:{bookingId:string}){
      <input aria-label="External reference" value={external} maxLength={200} onChange={e=>setExternal(e.target.value)} className="h-9 rounded border px-2" placeholder="External reference (optional)"/>
      <textarea aria-label="Remarks" value={remarks} onChange={e=>setRemarks(e.target.value)} maxLength={2000} placeholder="Remarks (optional, e.g. advance payment)" className="rounded border p-2"/>
     </> : <textarea aria-label="Reason" value={reason} onChange={e=>setReason(e.target.value)} maxLength={2000} placeholder="Reason (required)" className="rounded border p-2"/>}
-    <DialogFooter><Button variant="outline" disabled={saving} onClick={close}>Cancel</Button><Button disabled={saving} onClick={()=>void submit()}>{saving?'Saving…':mode==='receipt'?'Record payment':`Confirm ${mode}`}</Button></DialogFooter>
-   </DialogContent>
+    <DialogFooter className="gap-2 sm:space-x-0"><Button variant="outline" disabled={saving} onClick={close}>Cancel</Button><Button disabled={saving} onClick={()=>void submit()}>{saving?'Saving…':mode==='receipt'?'Record payment':`Confirm ${mode}`}</Button></DialogFooter>
+   </BookingDialogContent>
   </Dialog>
  </section>
 }

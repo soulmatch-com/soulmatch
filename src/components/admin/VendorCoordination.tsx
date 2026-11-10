@@ -2,10 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { BookingDialogContent } from "@/components/admin/BookingDialog";
 import { formatBookingDate } from "@/lib/utils";
 import {
   Dialog,
-  DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
@@ -224,7 +224,7 @@ export function VendorCoordination({ bookingId }: { bookingId: string }) {
     <section className="rounded-xl border bg-white p-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h2 className="font-semibold">Vendor Coordination</h2>
-        <div className="flex gap-2">
+        <div className="flex w-full flex-wrap gap-2 sm:w-auto">
           <Button
             size="sm"
             onClick={() => {
@@ -304,7 +304,7 @@ export function VendorCoordination({ bookingId }: { bookingId: string }) {
           }
         }}
       >
-        <DialogContent className="max-h-[90vh] overflow-y-auto">
+        <BookingDialogContent className="max-h-[90vh] overflow-y-auto">
           <DialogHeader><DialogTitle>Create Vendor Assignment</DialogTitle><DialogDescription>Link a vendor to one of this booking&apos;s services.</DialogDescription></DialogHeader>
           <form className="space-y-5" onSubmit={(event) => { event.preventDefault(); void create(); }}>
             {dialogError && <p role="alert" className="rounded-md bg-rose-50 p-3 text-sm text-rose-800">{dialogError}</p>}
@@ -313,9 +313,9 @@ export function VendorCoordination({ bookingId }: { bookingId: string }) {
               <label className="text-sm font-medium text-slate-700">Booking Service<select aria-label="Booking service" className={inputClass} value={draft.bookingServiceId} onChange={(e) => setDraft({ ...draft, bookingServiceId: e.target.value })}><option value="">Select booking service</option>{services.map((s) => <option value={s.id} key={s.id}>{s.service_name_snapshot}</option>)}</select></label>
             </div>
             <Fields value={draft} setValue={setDraft} />
-            <DialogFooter><Button type="button" variant="outline" disabled={saving} onClick={() => { setCreating(false); close(); }}>Cancel</Button><Button disabled={saving} type="submit">{saving ? "Creating…" : "Create assignment"}</Button></DialogFooter>
+            <DialogFooter className="gap-2 sm:space-x-0"><Button type="button" variant="outline" disabled={saving} onClick={() => { setCreating(false); close(); }}>Cancel</Button><Button disabled={saving} type="submit">{saving ? "Creating…" : "Create assignment"}</Button></DialogFooter>
           </form>
-        </DialogContent>
+        </BookingDialogContent>
       </Dialog>
       <Dialog
         open={!!edit}
@@ -326,7 +326,7 @@ export function VendorCoordination({ bookingId }: { bookingId: string }) {
           }
         }}
       >
-        <DialogContent>
+        <BookingDialogContent>
           <DialogHeader>
             <DialogTitle>Edit Assignment</DialogTitle>
           </DialogHeader>
@@ -377,7 +377,7 @@ export function VendorCoordination({ bookingId }: { bookingId: string }) {
               </Button>
             </>
           )}
-        </DialogContent>
+        </BookingDialogContent>
       </Dialog>
       <Dialog
         open={!!action}
@@ -388,7 +388,7 @@ export function VendorCoordination({ bookingId }: { bookingId: string }) {
           }
         }}
       >
-        <DialogContent>
+        <BookingDialogContent>
           <DialogHeader>
             <DialogTitle>{title(action?.to || "")} Vendor Assignment</DialogTitle>
           </DialogHeader>
@@ -405,13 +405,13 @@ export function VendorCoordination({ bookingId }: { bookingId: string }) {
               </Button>
             </>
           )}
-        </DialogContent>
+        </BookingDialogContent>
       </Dialog>
       <Dialog
         open={history !== null}
         onOpenChange={(open) => !open && setHistory(null)}
       >
-        <DialogContent>
+        <BookingDialogContent>
           <DialogHeader>
             <DialogTitle>Coordination History</DialogTitle>
           </DialogHeader>
@@ -422,7 +422,7 @@ export function VendorCoordination({ bookingId }: { bookingId: string }) {
               <p>{display(x.metadata)}</p>
             </article>
           ))}
-        </DialogContent>
+        </BookingDialogContent>
       </Dialog>
     </section>
   );

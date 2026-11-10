@@ -178,7 +178,7 @@ export function PaymentAuditHistory({ activities, bookingReference }: { activiti
   }
   return <Dialog open={open} onOpenChange={value => { setOpen(value); if (!value) setError('') }}>
     <DialogTrigger asChild><Button type="button" size="sm" variant="outline">View audit history</Button></DialogTrigger>
-    <DialogContent showCloseButton={false} className="flex max-h-[85vh] w-[calc(100%-1.5rem)] max-w-[960px] flex-col gap-0 overflow-hidden rounded-xl border-slate-200 bg-white p-0 text-slate-900 shadow-2xl sm:max-w-[960px] dark:bg-white dark:text-slate-900">
+    <DialogContent showCloseButton={false} className="flex max-h-[85dvh] w-[calc(100%-1.5rem)] max-w-[960px] flex-col gap-0 overflow-hidden rounded-xl border-slate-200 bg-white p-0 text-slate-900 shadow-2xl [overflow-wrap:anywhere] sm:max-w-[960px] dark:bg-white dark:text-slate-900">
       <DialogHeader className="shrink-0 border-b border-slate-200 px-4 py-5 text-left sm:px-6">
         <div className="flex items-start justify-between gap-3">
           <div className="flex min-w-0 items-start gap-3">

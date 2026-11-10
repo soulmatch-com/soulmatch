@@ -3,8 +3,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Pencil, Plus, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog'
+import { BookingDialogContent, BookingAlertDialogContent } from '@/components/admin/BookingDialog'
+import { Dialog, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog'
 import { formatBookingDate } from '@/lib/utils'
 import { subscribeToBookingUpdates } from '@/lib/admin/booking-updates'
 
@@ -135,11 +136,11 @@ export function ExpenseTracking({ bookingId }: { bookingId: string }) {
         {data.expenses.length ? <div className="mt-2 divide-y">{data.expenses.map(x => <div key={x.id} data-testid="expense-history-row" className="py-2 text-sm">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <span><b>{x.expense_reference}</b> · {x.category}</span>
-            <div className="flex items-center gap-3">
+            <div className="flex min-w-0 flex-wrap items-center gap-3">
               <b>{money.format(Number(x.amount))}</b>
               <div className="flex items-center gap-2">
-                <Button size="icon" variant="outline" className="h-9 w-9" aria-label="Edit" title="Edit expense" onClick={event => { actionTrigger.current = event.currentTarget; openForm(x) }}><Pencil aria-hidden="true" className="h-4 w-4" /></Button>
-                <Button size="icon" variant="outline" className="h-9 w-9 border-rose-200 text-rose-700 hover:bg-rose-50 hover:text-rose-800" aria-label="Delete" title="Delete expense" onClick={event => { actionTrigger.current = event.currentTarget; setDeleteError(''); setDeletingExpense(x) }}><Trash2 aria-hidden="true" className="h-4 w-4" /></Button>
+                <Button size="icon" variant="outline" className="size-11 xl:size-9" aria-label="Edit" title="Edit expense" onClick={event => { actionTrigger.current = event.currentTarget; openForm(x) }}><Pencil aria-hidden="true" className="h-4 w-4" /></Button>
+                <Button size="icon" variant="outline" className="size-11 border-rose-200 xl:size-9 text-rose-700 hover:bg-rose-50 hover:text-rose-800" aria-label="Delete" title="Delete expense" onClick={event => { actionTrigger.current = event.currentTarget; setDeleteError(''); setDeletingExpense(x) }}><Trash2 aria-hidden="true" className="h-4 w-4" /></Button>
               </div>
             </div>
           </div>
@@ -148,7 +149,7 @@ export function ExpenseTracking({ bookingId }: { bookingId: string }) {
       </div>
     </> : <p className="mt-3 text-sm text-slate-500">Loading Expense Tracking…</p>}
     <Dialog open={open} onOpenChange={value => { if (!saving) setOpen(value) }}>
-      <DialogContent className="max-h-[90dvh] overflow-y-auto" onCloseAutoFocus={restoreActionFocus}>
+      <BookingDialogContent className="max-h-[90dvh] overflow-y-auto" onCloseAutoFocus={restoreActionFocus}>
         <DialogHeader>
           <DialogTitle>{editing ? 'Edit Expense' : 'Record Expense'}</DialogTitle>
           <DialogDescription>{editing ? `Update expense ${editing.expense_reference}.` : 'This expense is allocated against the amount already received from the customer.'}</DialogDescription>
@@ -165,12 +166,12 @@ export function ExpenseTracking({ bookingId }: { bookingId: string }) {
             </select></label>
             <label className="text-sm">Notes (Optional)<textarea aria-label="Expense notes" maxLength={2000} className="mt-1 w-full rounded border p-2" value={notes} onChange={e => setNotes(e.target.value)} /></label>
           </fieldset>
-          <DialogFooter><Button type="button" variant="outline" disabled={saving} onClick={() => setOpen(false)}>Cancel</Button><Button type="submit" disabled={saving}>{saving ? 'Saving…' : editing ? 'Save changes' : 'Record expense'}</Button></DialogFooter>
+          <DialogFooter className="gap-2 sm:space-x-0"><Button type="button" variant="outline" disabled={saving} onClick={() => setOpen(false)}>Cancel</Button><Button type="submit" disabled={saving}>{saving ? 'Saving…' : editing ? 'Save changes' : 'Record expense'}</Button></DialogFooter>
         </form>
-      </DialogContent>
+      </BookingDialogContent>
     </Dialog>
     <AlertDialog open={deletingExpense !== null} onOpenChange={value => { if (!value && !deleting) setDeletingExpense(null) }}>
-      <AlertDialogContent className="max-w-[calc(100%-2rem)] sm:max-w-lg" onCloseAutoFocus={restoreActionFocus}>
+      <BookingAlertDialogContent className="max-w-[calc(100%-2rem)] sm:max-w-lg" onCloseAutoFocus={restoreActionFocus}>
         <AlertDialogHeader>
           <AlertDialogTitle>Delete expense?</AlertDialogTitle>
           <AlertDialogDescription>
@@ -178,13 +179,13 @@ export function ExpenseTracking({ bookingId }: { bookingId: string }) {
           </AlertDialogDescription>
         </AlertDialogHeader>
         {deleteError && <p role="alert" className="text-sm text-rose-700">{deleteError}</p>}
-        <AlertDialogFooter>
+        <AlertDialogFooter className="gap-2 sm:space-x-0">
           <AlertDialogCancel disabled={deleting}>Cancel</AlertDialogCancel>
           <AlertDialogAction className="bg-red-600 text-white hover:bg-red-700" disabled={deleting} onClick={event => { event.preventDefault(); void removeExpense() }}>
             <Trash2 aria-hidden="true" className="h-4 w-4" />{deleting ? 'Deleting…' : 'Delete expense'}
           </AlertDialogAction>
         </AlertDialogFooter>
-      </AlertDialogContent>
+      </BookingAlertDialogContent>
     </AlertDialog>
   </section>
 }

@@ -316,7 +316,7 @@ export function QuotationManager({ quotationId, initialLeadId, returnTo }: { quo
     }
   }
   return (
-    <section className="rounded-xl border bg-white p-5">
+    <section className="min-w-0 rounded-xl border bg-white p-4 sm:p-5">
       <div>
         <h2 className="font-semibold text-slate-900">Quotations</h2>
         <p className="mt-1 text-sm text-slate-600">
@@ -339,22 +339,23 @@ export function QuotationManager({ quotationId, initialLeadId, returnTo }: { quo
             Loading service catalogue…
           </p>
         ) : (
-          <div className="mt-3 overflow-x-auto">
-            <div className="min-w-[730px]">
-              <div className="grid grid-cols-[32px_minmax(180px,1fr)_130px_100px_130px_100px] gap-3 px-3 pb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
-                <span className="sr-only">Reorder</span>
-                <span>Service</span>
-                <span>Cost (₹)</span>
-                <span>Quantity</span>
-                <span>Total amount</span>
-                <span className="sr-only">Actions</span>
-              </div>
-              <div className="grid grid-cols-[32px_minmax(180px,1fr)_130px_100px_130px_100px] items-end gap-3 rounded-lg border border-dashed border-slate-300 bg-slate-50 p-3">
-                <span />
+          <div className="mt-3">
+            <div aria-hidden="true" className="hidden gap-3 px-3 pb-2 text-xs font-semibold uppercase tracking-wide text-slate-500 xl:grid xl:grid-cols-[32px_minmax(0,1fr)_110px_80px_120px_80px]">
+              <span />
+              <span>Service</span>
+              <span>Cost (₹)</span>
+              <span>Quantity</span>
+              <span>Total amount</span>
+              <span />
+            </div>
+            <div className="grid grid-cols-2 items-end gap-3 rounded-lg border border-dashed border-slate-300 bg-slate-50 p-3 xl:grid-cols-[32px_minmax(0,1fr)_110px_80px_120px_80px]">
+              <span className="hidden xl:block" />
+              <label className="col-span-2 min-w-0 text-xs text-slate-600 xl:col-span-1">
+                <span className="mb-1 block xl:sr-only">Service</span>
                 <select
                   value={selectedServiceId}
                   onChange={(event) => setSelectedServiceId(event.target.value)}
-                  className="h-9 min-w-0 rounded-md border border-slate-300 bg-white px-2 text-sm"
+                  className="h-11 w-full min-w-0 rounded-md border border-slate-300 bg-white px-2 text-base xl:h-9 xl:text-sm"
                 >
                   <option value="">Choose a service</option>
                   {services
@@ -370,6 +371,9 @@ export function QuotationManager({ quotationId, initialLeadId, returnTo }: { quo
                       </option>
                     ))}
                 </select>
+              </label>
+              <label className="min-w-0 text-xs text-slate-600">
+                <span className="mb-1 block xl:sr-only">Cost (₹)</span>
                 <input
                   aria-label="Cost"
                   min="0"
@@ -378,8 +382,11 @@ export function QuotationManager({ quotationId, initialLeadId, returnTo }: { quo
                   value={selectedUnitPrice}
                   onChange={(event) => setSelectedUnitPrice(event.target.value)}
                   placeholder="0.00"
-                  className="h-9 w-full rounded-md border border-slate-300 px-2 text-sm"
+                  className="h-11 w-full min-w-0 rounded-md border border-slate-300 bg-white px-2 text-base xl:h-9 xl:text-sm"
                 />
+              </label>
+              <label className="min-w-0 text-xs text-slate-600">
+                <span className="mb-1 block xl:sr-only">Quantity</span>
                 <input
                   aria-label="Quantity"
                   min="1"
@@ -387,139 +394,149 @@ export function QuotationManager({ quotationId, initialLeadId, returnTo }: { quo
                   type="number"
                   value={selectedQuantity}
                   onChange={(event) => setSelectedQuantity(event.target.value)}
-                  className="h-9 w-full rounded-md border border-slate-300 px-2 text-sm"
+                  className="h-11 w-full min-w-0 rounded-md border border-slate-300 bg-white px-2 text-base xl:h-9 xl:text-sm"
                 />
-                <p className="h-9 rounded-md bg-white px-3 py-2 text-sm font-medium text-slate-900">
+              </label>
+              <div className="min-w-0">
+                <span className="mb-1 block text-xs text-slate-600 xl:sr-only">Total amount</span>
+                <p className="flex min-h-11 items-center break-all rounded-md bg-white px-2 py-2 text-sm font-medium text-slate-900 xl:min-h-9">
                   {money.format(
                     (Number(selectedQuantity) || 0) *
                       (Number(selectedUnitPrice) || 0),
                   )}
                 </p>
-                <Button
-                  type="button"
-                  variant="outline"
-                  disabled={
-                    !selectedServiceId ||
-                    !selectedQuantity ||
-                    selectedUnitPrice === ""
-                  }
-                  onClick={addService}
-                >
-                  Add
-                </Button>
               </div>
-              <div className="mt-2 space-y-2">
-                {draftItems.map((item) => {
-                  const service = services.find(
-                    (candidate) => candidate.id === item.serviceId,
-                  );
-                  if (!service) return null;
-                  const lineTotal =
-                    (Number(item.quantity) || 0) *
-                    (Number(item.unitPrice) || 0);
-                  return (
-                    <div
-                      key={service.id}
-                      onDragOver={(event) => {
-                        event.preventDefault();
-                        if (draggedServiceId && draggedServiceId !== service.id) setDropTargetServiceId(service.id);
+              <Button
+                type="button"
+                variant="outline"
+                className="h-11 w-full xl:h-9"
+                disabled={
+                  !selectedServiceId ||
+                  !selectedQuantity ||
+                  selectedUnitPrice === ""
+                }
+                onClick={addService}
+              >
+                Add
+              </Button>
+            </div>
+            <div className="mt-2 space-y-2">
+              {draftItems.map((item) => {
+                const service = services.find(
+                  (candidate) => candidate.id === item.serviceId,
+                );
+                if (!service) return null;
+                const lineTotal =
+                  (Number(item.quantity) || 0) *
+                  (Number(item.unitPrice) || 0);
+                return (
+                  <div
+                    key={service.id}
+                    onDragOver={(event) => {
+                      event.preventDefault();
+                      if (draggedServiceId && draggedServiceId !== service.id) setDropTargetServiceId(service.id);
+                    }}
+                    onDrop={(event) => {
+                      event.preventDefault();
+                      if (draggedServiceId) moveService(draggedServiceId, service.id);
+                      setDraggedServiceId(null);
+                      setDropTargetServiceId(null);
+                    }}
+                    className={`relative grid grid-cols-2 items-end gap-3 rounded-lg border p-3 transition-colors xl:grid-cols-[32px_minmax(0,1fr)_110px_80px_120px_80px] ${dropTargetServiceId === service.id ? "border-sky-500 bg-sky-50" : "border-slate-200"}`}
+                  >
+                    <button
+                      type="button"
+                      draggable
+                      aria-label={`Drag ${service.name} to change its position`}
+                      title="Drag to reorder"
+                      onDragStart={(event) => {
+                        event.dataTransfer.effectAllowed = "move";
+                        event.dataTransfer.setData("text/plain", service.id);
+                        setDraggedServiceId(service.id);
                       }}
-                      onDrop={(event) => {
-                        event.preventDefault();
-                        if (draggedServiceId) moveService(draggedServiceId, service.id);
+                      onDragEnd={() => {
                         setDraggedServiceId(null);
                         setDropTargetServiceId(null);
                       }}
-                      className={`grid grid-cols-[32px_minmax(180px,1fr)_130px_100px_130px_100px] items-end gap-3 rounded-lg border p-3 transition-colors ${dropTargetServiceId === service.id ? "border-sky-500 bg-sky-50" : "border-slate-200"}`}
+                      className="absolute right-2 top-2 inline-flex h-11 w-8 cursor-grab items-center justify-center rounded-md text-slate-400 hover:bg-slate-100 hover:text-slate-700 active:cursor-grabbing xl:static xl:mb-1 xl:h-9"
                     >
-                      <button
-                        type="button"
-                        draggable
-                        aria-label={`Drag ${service.name} to change its position`}
-                        title="Drag to reorder"
-                        onDragStart={(event) => {
-                          event.dataTransfer.effectAllowed = "move";
-                          event.dataTransfer.setData("text/plain", service.id);
-                          setDraggedServiceId(service.id);
-                        }}
-                        onDragEnd={() => {
-                          setDraggedServiceId(null);
-                          setDropTargetServiceId(null);
-                        }}
-                        className="mb-1 inline-flex h-9 w-8 cursor-grab items-center justify-center rounded-md text-slate-400 hover:bg-slate-100 hover:text-slate-700 active:cursor-grabbing"
-                      >
-                        <GripVertical aria-hidden="true" className="size-5" />
-                      </button>
-                      <div className="pb-2">
-                        <p className="font-medium text-slate-900">
-                          {service.name}
-                        </p>
-                        {service.show_description_in_quotation && <label className="mt-2 block text-xs text-slate-600">Quotation description (this quotation only)<textarea value={item.descriptionOverride} onChange={(event) => changeItem(service.id, "descriptionOverride", event.target.value)} maxLength={1000} rows={2} className="mt-1 w-full rounded-md border border-slate-300 p-2 text-sm text-slate-700" /></label>}
-                      </div>
-                      <label>
-                        <span className="sr-only">Cost for {service.name}</span>
-                        <input
-                          required
-                          min="0"
-                          step="0.01"
-                          type="number"
-                          value={item.unitPrice}
-                          onChange={(event) =>
-                            changeItem(
-                              service.id,
-                              "unitPrice",
-                              event.target.value,
-                            )
-                          }
-                          className="h-9 w-full rounded-md border border-slate-300 px-2"
-                        />
-                      </label>
-                      <label>
-                        <span className="sr-only">
-                          Quantity for {service.name}
-                        </span>
-                        <input
-                          required
-                          min="1"
-                          max="10000"
-                          type="number"
-                          value={item.quantity}
-                          onChange={(event) =>
-                            changeItem(
-                              service.id,
-                              "quantity",
-                              event.target.value,
-                            )
-                          }
-                          className="h-9 w-full rounded-md border border-slate-300 px-2"
-                        />
-                      </label>
-                      <p className="h-9 rounded-md bg-slate-50 px-3 py-2 text-sm font-medium text-slate-900">
+                      <GripVertical aria-hidden="true" className="size-5" />
+                    </button>
+                    <div className="col-span-2 min-w-0 pr-8 xl:col-span-1 xl:pb-2 xl:pr-0">
+                      <p className="break-words font-medium text-slate-900">
+                        {service.name}
+                      </p>
+                      {service.show_description_in_quotation && <label className="mt-2 block text-xs text-slate-600">Quotation description (this quotation only)<textarea value={item.descriptionOverride} onChange={(event) => changeItem(service.id, "descriptionOverride", event.target.value)} maxLength={1000} rows={2} className="mt-1 w-full min-w-0 rounded-md border border-slate-300 p-2 text-base text-slate-700 xl:text-sm" /></label>}
+                    </div>
+                    <label className="min-w-0">
+                      <span aria-hidden="true" className="mb-1 block text-xs text-slate-600 xl:hidden">Cost (₹)</span>
+                      <span className="sr-only">Cost for {service.name}</span>
+                      <input
+                        required
+                        min="0"
+                        step="0.01"
+                        type="number"
+                        value={item.unitPrice}
+                        onChange={(event) =>
+                          changeItem(
+                            service.id,
+                            "unitPrice",
+                            event.target.value,
+                          )
+                        }
+                        className="h-11 w-full min-w-0 rounded-md border border-slate-300 px-2 text-base xl:h-9"
+                      />
+                    </label>
+                    <label className="min-w-0">
+                      <span aria-hidden="true" className="mb-1 block text-xs text-slate-600 xl:hidden">Quantity</span>
+                      <span className="sr-only">
+                        Quantity for {service.name}
+                      </span>
+                      <input
+                        required
+                        min="1"
+                        max="10000"
+                        type="number"
+                        value={item.quantity}
+                        onChange={(event) =>
+                          changeItem(
+                            service.id,
+                            "quantity",
+                            event.target.value,
+                          )
+                        }
+                        className="h-11 w-full min-w-0 rounded-md border border-slate-300 px-2 text-base xl:h-9"
+                      />
+                    </label>
+                    <div className="min-w-0">
+                      <span className="mb-1 block text-xs text-slate-600 xl:sr-only">Total amount</span>
+                      <p className="flex min-h-11 items-center break-all rounded-md bg-slate-50 px-2 py-2 text-sm font-medium text-slate-900 xl:min-h-9">
                         {money.format(lineTotal)}
                       </p>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={() => removeService(service.id)}
-                      >
-                        Remove
-                      </Button>
                     </div>
-                  );
-                })}
-              </div>
-              {draftItems.length === 0 && (
-                <p className="mt-3 text-sm text-slate-500">
-                  Add a service line to start this quotation.
-                </p>
-              )}
-              {services.length === 0 && (
-                <p className="mt-3 text-sm text-slate-500">
-                  No active celebration services are available.
-                </p>
-              )}
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="h-11 w-full xl:h-9"
+                      onClick={() => removeService(service.id)}
+                    >
+                      Remove
+                    </Button>
+                  </div>
+                );
+              })}
             </div>
+            {draftItems.length === 0 && (
+              <p className="mt-3 text-sm text-slate-500">
+                Add a service line to start this quotation.
+              </p>
+            )}
+            {services.length === 0 && (
+              <p className="mt-3 text-sm text-slate-500">
+                No active celebration services are available.
+              </p>
+            )}
           </div>
         )}
         <div className="mt-5 grid gap-4 sm:grid-cols-2">

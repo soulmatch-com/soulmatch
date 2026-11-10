@@ -2,7 +2,8 @@
 
 import { useCallback, useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { BookingDialogContent } from '@/components/admin/BookingDialog'
+import { Dialog, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { notifyBookingUpdated, subscribeToBookingUpdates } from '@/lib/admin/booking-updates'
 
 const money = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' })
@@ -80,13 +81,13 @@ export function BookingAmountHistory({ bookingId }: { bookingId: string }) {
       </li>)}
     </ul> : <p className="mt-3 text-sm text-slate-500">No amount alterations recorded.</p>}
     <Dialog open={open} onOpenChange={value => !saving && setOpen(value)}>
-      <DialogContent><form onSubmit={event => void submit(event)} className="space-y-4">
+      <BookingDialogContent><form onSubmit={event => void submit(event)} className="space-y-4">
         <DialogHeader><DialogTitle>Alter booking amount</DialogTitle><DialogDescription>Current total: {money.format(expectedTotal)}. The change and your reason will be saved in the booking history.</DialogDescription></DialogHeader>
         {error && <p role="alert" className="text-sm text-rose-700">{error}</p>}
         <label className="block text-sm font-medium">New booking amount<input aria-label="New booking amount" required disabled={saving} type="number" min="0" max="9999999999.99" step="0.01" value={amount} onChange={event => setAmount(event.target.value)} className="mt-1 h-10 w-full rounded border px-3" /></label>
         <label className="block text-sm font-medium">Reason for amount change<textarea aria-label="Reason for amount change" required disabled={saving} maxLength={2000} rows={3} value={reason} onChange={event => setReason(event.target.value)} className="mt-1 w-full rounded border p-3" /></label>
-        <DialogFooter><Button type="button" variant="outline" disabled={saving} onClick={() => setOpen(false)}>Cancel</Button><Button type="submit" disabled={saving || !reason.trim() || amount === '' || Number(amount) === expectedTotal}>{saving ? 'Saving…' : 'Save amount'}</Button></DialogFooter>
-      </form></DialogContent>
+        <DialogFooter className="gap-2 sm:space-x-0"><Button type="button" variant="outline" disabled={saving} onClick={() => setOpen(false)}>Cancel</Button><Button type="submit" disabled={saving || !reason.trim() || amount === '' || Number(amount) === expectedTotal}>{saving ? 'Saving…' : 'Save amount'}</Button></DialogFooter>
+      </form></BookingDialogContent>
     </Dialog>
   </section>
 }

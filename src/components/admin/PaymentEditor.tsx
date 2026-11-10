@@ -3,7 +3,8 @@
 import { useRef, useState } from 'react'
 import { Pencil } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { BookingDialogContent } from '@/components/admin/BookingDialog'
+import { Dialog, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { notifyBookingUpdated } from '@/lib/admin/booking-updates'
 
 const methods = ['cash', 'upi', 'bank_transfer', 'card_external', 'other'] as const
@@ -52,11 +53,11 @@ export function PaymentEditor({ bookingId, payment }: { bookingId: string; payme
   }
 
   return <>
-    <Button ref={trigger} size="icon" className="h-9 w-9" variant="outline" aria-label="Edit" disabled={!payment.canEdit}
+    <Button ref={trigger} size="icon" className="size-11 xl:size-9" variant="outline" aria-label="Edit" disabled={!payment.canEdit}
       title={!payment.canEdit ? 'Receipts with refunds, reversals or earlier edits cannot be edited. Select the latest corrected receipt.' : 'Edit recorded payment'}
       onClick={startEdit}><Pencil aria-hidden="true" className="h-4 w-4" /></Button>
     <Dialog open={open} onOpenChange={value => !saving && setOpen(value)}>
-      <DialogContent showCloseButton={false} className="max-h-[90vh] overflow-y-auto" onCloseAutoFocus={event => {
+      <BookingDialogContent showCloseButton={false} className="max-h-[90vh] overflow-y-auto" onCloseAutoFocus={event => {
         if (trigger.current && !trigger.current.disabled) { event.preventDefault(); trigger.current.focus() }
       }}><form onSubmit={event => void submit(event)} className="space-y-4">
         <DialogHeader><DialogTitle>Edit recorded payment</DialogTitle><DialogDescription>Correct {payment.payment_reference}. The original receipt stays in history, and a corrected receipt is created with your reason.</DialogDescription></DialogHeader>
@@ -67,8 +68,8 @@ export function PaymentEditor({ bookingId, payment }: { bookingId: string; payme
         <label className="block text-sm">Payment date and time<input aria-label="Edit payment date" required disabled={saving} type="datetime-local" step="1" value={paymentDate} onChange={event => setPaymentDate(event.target.value)} className="mt-1 h-9 w-full rounded border px-2" /></label>
         <label className="block text-sm">Remarks<textarea aria-label="Edit payment remarks" disabled={saving} maxLength={2000} rows={2} value={notes} onChange={event => setNotes(event.target.value)} className="mt-1 w-full rounded border p-2" /></label>
         <label className="block text-sm">Reason for edit<textarea aria-label="Reason for payment edit" required disabled={saving} maxLength={2000} rows={2} value={reason} onChange={event => setReason(event.target.value)} className="mt-1 w-full rounded border p-2" /></label>
-        <DialogFooter><Button type="button" variant="outline" disabled={saving} onClick={() => setOpen(false)}>Cancel</Button><Button type="submit" disabled={saving || !reason.trim()}>{saving ? 'Saving…' : 'Save changes'}</Button></DialogFooter>
-      </form></DialogContent>
+        <DialogFooter className="gap-2 sm:space-x-0"><Button type="button" variant="outline" disabled={saving} onClick={() => setOpen(false)}>Cancel</Button><Button type="submit" disabled={saving || !reason.trim()}>{saving ? 'Saving…' : 'Save changes'}</Button></DialogFooter>
+      </form></BookingDialogContent>
     </Dialog>
   </>
 }

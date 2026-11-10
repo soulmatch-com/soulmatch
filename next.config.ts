@@ -20,6 +20,11 @@ const nextConfig: NextConfig = {
       { source: '/:path*', has: [{ type: 'host', value: 'mythirumanam.in' }], destination: 'https://mythirumanam.com/:path*', permanent: true },
       { source: '/:path*', has: [{ type: 'host', value: 'www.mythirumanam.in' }], destination: 'https://mythirumanam.com/:path*', permanent: true },
       { source: '/:path*', has: [{ type: 'host', value: 'www.mythirumanam.com' }], destination: 'https://mythirumanam.com/:path*', permanent: true },
+      // Former root-level article links must reach their public canonical pages,
+      // rather than falling through to the authentication proxy.
+      { source: '/60th-marriage-cost-thirukadaiyur', destination: '/blog/60th-marriage-cost-thirukadaiyur', permanent: true },
+      { source: '/thirukadaiyur-60th-marriage-catering-hall-photography-arrangements', destination: '/blog/thirukadaiyur-60th-marriage-catering-hall-photography-arrangements', permanent: true },
+      { source: '/thirukadaiyur-60th-marriage-ceremony-what-happens-on-the-day', destination: '/blog/thirukadaiyur-60th-marriage-ceremony-what-happens-on-the-day', permanent: true },
       { source: '/celebrations', destination: '/', permanent: true },
       { source: '/celebrations/thirukadaiyur', destination: '/', permanent: true },
       { source: '/celebrations/thirukadaiyur/60th-marriage', destination: '/60th-marriage', permanent: true },

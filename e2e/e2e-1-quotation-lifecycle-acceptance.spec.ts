@@ -43,6 +43,55 @@ const lifecycleUrl = (fixture: Fixture, url: string) => url.includes(`/api/admin
 const lifecyclePost = (fixture: Fixture) => (url: URL) => lifecycleUrl(fixture, url.toString())
 async function fulfillError(route: Route, status: number, error: string) { await route.fulfill({ status, contentType: 'application/json', body: JSON.stringify({ error }) }) }
 
+for (const status of ['accepted', 'rejected', 'cancelled'] as const) {
+  test(`quotation edits return a conflict and show read-only details when ${status}`, async ({ page }) => {
+    const fixture = await createFixture()
+    try {
+      const db = await localDb()
+      for (const toStatus of ['sent', status]) {
+        const { error } = await db.rpc('transition_admin_quotation', { p_quotation_id: fixture.quotationId, p_to_status: toStatus, p_admin_id: fixture.adminId, p_reopen_valid_until: null })
+        expect(error).toBeNull()
+      }
+      await openLifecycle(page, fixture)
+      await expect(page.getByRole('status')).toContainText(`This quotation is ${status} and cannot be edited.`)
+      await expect(page.getByRole('button', { name: 'Save quotation', exact: true })).toBeDisabled()
+      await expect(page.getByLabel('Notes for the family')).toBeDisabled()
+      await expect(page.getByRole('button', { name: 'Record manual delivery' })).toBeEnabled()
+
+      const { data: before, error: beforeError } = await db.from('quotations').select('*').eq('id', fixture.quotationId).single()
+      expect(beforeError).toBeNull()
+      const response = await page.request.patch(`/api/admin/quotations/${fixture.quotationId}`, { data: { notes: 'Attempted terminal edit', validUntil: null } })
+      expect(response.status()).toBe(409)
+      expect(await response.json()).toEqual({ error: 'Terminal quotations cannot be edited' })
+      const { data: after, error: afterError } = await db.from('quotations').select('*').eq('id', fixture.quotationId).single()
+      expect(afterError).toBeNull()
+      expect(after).toEqual(before)
+    } finally { await cleanup(fixture) }
+  })
+}
+
+test('quotation details remain editable until approval and lock immediately after approval', async ({ page }) => {
+  const fixture = await createFixture()
+  try {
+    await openLifecycle(page, fixture)
+    const save = page.getByRole('button', { name: 'Save quotation', exact: true })
+    await expect(save).toBeEnabled()
+    await expect(page.getByLabel('Notes for the family')).toBeEnabled()
+    const response = await page.request.patch(`/api/admin/quotations/${fixture.quotationId}`, { data: { notes: fixture.marker } })
+    expect(response.status()).toBe(200)
+
+    for (const label of ['Sent', 'Approve']) {
+      await page.getByRole('button', { name: label, exact: true }).click()
+      const dialog = page.getByRole('dialog')
+      await dialog.getByRole('button', { name: 'Confirm', exact: true }).click()
+      await expect(dialog).toBeHidden()
+    }
+    await expect(page.getByRole('status')).toContainText('This quotation is accepted and cannot be edited.')
+    await expect(save).toBeDisabled()
+    await expect(page.getByLabel('Notes for the family')).toBeDisabled()
+  } finally { await cleanup(fixture) }
+})
+
 test('E2E-1B handles a genuine stale lifecycle transition conflict and refreshes allowed actions', async ({ page }) => {
   test.setTimeout(90_000); const fixture = await createFixture()
   try {

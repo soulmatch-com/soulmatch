@@ -746,6 +746,10 @@ export interface Database {
         Args: { p_quotation_number: string; p_valid_until: string | null; p_notes: string | null; p_created_by: string | null; p_items: Json; p_lead_ids?: string[] }
         Returns: string
       }
+      copy_admin_quotation: {
+        Args: { p_source_quotation_id: string; p_quotation_number: string; p_admin_id: string | null }
+        Returns: string
+      }
       update_admin_quotation: {
         Args: { p_quotation_id: string; p_status: string | null; p_set_valid_until: boolean; p_valid_until: string | null; p_set_notes: boolean; p_notes: string | null; p_replace_items: boolean; p_items: Json | null; p_replace_leads: boolean; p_lead_ids?: string[] }
         Returns: string

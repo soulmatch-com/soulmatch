@@ -1,6 +1,7 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
+import { useBookingData } from './booking-workspace-data'
 import { useRouter } from 'next/navigation'
 import { Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -9,11 +10,11 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogDescripti
 
 export function BookingDeletion({ bookingId }: { bookingId: string }) {
   const router = useRouter()
-  const [status, setStatus] = useState<string | null>(null)
+  const { data } = useBookingData(bookingId)
+  const status = data?.booking.status
   const [open, setOpen] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [error, setError] = useState('')
-  useEffect(() => { fetch(`/api/admin/bookings/${bookingId}`).then(async response => { const body = await response.json(); if (response.ok) setStatus(body.booking.status) }).catch(() => {}) }, [bookingId])
   if (!status || !['pending_confirmation', 'cancelled'].includes(status)) return null
   async function remove() {
     setDeleting(true); setError('')

@@ -1,28 +1,88 @@
 'use client'
 
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
+import { useBookingResource, useBookingSummary } from './booking-workspace-data'
 import { FileDown, HandCoins, RotateCcw } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { BookingDialogContent } from '@/components/admin/BookingDialog'
+import { BookingDialogContent, BookingField, BookingFormGrid } from '@/components/admin/BookingDialog'
 import { Dialog, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { PaymentEditor, type EditablePayment } from '@/components/admin/PaymentEditor'
 import { PaymentAuditHistory, type PaymentActivity } from '@/components/admin/PaymentAuditHistory'
-import { notifyBookingUpdated, subscribeToBookingUpdates } from '@/lib/admin/booking-updates'
+import { notifyBookingUpdated } from '@/lib/admin/booking-updates'
 
 const money=new Intl.NumberFormat('en-IN',{style:'currency',currency:'INR'}),methods=['cash','upi','bank_transfer','card_external','other'] as const,paymentMethodLabel:Record<typeof methods[number],string>={cash:'Cash',upi:'UPI',bank_transfer:'Bank Transfer',card_external:'Card (External)',other:'Other'}
-type Summary={booking_total:number;gross_received:number;total_refunded:number;total_reversed:number;net_received:number;outstanding_balance:number;payment_status:string}
 type Payment=EditablePayment & {transaction_type:string;original_payment_id:string|null;currency:string;remainingAmount:number}
 type Mode='receipt'|'refund'|'reversal'|null
-const key=()=>crypto.randomUUID()
+type PendingPayment = { path: string; body: Record<string, unknown> }
 
-export function CustomerPayments({bookingId}:{bookingId:string}){
- const[summary,setSummary]=useState<Summary|null>(null),[payments,setPayments]=useState<Payment[]>([]),[activities,setActivities]=useState<PaymentActivity[]>([]),[error,setError]=useState(''),[mode,setMode]=useState<Mode>(null),[original,setOriginal]=useState<Payment|null>(null),[saving,setSaving]=useState(false),[amount,setAmount]=useState(''),[method,setMethod]=useState<typeof methods[number]>('upi'),[reason,setReason]=useState(''),[external,setExternal]=useState(''),[remarks,setRemarks]=useState('')
- const triggerRef=useRef<HTMLButtonElement|null>(null)
- const [bookingReference,setBookingReference]=useState<string|null>(null)
- const load=useCallback(async()=>{const[s,p,a]=await Promise.all([fetch(`/api/admin/bookings/${bookingId}/payment-summary`),fetch(`/api/admin/bookings/${bookingId}/payments`),fetch(`/api/admin/bookings/${bookingId}/payment-activities`)]);const sd=await s.json(),pd=await p.json(),ad=await a.json();if(!s.ok)throw Error(sd.error);if(!p.ok)throw Error(pd.error);if(!a.ok)throw Error(ad.error);setSummary(sd.summary);setPayments(pd.payments);setActivities(ad.activities);setBookingReference(ad.bookingReference??null)},[bookingId])
- useEffect(()=>{const refresh=()=>{void load().catch(e=>setError(e.message))};refresh();return subscribeToBookingUpdates(bookingId,refresh)},[bookingId,load])
- const close=()=>{if(!saving){setMode(null);setOriginal(null);setAmount('');setReason('');setExternal('');setRemarks('')}}
- async function submit(){const value=Number(amount);if(!Number.isFinite(value)||value<=0){setError('Enter a positive amount.');return}if(mode!=='receipt'&&!reason.trim()){setError('A reason is required.');return}if(!mode)return;setSaving(true);setError('');const now=new Date().toISOString(),path=mode==='receipt'?`/api/admin/bookings/${bookingId}/payments`:`/api/admin/bookings/${bookingId}/payments/${original?.id}/${mode==='refund'?'refund':'reverse'}`,body=mode==='receipt'?{idempotencyKey:key(),amount:value,currency:'INR',method,externalReference:external||undefined,notes:remarks||undefined,paymentDate:now}:{idempotencyKey:key(),amount:value,currency:'INR',reason,paymentDate:now};try{const r=await fetch(path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}),d=await r.json();if(!r.ok){if(r.status===409)await load();throw Error(d.error)}await load();setMode(null);setOriginal(null);setAmount('');setReason('');setExternal('');setRemarks('');notifyBookingUpdated(bookingId)}catch(e){setError(e instanceof Error?e.message:'Unable to save payment')}finally{setSaving(false)}}
+export function CustomerPayments({bookingId,initialAction=false}:{bookingId:string;initialAction?:boolean}){
+ const {data:summaryData,refetch:refreshSummary,error:summaryError}=useBookingSummary(bookingId)
+ const summary=summaryData?.summary
+ const recordTrigger=useRef<HTMLButtonElement>(null)
+ const paymentQuery = useBookingResource<{ payments: Payment[] }>(bookingId, 'payments')
+ const auditQuery = useBookingResource<{ activities: PaymentActivity[]; bookingReference: string | null }>(bookingId, 'payment-activities')
+ const payments = paymentQuery.data?.payments ?? []
+ const activities = auditQuery.data?.activities ?? []
+ const bookingReference = auditQuery.data?.bookingReference ?? null
+ const [error, setError] = useState(''), [mode, setMode] = useState<Mode>(initialAction ? 'receipt' : null)
+ const [original, setOriginal] = useState<Payment | null>(null), [saving, setSaving] = useState(false)
+ const [amount, setAmount] = useState(''), [method, setMethod] = useState<typeof methods[number]>('upi')
+ const [reason, setReason] = useState(''), [external, setExternal] = useState(''), [remarks, setRemarks] = useState('')
+ const [uncertain, setUncertain] = useState(false)
+ const triggerRef = useRef<HTMLButtonElement | null>(null)
+ const savingRef = useRef(false)
+ const pendingPayment = useRef<PendingPayment | null>(null)
+ const { refetch: refreshPayments } = paymentQuery, { refetch: refreshAudit } = auditQuery
+ const load = useCallback(async () => {
+   await Promise.all([refreshPayments({ throwOnError: true }), refreshAudit({ throwOnError: true }), refreshSummary({ throwOnError: true })])
+ }, [refreshPayments, refreshAudit, refreshSummary])
+ const loadError = paymentQuery.error || auditQuery.error || summaryError
+ function resetForm() {
+   setMode(null); setOriginal(null); setAmount(''); setReason(''); setExternal(''); setRemarks('')
+   setUncertain(false); pendingPayment.current = null
+ }
+ function openForm(next: Exclude<Mode, null>, trigger: HTMLButtonElement, payment: Payment | null = null) {
+   if (savingRef.current) return
+   resetForm(); setError(''); triggerRef.current = trigger; setOriginal(payment); setMode(next)
+ }
+ const close = () => { if (!savingRef.current) resetForm() }
+ async function submit() {
+   if (savingRef.current || !mode) return
+   const value = Number(amount)
+   if (!Number.isFinite(value) || value <= 0) { setError('Enter a positive amount.'); return }
+   if (mode !== 'receipt' && !reason.trim()) { setError('A reason is required.'); return }
+   if (mode !== 'receipt' && !original) { setError('Select the original receipt.'); return }
+   savingRef.current = true; setSaving(true); setError('')
+   if (!pendingPayment.current) {
+     const paymentDate = new Date().toISOString(), idempotencyKey = crypto.randomUUID()
+     pendingPayment.current = {
+       path: mode === 'receipt' ? `/api/admin/bookings/${bookingId}/payments` : `/api/admin/bookings/${bookingId}/payments/${original!.id}/${mode === 'refund' ? 'refund' : 'reverse'}`,
+       body: mode === 'receipt'
+         ? { idempotencyKey, amount: value, currency: 'INR', method, externalReference: external || undefined, notes: remarks || undefined, paymentDate }
+         : { idempotencyKey, amount: value, currency: 'INR', reason, paymentDate },
+     }
+   }
+   try {
+     const { path, body } = pendingPayment.current
+     const response = await fetch(path, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
+     if (!response.ok) {
+       const result = await response.json().catch(() => ({}))
+       // A rejected request can be corrected. An uncertain server response must
+       // retry the same operation, with its original key and payment details.
+       if (response.status < 500) { pendingPayment.current = null; setUncertain(false) }
+       if (response.status === 409) { notifyBookingUpdated(bookingId); void load().catch(() => {}) }
+       throw Error(result.error || 'Unable to save payment')
+     }
+     // Once saved, close before refreshing. A failed read must never invite a
+     // second financial write for an already committed receipt or adjustment.
+     resetForm()
+     notifyBookingUpdated(bookingId)
+     await load().catch(() => setError('Payment saved, but the latest totals could not be loaded. Retry loading the payment details.'))
+   } catch (cause) {
+     if (pendingPayment.current) setUncertain(true)
+     setError(cause instanceof Error ? cause.message : 'Unable to save payment')
+   } finally { savingRef.current = false; setSaving(false) }
+ }
  const label=(v:string)=>v.replaceAll('_',' ').replace(/\b\w/g,x=>x.toUpperCase())
  const edits = activities.filter(activity => activity.event_type === 'edited')
  const supersededReceipts = new Set(edits.map(activity => activity.payment_id))
@@ -33,9 +93,9 @@ export function CustomerPayments({bookingId}:{bookingId:string}){
  return <section className="rounded-xl border bg-white p-5">
   <div className="flex flex-wrap items-center justify-between gap-2">
    <div><h2 className="font-semibold">Customer Payments</h2><p className="text-sm text-slate-500">Manual, verified entries only. Vendor costs are tracked separately.</p></div>
-   <Button size="sm" onClick={event=>{triggerRef.current=event.currentTarget;setMode('receipt')}}>Record Payment</Button>
+   <Button ref={recordTrigger} size="sm" disabled={saving} onClick={event=>openForm('receipt',event.currentTarget)}>Record Payment</Button>
   </div>
-  {error&&<p role="alert" className="mt-3 text-sm text-rose-700">{error}</p>}
+  {!mode&&(error||loadError)&&<div role="alert" className="mt-3 text-sm text-rose-700">{error||loadError?.message} <button type="button" className="font-semibold underline" onClick={()=>void load().then(()=>setError('')).catch(()=>{})}>Retry loading</button></div>}
   {summary ? <dl className="mt-4 grid grid-cols-2 gap-4 text-sm sm:grid-cols-3 xl:grid-cols-4">
    {[['Booking Total',summary.booking_total],['Gross Received',summary.gross_received],['Refunded',summary.total_refunded],['Reversed',summary.total_reversed],['Net Received',summary.net_received],['Outstanding',summary.outstanding_balance]].map(([l,v])=><div key={String(l)}><dt className="text-slate-500">{l}</dt><dd className="font-medium">{money.format(Number(v))}</dd></div>)}
    <div><dt className="text-slate-500">Payment Status</dt><dd className="font-medium capitalize">{label(summary.payment_status)}</dd></div>
@@ -58,26 +118,32 @@ export function CustomerPayments({bookingId}:{bookingId:string}){
      <div className="flex flex-wrap gap-2">
       {payment.transaction_type === 'receipt' && <>
        <PaymentEditor bookingId={bookingId} payment={payment}/>
-       <Button size="icon" className="size-11 xl:size-9" variant="outline" aria-label="Refund" title="Refund" disabled={payment.remainingAmount<=0} onClick={event=>{triggerRef.current=event.currentTarget;setOriginal(payment);setMode('refund')}}><HandCoins aria-hidden="true" className="h-4 w-4" /></Button>
-       <Button size="icon" className="size-11 xl:size-9" variant="outline" aria-label="Reverse" title="Reverse" disabled={payment.remainingAmount<=0} onClick={event=>{triggerRef.current=event.currentTarget;setOriginal(payment);setMode('reversal')}}><RotateCcw aria-hidden="true" className="h-4 w-4" /></Button>
+       <Button size="icon" className="size-11 xl:size-9" variant="outline" aria-label="Refund" title="Refund" disabled={saving||payment.remainingAmount<=0} onClick={event=>openForm('refund',event.currentTarget,payment)}><HandCoins aria-hidden="true" className="h-4 w-4" /></Button>
+       <Button size="icon" className="size-11 xl:size-9" variant="outline" aria-label="Reverse" title="Reverse" disabled={saving||payment.remainingAmount<=0} onClick={event=>openForm('reversal',event.currentTarget,payment)}><RotateCcw aria-hidden="true" className="h-4 w-4" /></Button>
       </>}
       <a aria-label="Download PDF" title="Download PDF" className="inline-flex size-11 items-center justify-center xl:size-9 rounded-md border border-slate-300 text-slate-800 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2" href={`/api/admin/bookings/${bookingId}/payments/${payment.id}/receipt`}><FileDown aria-hidden="true" className="h-4 w-4" /></a>
      </div>
     </div>)}
-   </div> : <p className="mt-2 text-sm text-slate-500">No Payment Entries Recorded.</p>}
+   </div> : <p className="mt-2 text-sm text-slate-500">{paymentQuery.isPending ? 'Loading payment entries…' : loadError ? 'Payment entries are unavailable.' : 'No Payment Entries Recorded.'}</p>}
   </div>
   <Dialog open={mode!==null} onOpenChange={open=>!open&&close()}>
-   <BookingDialogContent showCloseButton={false} onCloseAutoFocus={event=>{const trigger=triggerRef.current;if(trigger?.isConnected&&!trigger.disabled&&trigger.getClientRects().length){event.preventDefault();trigger.focus()}}}>
+   <BookingDialogContent showCloseButton={false} onCloseAutoFocus={event=>{const trigger=triggerRef.current??recordTrigger.current;if(trigger?.isConnected&&!trigger.disabled&&trigger.getClientRects().length){event.preventDefault();trigger.focus()}}}>
     <DialogHeader>
      <DialogTitle>{mode==='receipt'?'Record payment':mode==='refund'?'Record refund':'Reverse payment'}</DialogTitle>
      <DialogDescription>{mode==='receipt'?'Record a verified customer receipt.':`This permanently appends a ${mode} against ${original?.payment_reference}. Confirm only after checking the original entry.`}</DialogDescription>
     </DialogHeader>
-    <input aria-label="Amount" type="number" min="0.01" step="0.01" value={amount} onChange={e=>setAmount(e.target.value)} className="h-9 rounded border px-2"/>
+    {error&&<p role="alert" className="text-sm text-rose-700">{error}</p>}
+    {uncertain && <p role="status" className="text-sm text-amber-800">The payment result could not be confirmed. Retry these same details to check or complete the original entry.</p>}
+    <fieldset disabled={saving || uncertain} className="grid gap-4">
+    <BookingField label="Amount (₹)"><input aria-label="Amount" type="number" min="0.01" step="0.01" value={amount} onChange={e=>setAmount(e.target.value)} placeholder="0.00"/></BookingField>
     {mode==='receipt' ? <>
-     <select aria-label="Payment method" value={method} onChange={e=>setMethod(e.target.value as typeof method)} className="h-9 rounded border px-2">{methods.map(m=><option key={m} value={m}>{paymentMethodLabel[m]}</option>)}</select>
-     <input aria-label="External reference" value={external} maxLength={200} onChange={e=>setExternal(e.target.value)} className="h-9 rounded border px-2" placeholder="External reference (optional)"/>
-     <textarea aria-label="Remarks" value={remarks} onChange={e=>setRemarks(e.target.value)} maxLength={2000} placeholder="Remarks (optional, e.g. advance payment)" className="rounded border p-2"/>
-    </> : <textarea aria-label="Reason" value={reason} onChange={e=>setReason(e.target.value)} maxLength={2000} placeholder="Reason (required)" className="rounded border p-2"/>}
+     <BookingFormGrid>
+      <BookingField label="Payment method"><select aria-label="Payment method" value={method} onChange={e=>setMethod(e.target.value as typeof method)}>{methods.map(m=><option key={m} value={m}>{paymentMethodLabel[m]}</option>)}</select></BookingField>
+      <BookingField label="External reference (optional)"><input aria-label="External reference" value={external} maxLength={200} onChange={e=>setExternal(e.target.value)} placeholder="Transaction or receipt ID"/></BookingField>
+     </BookingFormGrid>
+     <BookingField label="Remarks (optional)"><textarea aria-label="Remarks" value={remarks} onChange={e=>setRemarks(e.target.value)} maxLength={2000} placeholder="e.g. Advance for ceremony arrangements" rows={3}/></BookingField>
+    </> : <BookingField label="Reason (required)"><textarea aria-label="Reason" value={reason} onChange={e=>setReason(e.target.value)} maxLength={2000} placeholder="Explain the reason for this adjustment" rows={3}/></BookingField>}
+    </fieldset>
     <DialogFooter className="gap-2 sm:space-x-0"><Button variant="outline" disabled={saving} onClick={close}>Cancel</Button><Button disabled={saving} onClick={()=>void submit()}>{saving?'Saving…':mode==='receipt'?'Record payment':`Confirm ${mode}`}</Button></DialogFooter>
    </BookingDialogContent>
   </Dialog>

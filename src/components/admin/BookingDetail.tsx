@@ -1,24 +1,67 @@
 'use client'
+
 import Link from 'next/link'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
+import { Check, ChevronDown, Flag, Layers3, UserRound } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { formatBookingDate } from '@/lib/utils'
-import { subscribeToBookingUpdates } from '@/lib/admin/booking-updates'
+import { notifyBookingUpdated } from '@/lib/admin/booking-updates'
+import { bookingLabel, bookingMoney, useBookingData, type BookingActivity } from './booking-workspace-data'
+import { BookingCard, BookingBadge, BookingViewLink } from './BookingWorkspaceUI'
+import styles from './BookingWorkspace.module.css'
 
-const money = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }); const title=(v:string)=>v.replaceAll('_',' ').replace(/\b\w/g,x=>x.toUpperCase())
-type Booking = { booking_reference: string; customer_name: string | null; ceremony_type: string | null; event_date: string | null; customer_contact: string | null; quoted_total: number; status: string; quotation_id: string; quotations: { quotation_number: string } | null }
-type Service = { id: string; service_name_snapshot: string; quantity: number; service_code_snapshot: string; description_snapshot: string | null; fulfillment_status: string; total_price_snapshot: number }
-type Activity = { id: string; created_at: string; event_type: string; previous_status: string | null; new_status: string; metadata: { cancellation_reason?: string } }
-type Lead = { lead_id: string; leads: { contact_name: string; mobile: string | null; email: string | null } | null }
-type Detail = { booking: Booking; services: Service[]; activities: Activity[]; leads: Lead[]; allowedTransitions: string[] }
-export function BookingDetail({ id }: { id: string }) {
-  const [detail, setDetail] = useState<Detail | null>(null), [error, setError] = useState(''), [saving, setSaving] = useState(false), [reason, setReason] = useState('')
+export function BookingStatus({ id }: { id: string }) {
+  const { data: detail, refetch } = useBookingData(id)
+  const [error, setError] = useState(''), [saving, setSaving] = useState(false), [reason, setReason] = useState(''), [controls, setControls] = useState(false)
   const controlsHeading = useRef<HTMLHeadingElement>(null)
-  const load = useCallback(() => fetch(`/api/admin/bookings/${id}`).then(async response => { const data=await response.json(); if (!response.ok) throw new Error(data.error); setDetail(data) }).catch(err=>setError(err instanceof Error?err.message:'Unable to load booking.')), [id])
-  useEffect(()=>{ void load(); return subscribeToBookingUpdates(id, () => { void load() }) }, [id, load])
-  async function transition(toStatus: string) { if (toStatus === 'cancelled' && !reason.trim()) { setError('A cancellation reason is required.'); return } setSaving(true); setError(''); try { const response = await fetch(`/api/admin/bookings/${id}/lifecycle`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({toStatus, cancellationReason: toStatus === 'cancelled' ? reason : undefined}) }); const data=await response.json(); if (!response.ok) { if (response.status === 409) await load(); throw new Error(data.error) } await load(); setReason(''); requestAnimationFrame(() => controlsHeading.current?.focus()) } catch (err) { setError(err instanceof Error?err.message:'Unable to update booking.') } finally { setSaving(false) } }
-  if (!detail && !error) return <p className="text-sm text-slate-500">Loading booking…</p>
-  if (!detail) return <p role="alert" className="text-rose-700">{error}</p>
-  const { booking } = detail
-  return <div className="space-y-6">{error&&<p role="alert" className="rounded bg-rose-50 p-3 text-sm text-rose-700">{error}</p>}<section className="rounded-xl border bg-white p-5"><div className="flex flex-wrap items-start justify-between gap-4 [&>div]:min-w-0"><div><p className="text-sm font-semibold uppercase tracking-wide text-slate-500">{booking.booking_reference}</p><h1 className="mt-1 text-2xl font-bold text-slate-900">{booking.customer_name || 'Booking without a primary lead'}</h1><p className="mt-2 text-sm text-slate-600">{booking.ceremony_type || 'Ceremony not specified'} · {booking.event_date ? formatBookingDate(booking.event_date) : 'Date not specified'}</p></div><span className="rounded bg-slate-100 px-3 py-1 text-sm">{title(booking.status)}</span></div><dl className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-3"><div><dt className="text-xs uppercase text-slate-500">Customer contact</dt><dd>{booking.customer_contact || '—'}</dd></div><div><dt className="text-xs uppercase text-slate-500">Quoted total</dt><dd>{money.format(booking.quoted_total)}</dd></div><div><dt className="text-xs uppercase text-slate-500">Quotation</dt><dd>{booking.quotations ? <Link className="underline" href={`/admin/quotations/${booking.quotation_id}/edit`}>{booking.quotations.quotation_number}</Link> : '—'}</dd></div></dl></section><section className="rounded-xl border bg-white p-5"><h2 ref={controlsHeading} tabIndex={-1} className="font-semibold">Status Controls</h2>{detail.allowedTransitions.includes('cancelled')&&<input aria-label="Cancellation reason (required to cancel)" className="mt-3 h-9 w-full max-w-md rounded border px-2 text-sm" placeholder="Cancellation reason (required to cancel)" value={reason} onChange={e=>setReason(e.target.value)}/>}<div className="mt-3 flex flex-wrap gap-2">{detail.allowedTransitions.map(status=><Button key={status} size="sm" variant="outline" disabled={saving} onClick={()=>void transition(status)}>{title(status)}</Button>)}</div></section><section className="rounded-xl border bg-white p-5"><h2 className="font-semibold">Linked Leads</h2>{detail.leads.length ? <ul className="mt-3 space-y-2 text-sm">{detail.leads.map(link=><li key={link.lead_id}>{link.leads?.contact_name || link.lead_id} — {link.leads?.mobile || link.leads?.email || 'No contact'}</li>)}</ul> : <p className="mt-2 text-sm text-slate-500">No leads were linked to this quotation.</p>}</section><section className="rounded-xl border bg-white p-5"><h2 className="font-semibold">Service Snapshots</h2><div className="mt-3 divide-y">{detail.services.map(service=><div key={service.id} className="flex min-w-0 flex-col gap-2 py-3 text-sm sm:flex-row sm:justify-between [&>div]:min-w-0"><div><p className="font-medium">{service.service_name_snapshot} × {service.quantity}</p><p className="text-slate-500">{service.service_code_snapshot}{service.description_snapshot ? ` · ${service.description_snapshot}` : ''} · {title(service.fulfillment_status)}</p></div><p className="shrink-0 font-medium">{money.format(service.total_price_snapshot)}</p></div>)}</div></section><section className="rounded-xl border bg-white p-5"><h2 className="font-semibold">Activity History</h2><ul className="mt-3 space-y-2 text-sm text-slate-600">{detail.activities.map(activity=><li key={activity.id}>{formatBookingDate(activity.created_at)} — {title(activity.event_type)}{activity.previous_status ? `: ${title(activity.previous_status)} → ${title(activity.new_status)}` : ''}{activity.metadata?.cancellation_reason ? ` (${activity.metadata.cancellation_reason})` : ''}</li>)}</ul></section></div>
+  if (!detail) return null
+  const { booking, activities, allowedTransitions } = detail
+  const stages = ['pending_confirmation', 'confirmed', 'planning', 'ready', 'completed']
+  if (booking.status === 'cancelled') stages.push('cancelled')
+  const currentIndex = stages.indexOf(booking.status)
+  async function transition(toStatus: string) {
+    if (saving) return
+    if (toStatus === 'cancelled' && !reason.trim()) { setError('A cancellation reason is required.'); return }
+    setSaving(true); setError('')
+    try {
+      const response = await fetch(`/api/admin/bookings/${id}/lifecycle`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ toStatus, cancellationReason: toStatus === 'cancelled' ? reason : undefined }) })
+      const data = await response.json()
+      if (!response.ok) { if (response.status === 409) await refetch(); throw new Error(data.error) }
+      notifyBookingUpdated(id)
+      await refetch({ throwOnError: true })
+      setReason('')
+      requestAnimationFrame(() => controlsHeading.current?.focus())
+    } catch (err) { setError(err instanceof Error ? err.message : 'Unable to update booking.') }
+    finally { setSaving(false) }
+  }
+  return <BookingCard title="Booking Status" icon={Flag} action={allowedTransitions.length ? <Button size="sm" variant="outline" className="gap-1 px-2 text-[11px]" aria-expanded={controls} aria-controls="booking-status-controls" onClick={() => setControls(!controls)}>Change Status<ChevronDown className="size-3" /></Button> : undefined}>
+    <ol className={styles.timeline}>{stages.map((status, index) => {
+      const activity = activities.find(item => item.new_status === status && ['created', 'booking_created', 'status_transition'].includes(item.event_type))
+      const visited = booking.status === 'cancelled' ? Boolean(activity) || status === 'pending_confirmation' : index <= currentIndex
+      return <li key={status} aria-current={booking.status === status ? 'step' : undefined}>
+        <span className={styles.timelineDot} data-visited={visited}>{visited && <Check className="size-3" aria-hidden="true" />}</span>
+        <div className={`flex-1 rounded-lg px-2 py-1 ${booking.status === status ? status === 'cancelled' ? 'bg-rose-50' : 'bg-emerald-50' : ''}`}><p className={visited ? 'font-semibold' : 'text-slate-500'}>{bookingLabel(status)}</p>{activity && <p className="mt-0.5 text-xs text-slate-500">{formatBookingDate(activity.created_at)}</p>}</div>
+      </li>
+    })}</ol>
+    {controls && <div id="booking-status-controls" className="mt-4 border-t border-violet-100 pt-3"><h3 ref={controlsHeading} tabIndex={-1} className="text-sm font-semibold">Status Controls</h3>{allowedTransitions.includes('cancelled') && <input aria-label="Cancellation reason (required to cancel)" className="mt-3 min-h-11 w-full rounded-md border border-slate-300 px-2 text-sm" placeholder="Cancellation reason (required to cancel)" value={reason} onChange={event => setReason(event.target.value)} />}<div className="mt-3 flex flex-wrap gap-2">{allowedTransitions.map(status => <Button key={status} size="sm" variant="outline" disabled={saving} onClick={() => void transition(status)}>{bookingLabel(status)}</Button>)}</div>{!allowedTransitions.length && <p className="mt-2 text-sm text-slate-500">No further status changes are available.</p>}</div>}
+    {error && <p role="alert" className="mt-3 rounded-lg bg-rose-50 p-3 text-sm text-rose-700">{error}</p>}
+  </BookingCard>
+}
+
+export function BookingServices({ id, compact = false, onViewAll }: { id: string; compact?: boolean; onViewAll?: () => void }) {
+  const { data } = useBookingData(id)
+  const services = data?.services ?? []
+  return <BookingCard title="Services" icon={Layers3} subtitle="Service snapshots" action={onViewAll ? <BookingViewLink onClick={onViewAll}>View All Services</BookingViewLink> : undefined}>
+    {services.length ? <ul className="divide-y divide-violet-100">{(compact ? services.slice(0, 2) : services).map(service => <li key={service.id} className="py-2 text-sm"><div className="flex flex-wrap items-start justify-between gap-3"><p className="font-semibold">{service.service_name_snapshot} × {service.quantity}</p><span className="shrink-0 font-semibold">{bookingMoney(service.total_price_snapshot)}</span></div><p className={`mt-1 text-xs leading-relaxed text-slate-500 ${compact ? 'line-clamp-2' : ''}`}>{service.service_code_snapshot}{service.description_snapshot ? ` · ${service.description_snapshot}` : ''}</p><div className="mt-1.5"><BookingBadge status={service.fulfillment_status} /></div></li>)}</ul> : <p className="text-sm text-slate-500">No services recorded.</p>}
+    {compact && services.length > 2 && <p className="mt-2 text-xs text-slate-500">+{services.length - 2} more services in Services &amp; Quotations</p>}
+  </BookingCard>
+}
+
+export function BookingLeads({ id }: { id: string }) {
+  const { data } = useBookingData(id)
+  return <BookingCard title="Linked Leads" icon={UserRound}>{data?.leads.length ? <ul className="space-y-2 text-sm">{data.leads.map(link => <li key={link.lead_id}><Link className="font-medium text-violet-800 hover:underline" href={`/admin/leads/${link.lead_id}`}>{link.leads?.contact_name || 'View lead'}</Link><p className="mt-0.5 text-xs text-slate-500">{link.leads?.mobile || link.leads?.email || 'No contact'}</p></li>)}</ul> : <p className="text-sm text-slate-500">No leads linked to this booking.</p>}</BookingCard>
+}
+
+export function BookingActivityList({ activities }: { activities: BookingActivity[] }) {
+  return activities.length ? <ol className={styles.timeline}>{activities.map(activity => <li key={activity.id}><span className={styles.timelineDot} data-visited="true"><Check className="size-3" aria-hidden="true" /></span><div><p className="font-medium">{bookingLabel(activity.event_type)}{activity.previous_status ? `: ${bookingLabel(activity.previous_status)} → ${bookingLabel(activity.new_status)}` : ''}</p><p className="mt-1 text-xs text-slate-500">{formatBookingDate(activity.created_at)} · {activity.actorName || 'System'}</p>{typeof activity.metadata?.cancellation_reason === 'string' && <p className="mt-1 text-xs text-rose-700">{activity.metadata.cancellation_reason}</p>}</div></li>)}</ol> : <p className="text-sm text-slate-500">No activity recorded.</p>
 }

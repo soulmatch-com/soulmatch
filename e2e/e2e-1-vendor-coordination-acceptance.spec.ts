@@ -245,7 +245,7 @@ async function makeVendor(page: Page, value: Fixture) {
   value.vendorId = data!.id;
 }
 async function createAssignment(page: Page, value: Fixture, cost = "6400") {
-  await page.goto(`/admin/bookings/${value.bookingId}`);
+  await page.goto(`/admin/bookings/${value.bookingId}?tab=vendors`);
   const section = coordination(page);
   await section.getByRole("button", { name: "Create assignment" }).click();
   const dialog = page.getByRole("dialog");
@@ -352,19 +352,19 @@ test("Scenario F browser: catalogue, assignment, audit lifecycle and financial i
       requirements: "Updated dietary requirements",
     });
     await coordination(page).getByRole("button", { name: "History" }).click();
-    await expect(page.getByRole("dialog")).toContainText("updated");
+    await expect(page.getByRole("dialog")).toContainText(/updated/i);
     await page.keyboard.press("Escape");
     await row.getByRole("button", { name: "confirmed" }).click();
     await page
       .getByRole("dialog")
       .getByRole("button", { name: "Confirm confirmed" })
       .click();
-    await expect(row).toContainText("confirmed");
+    await expect(row).toContainText(/confirmed/i);
     await expect(row.getByRole("button", { name: "Cancel" })).toBeVisible();
     const activities = await client
       .from("event_vendor_assignment_activities")
       .select("event_type,actor_id")
-      .eq("assignment_id", assignment.data!.id);
+      .eq("assignment_id", assignment.data!.id).order('created_at').order('id');
     expect(activities.data?.map((x) => x.event_type)).toEqual([
       "created",
       "updated",
@@ -437,11 +437,11 @@ test("Scenario F browser: stale edit, failures, ownership, and no duplicate writ
       .select("id,lock_version")
       .eq("booking_id", value.bookingId)
       .single();
-    otherContext = await browser.newContext();
+    otherContext = await browser.newContext({ baseURL: new URL(page.url()).origin, extraHTTPHeaders: { Origin: new URL(page.url()).origin } });
     const other = await otherContext.newPage();
     await login(other);
-    await page.goto(`/admin/bookings/${value.bookingId}`);
-    await other.goto(`/admin/bookings/${value.bookingId}`);
+    await page.goto(`/admin/bookings/${value.bookingId}?tab=vendors`);
+    await other.goto(`/admin/bookings/${value.bookingId}?tab=vendors`);
     const first = coordination(page)
         .getByText(`${value.marker} Caterers`, { exact: false })
         .locator("xpath=.."),

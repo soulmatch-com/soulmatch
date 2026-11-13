@@ -1,12 +1,7 @@
-import Link from 'next/link'
-import styles from '@/components/admin/BookingLayout.module.css'
-import { ArrowLeft } from 'lucide-react'
-import { BookingDetail } from '@/components/admin/BookingDetail'
-import { EventPlanning } from '@/components/admin/EventPlanning'
-import { VendorCoordination } from '@/components/admin/VendorCoordination'
-import { CustomerPayments } from '@/components/admin/CustomerPayments'
-import { ExpenseTracking } from '@/components/admin/ExpenseTracking'
-import { AdditionalQuotationLinker } from '@/components/admin/AdditionalQuotationLinker'
-import { BookingDeletion } from '@/components/admin/BookingDeletion'
-import { BookingAmountHistory } from '@/components/admin/BookingAmountHistory'
-export default async function BookingPage({ params }: { params: Promise<{ id: string }> }) { const { id } = await params; return <div className={`container mx-auto max-w-5xl px-4 py-10 ${styles.workspace}`}><Link href="/admin/bookings" className="inline-flex items-center text-sm font-medium text-slate-700"><ArrowLeft className="mr-1 h-4 w-4"/>Back to bookings</Link><div className="mt-6 space-y-6"><BookingDetail id={id}/><BookingAmountHistory bookingId={id}/><AdditionalQuotationLinker bookingId={id}/><CustomerPayments bookingId={id}/><ExpenseTracking bookingId={id}/><EventPlanning bookingId={id}/><VendorCoordination bookingId={id}/><BookingDeletion bookingId={id}/></div></div> }
+import { Suspense } from 'react'
+import { BookingWorkspace } from '@/components/admin/BookingWorkspace'
+
+export default async function BookingPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
+  return <Suspense fallback={<p className="p-6 text-sm text-slate-500">Loading booking workspace…</p>}><BookingWorkspace key={id} id={id} /></Suspense>
+}

@@ -53,7 +53,7 @@ test('route checks limiter before body parsing and privileged RPC creation', asy
 })
 
 test('rate limiting is scoped to the celebration enquiry route', async () => {
-  for (const path of ['middleware.ts', 'src/lib/supabase/middleware.ts']) assert.doesNotMatch(await read(path), /checkCelebrationEnquiryRateLimit/)
+  for (const path of ['src/proxy.ts', 'src/lib/supabase/middleware.ts']) assert.doesNotMatch(await read(path), /checkCelebrationEnquiryRateLimit/)
 })
 
 test('client normalizes 429 without exposing provider details', async () => {

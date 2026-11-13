@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { BookingDialogContent } from "@/components/admin/BookingDialog";
+import { notifyBookingUpdated } from "@/lib/admin/booking-updates";
 import { formatBookingDate } from "@/lib/utils";
 import {
   Dialog,
@@ -58,11 +59,11 @@ async function body(response: Response) {
   return value;
 }
 
-export function VendorCoordination({ bookingId }: { bookingId: string }) {
+export function VendorCoordination({ bookingId, initialAction = false }: { bookingId: string; initialAction?: boolean }) {
   const [assignments, setAssignments] = useState<Assignment[]>([]),
     [vendors, setVendors] = useState<Vendor[]>([]),
     [services, setServices] = useState<Service[]>([]);
-  const [creating, setCreating] = useState(false),
+  const [creating, setCreating] = useState(initialAction),
     [draft, setDraft] = useState<Draft>(emptyDraft),
     [edit, setEdit] = useState<Assignment | null>(null),
     [action, setAction] = useState<{ a: Assignment; to: string } | null>(null),
@@ -137,6 +138,7 @@ export function VendorCoordination({ bookingId }: { bookingId: string }) {
       );
       setCreating(false);
       setDraft(emptyDraft);
+      notifyBookingUpdated(bookingId);
       await load();
     } catch (e) {
       setDialogError(
@@ -173,6 +175,7 @@ export function VendorCoordination({ bookingId }: { bookingId: string }) {
         }),
       );
       setEdit(null);
+      notifyBookingUpdated(bookingId);
       await load();
       if (history) await refreshHistory();
     } catch (e) {
@@ -203,6 +206,7 @@ export function VendorCoordination({ bookingId }: { bookingId: string }) {
         ),
       );
       setAction(null);
+      notifyBookingUpdated(bookingId);
       await load();
       if (history) await refreshHistory();
     } catch (e) {
@@ -329,54 +333,16 @@ export function VendorCoordination({ bookingId }: { bookingId: string }) {
         <BookingDialogContent>
           <DialogHeader>
             <DialogTitle>Edit Assignment</DialogTitle>
+            <DialogDescription>{edit?.event_vendors?.vendor_name} — {edit?.celebration_booking_services?.service_name_snapshot}</DialogDescription>
           </DialogHeader>
-          {edit && (
-            <>
-              <p>
-                {edit.event_vendors?.vendor_name} —{" "}
-                {edit.celebration_booking_services?.service_name_snapshot}
-              </p>
-              {dialogError && <p role="alert">{dialogError}</p>}
-              <input
-                aria-label="Agreed cost"
-                type="number"
-                min="0"
-                value={edit.agreed_cost ?? ""}
-                onChange={(e) =>
-                  setEdit({
-                    ...edit,
-                    agreed_cost:
-                      e.target.value === "" ? null : Number(e.target.value),
-                  })
-                }
-              />
-              <input
-                aria-label="Scheduled date"
-                type="date"
-                value={edit.scheduled_date || ""}
-                onChange={(e) =>
-                  setEdit({ ...edit, scheduled_date: e.target.value || null })
-                }
-              />
-              <textarea
-                aria-label="Requirements"
-                value={edit.requirements || ""}
-                onChange={(e) =>
-                  setEdit({ ...edit, requirements: e.target.value || null })
-                }
-              />
-              <textarea
-                aria-label="Internal notes"
-                value={edit.internal_notes || ""}
-                onChange={(e) =>
-                  setEdit({ ...edit, internal_notes: e.target.value || null })
-                }
-              />
-              <Button disabled={saving} onClick={() => void save()}>
-                {saving ? "Saving…" : "Save"}
-              </Button>
-            </>
-          )}
+          {edit && <form className="space-y-5" onSubmit={event => { event.preventDefault(); void save(); }}>
+            {dialogError && <p role="alert">{dialogError}</p>}
+            <Fields value={{ vendorId: '', bookingServiceId: '', agreedCost: String(edit.agreed_cost ?? ''), scheduledDate: edit.scheduled_date || '', requirements: edit.requirements || '', internalNotes: edit.internal_notes || '' }} setValue={value => setEdit({ ...edit, agreed_cost: value.agreedCost === '' ? null : Number(value.agreedCost), scheduled_date: value.scheduledDate || null, requirements: value.requirements || null, internal_notes: value.internalNotes || null })} />
+            <DialogFooter>
+              <Button type="button" variant="outline" disabled={saving} onClick={() => { setEdit(null); close(); }}>Cancel</Button>
+              <Button type="submit" disabled={saving}>{saving ? 'Saving…' : 'Save'}</Button>
+            </DialogFooter>
+          </form>}
         </BookingDialogContent>
       </Dialog>
       <Dialog
@@ -391,6 +357,7 @@ export function VendorCoordination({ bookingId }: { bookingId: string }) {
         <BookingDialogContent>
           <DialogHeader>
             <DialogTitle>{title(action?.to || "")} Vendor Assignment</DialogTitle>
+            <DialogDescription>Update the coordination status for this vendor assignment.</DialogDescription>
           </DialogHeader>
           {action && (
             <>
@@ -400,9 +367,12 @@ export function VendorCoordination({ bookingId }: { bookingId: string }) {
               </p>
               <p>This updates only internal coordination status.</p>
               {dialogError && <p role="alert">{dialogError}</p>}
-              <Button disabled={saving} onClick={() => void transition()}>
-                {saving ? "Saving…" : `Confirm ${title(action.to)}`}
-              </Button>
+              <DialogFooter>
+                <Button variant="outline" disabled={saving} onClick={() => { setAction(null); close(); }}>Cancel</Button>
+                <Button variant={['cancelled', 'declined'].includes(action.to) ? 'destructive' : 'default'} disabled={saving} onClick={() => void transition()}>
+                  {saving ? "Saving…" : `Confirm ${title(action.to)}`}
+                </Button>
+              </DialogFooter>
             </>
           )}
         </BookingDialogContent>
@@ -414,7 +384,9 @@ export function VendorCoordination({ bookingId }: { bookingId: string }) {
         <BookingDialogContent>
           <DialogHeader>
             <DialogTitle>Coordination History</DialogTitle>
+            <DialogDescription>Review vendor assignment changes and status updates.</DialogDescription>
           </DialogHeader>
+          {history?.length === 0 && <p className="text-sm text-slate-500">No coordination activity recorded.</p>}
           {history?.map((x) => (
             <article key={x.id}>
               <b>{title(x.event_type)}</b> — {x.actorName} —{" "}
@@ -437,7 +409,7 @@ function Fields({
   return (
     <div className="space-y-4">
       <div className="grid gap-4 sm:grid-cols-2">
-        <label className="text-sm font-medium text-slate-700">Agreed Cost (₹)<input aria-label="Agreed cost" className={inputClass} type="number" min="0" value={value.agreedCost} onChange={(e) => setValue({ ...value, agreedCost: e.target.value })} /></label>
+        <label className="text-sm font-medium text-slate-700">Agreed Cost (₹)<input aria-label="Agreed cost" className={inputClass} type="number" min="0" step="0.01" value={value.agreedCost} onChange={(e) => setValue({ ...value, agreedCost: e.target.value })} /></label>
         <label className="text-sm font-medium text-slate-700">Scheduled Date<input aria-label="Scheduled date" className={inputClass} type="date" value={value.scheduledDate} onChange={(e) => setValue({ ...value, scheduledDate: e.target.value })} /></label>
       </div>
       <label className="block text-sm font-medium text-slate-700">Requirements<textarea aria-label="Requirements" className={textareaClass} rows={3} value={value.requirements} onChange={(e) => setValue({ ...value, requirements: e.target.value })} /></label>

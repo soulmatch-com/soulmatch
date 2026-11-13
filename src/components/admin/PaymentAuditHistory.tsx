@@ -3,7 +3,8 @@
 import { useId, useState, type ReactNode } from 'react'
 import { Activity, ArrowRight, Check, ChevronDown, Clock3, Download, FilePenLine, Printer, ReceiptText, RotateCcw, UserRound, Wallet, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import { BookingDialogContent } from './BookingDialog'
+import { Dialog, DialogClose, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { auditDate, auditLabel, auditMoney, auditTitle, comparisonRows, groupPaymentAudit, paymentAuditCsv, paymentAuditPrintHtml, type AuditEvent, type PaymentActivity } from '@/lib/payments/payment-audit'
 
 export type { PaymentActivity } from '@/lib/payments/payment-audit'
@@ -178,7 +179,7 @@ export function PaymentAuditHistory({ activities, bookingReference }: { activiti
   }
   return <Dialog open={open} onOpenChange={value => { setOpen(value); if (!value) setError('') }}>
     <DialogTrigger asChild><Button type="button" size="sm" variant="outline">View audit history</Button></DialogTrigger>
-    <DialogContent showCloseButton={false} className="flex max-h-[85dvh] w-[calc(100%-1.5rem)] max-w-[960px] flex-col gap-0 overflow-hidden rounded-xl border-slate-200 bg-white p-0 text-slate-900 shadow-2xl [overflow-wrap:anywhere] sm:max-w-[960px] dark:bg-white dark:text-slate-900">
+    <BookingDialogContent layout="audit" showCloseButton={false} className="flex max-h-[85dvh] w-[calc(100%-1.5rem)] max-w-[960px] flex-col gap-0 overflow-hidden rounded-xl border-slate-200 bg-white p-0 text-slate-900 shadow-2xl [overflow-wrap:anywhere] sm:max-w-[960px] dark:bg-white dark:text-slate-900">
       <DialogHeader className="shrink-0 border-b border-slate-200 px-4 py-5 text-left sm:px-6">
         <div className="flex items-start justify-between gap-3">
           <div className="flex min-w-0 items-start gap-3">
@@ -213,6 +214,6 @@ export function PaymentAuditHistory({ activities, bookingReference }: { activiti
         </div>
         <DialogClose asChild><Button type="button" size="sm" className="min-w-20">Close</Button></DialogClose>
       </DialogFooter>
-    </DialogContent>
+    </BookingDialogContent>
   </Dialog>
 }

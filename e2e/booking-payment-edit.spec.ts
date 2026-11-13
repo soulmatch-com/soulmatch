@@ -44,7 +44,7 @@ test('correct 1000 to 2000 without inflating gross received, and retain payment 
     await page.getByLabel('Password').fill(credentials.password)
     await page.getByRole('button', { name: 'Sign in as Admin' }).click()
     await expect(page).toHaveURL(/\/admin\/dashboard$/)
-    await page.goto(`/admin/bookings/${bookingId}`)
+    await page.goto(`/admin/bookings/${bookingId}?tab=payments`)
     const originalRow = page.getByTestId('payment-history-row').filter({ hasText: original!.payment_reference })
     await originalRow.getByRole('button', { name: 'Edit', exact: true }).click()
     const dialog = page.getByRole('dialog', { name: 'Edit recorded payment' })

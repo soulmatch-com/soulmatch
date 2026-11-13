@@ -3,7 +3,7 @@
 import { useRef, useState } from 'react'
 import { Pencil } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { BookingDialogContent } from '@/components/admin/BookingDialog'
+import { BookingDialogContent, BookingFormGrid } from '@/components/admin/BookingDialog'
 import { Dialog, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { notifyBookingUpdated } from '@/lib/admin/booking-updates'
 
@@ -62,10 +62,10 @@ export function PaymentEditor({ bookingId, payment }: { bookingId: string; payme
       }}><form onSubmit={event => void submit(event)} className="space-y-4">
         <DialogHeader><DialogTitle>Edit recorded payment</DialogTitle><DialogDescription>Correct {payment.payment_reference}. The original receipt stays in history, and a corrected receipt is created with your reason.</DialogDescription></DialogHeader>
         {error && <p role="alert" className="text-sm text-rose-700">{error}</p>}
-        <label className="block text-sm">Amount<input aria-label="Edit payment amount" required disabled={saving} type="number" min="0.01" max="9999999999.99" step="0.01" value={amount} onChange={event => setAmount(event.target.value)} className="mt-1 h-9 w-full rounded border px-2" /></label>
+        <BookingFormGrid><label className="block text-sm">Amount (₹)<input aria-label="Edit payment amount" required disabled={saving} type="number" min="0.01" max="9999999999.99" step="0.01" value={amount} onChange={event => setAmount(event.target.value)} className="mt-1 h-9 w-full rounded border px-2" /></label>
         <label className="block text-sm">Payment method<select aria-label="Edit payment method" disabled={saving} value={method} onChange={event => setMethod(event.target.value)} className="mt-1 h-9 w-full rounded border px-2">{methods.map(value => <option key={value} value={value}>{methodLabels[value]}</option>)}</select></label>
         <label className="block text-sm">External reference<input aria-label="Edit external reference" disabled={saving} maxLength={200} value={external} onChange={event => setExternal(event.target.value)} className="mt-1 h-9 w-full rounded border px-2" /></label>
-        <label className="block text-sm">Payment date and time<input aria-label="Edit payment date" required disabled={saving} type="datetime-local" step="1" value={paymentDate} onChange={event => setPaymentDate(event.target.value)} className="mt-1 h-9 w-full rounded border px-2" /></label>
+        <label className="block text-sm">Payment date and time<input aria-label="Edit payment date" required disabled={saving} type="datetime-local" step="1" value={paymentDate} onChange={event => setPaymentDate(event.target.value)} className="mt-1 h-9 w-full rounded border px-2" /></label></BookingFormGrid>
         <label className="block text-sm">Remarks<textarea aria-label="Edit payment remarks" disabled={saving} maxLength={2000} rows={2} value={notes} onChange={event => setNotes(event.target.value)} className="mt-1 w-full rounded border p-2" /></label>
         <label className="block text-sm">Reason for edit<textarea aria-label="Reason for payment edit" required disabled={saving} maxLength={2000} rows={2} value={reason} onChange={event => setReason(event.target.value)} className="mt-1 w-full rounded border p-2" /></label>
         <DialogFooter className="gap-2 sm:space-x-0"><Button type="button" variant="outline" disabled={saving} onClick={() => setOpen(false)}>Cancel</Button><Button type="submit" disabled={saving || !reason.trim()}>{saving ? 'Saving…' : 'Save changes'}</Button></DialogFooter>

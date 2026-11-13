@@ -13,18 +13,18 @@ async function clean(f:F){const c=await db();if(f.bookingId){const{data:p}=await
 async function login(p:Page){const a=JSON.parse(await readFile('.playwright/local-admin.json','utf8'));await p.goto('/admin/login');await p.getByLabel('Email').fill(a.email);await p.getByLabel('Password').fill(a.password);await p.getByRole('button',{name:'Sign in as Admin'}).click();await expect(p).toHaveURL(/\/admin\/dashboard$/)}
 const post=(p:Page,f:F,path:string,body:unknown)=>p.request.post(`/api/admin/bookings/${f.bookingId}${path}`,{data:body})
 
-test('Scenario G records customer receipts in the authenticated UI and preserves financial snapshots',async({page})=>{test.setTimeout(90000);const f=await fixture();try{await login(page);const c=await db();const before=await c.from('celebration_booking_services').select('total_price_snapshot').eq('booking_id',f.bookingId);await page.goto(`/admin/bookings/${f.bookingId}`);const payments=page.getByRole('heading',{name:'Customer payments'}).locator('xpath=ancestor::section');await expect(payments).toBeVisible();await payments.getByRole('button',{name:'Record payment'}).click();const d=page.getByRole('dialog');await d.getByLabel('Amount').fill('30');await d.getByLabel('Payment method').selectOption('upi');await d.getByRole('button',{name:'Record payment'}).click();await expect(d).toBeHidden();const{data:r}=await c.from('booking_payment_records').select('*').eq('booking_id',f.bookingId).eq('transaction_type','receipt');expect(r).toHaveLength(1);expect(Number(r![0].amount)).toBe(30);expect(r![0].payment_reference).toMatch(/^RCPT-/);const summary=await c.rpc('booking_payment_summary',{p_booking_id:f.bookingId});expect(summary.data?.[0]).toMatchObject({booking_total:100,gross_received:30,net_received:30,outstanding_balance:70,payment_status:'partially_paid'});expect((await c.from('celebration_booking_services').select('total_price_snapshot').eq('booking_id',f.bookingId)).data).toEqual(before.data);const pdf=await page.request.get(`/api/admin/bookings/${f.bookingId}/payments/${r![0].id}/receipt`);expect(pdf.status()).toBe(200);expect(pdf.headers()['content-type']).toContain('application/pdf');expect((await pdf.body()).subarray(0,4).toString()).toBe('%PDF');}finally{await clean(f)}})
+test('Scenario G records customer receipts in the authenticated UI and preserves financial snapshots',async({page})=>{test.setTimeout(90000);const f=await fixture();try{await login(page);const c=await db();const before=await c.from('celebration_booking_services').select('total_price_snapshot').eq('booking_id',f.bookingId);await page.goto(`/admin/bookings/${f.bookingId}?tab=payments`);const payments=page.getByRole('heading',{name:'Customer payments'}).locator('xpath=ancestor::section');await expect(payments).toBeVisible();await payments.getByRole('button',{name:'Record payment'}).click();const d=page.getByRole('dialog');await d.getByLabel('Amount').fill('30');await d.getByLabel('Payment method').selectOption('upi');await d.getByRole('button',{name:'Record payment'}).click();await expect(d).toBeHidden();const{data:r}=await c.from('booking_payment_records').select('*').eq('booking_id',f.bookingId).eq('transaction_type','receipt');expect(r).toHaveLength(1);expect(Number(r![0].amount)).toBe(30);expect(r![0].payment_reference).toMatch(/^RCPT-/);const summary=await c.rpc('booking_payment_summary',{p_booking_id:f.bookingId});expect(summary.data?.[0]).toMatchObject({booking_total:100,gross_received:30,net_received:30,outstanding_balance:70,payment_status:'partially_paid'});expect((await c.from('celebration_booking_services').select('total_price_snapshot').eq('booking_id',f.bookingId)).data).toEqual(before.data);const pdf=await page.request.get(`/api/admin/bookings/${f.bookingId}/payments/${r![0].id}/receipt`);expect(pdf.status()).toBe(200);expect(pdf.headers()['content-type']).toContain('application/pdf');expect((await pdf.body()).subarray(0,4).toString()).toBe('%PDF');}finally{await clean(f)}})
 
 test('Scenario G settles, corrects, authorizes and idempotently protects the append-only ledger',async({page,request})=>{test.setTimeout(90000);const f=await fixture();try{await login(page);const base={currency:'INR',method:'cash',paymentDate:now()};expect((await request.post(`/api/admin/bookings/${f.bookingId}/payments`,{data:{...base,idempotencyKey:key('anon'),amount:1}})).status()).toBe(401);const first=await post(page,f,'/payments',{...base,idempotencyKey:key('one'),amount:60});expect(first.status()).toBe(201);const firstId=(await first.json()).paymentId;const duplicateKey=key('dup');const a=await post(page,f,'/payments',{...base,idempotencyKey:duplicateKey,amount:20}),b=await post(page,f,'/payments',{...base,idempotencyKey:duplicateKey,amount:20});expect([a.status(),b.status()]).toEqual([201,201]);expect((await a.json()).paymentId).toBe((await b.json()).paymentId);expect((await post(page,f,'/payments',{...base,idempotencyKey:key('over'),amount:30})).status()).toBe(409);const refund=await post(page,f,`/payments/${firstId}/refund`,{idempotencyKey:key('refund'),amount:10,currency:'INR',reason:'customer change',paymentDate:now()});expect(refund.status()).toBe(201);expect((await post(page,f,`/payments/${firstId}/refund`,{idempotencyKey:key('badrefund'),amount:51,currency:'INR',reason:'too much',paymentDate:now()})).status()).toBe(409);const reversal=await post(page,f,`/payments/${firstId}/reverse`,{idempotencyKey:key('reverse'),amount:20,currency:'INR',reason:'entry correction',paymentDate:now()});expect(reversal.status()).toBe(201);const c=await db();const{data:rows}=await c.from('booking_payment_records').select('transaction_type,original_payment_id,amount').eq('booking_id',f.bookingId);expect(rows).toHaveLength(4);expect(rows?.filter(x=>x.transaction_type==='receipt')).toHaveLength(2);expect(rows?.filter(x=>x.transaction_type==='refund'&&x.original_payment_id===firstId)).toHaveLength(1);expect(rows?.filter(x=>x.transaction_type==='reversal'&&x.original_payment_id===firstId)).toHaveLength(1);const s=await c.rpc('booking_payment_summary',{p_booking_id:f.bookingId});expect(s.data?.[0]).toMatchObject({gross_received:80,total_refunded:10,total_reversed:20,net_received:50,outstanding_balance:50,payment_status:'partially_paid'});expect((await c.from('booking_payment_activities').select('id').in('payment_id',(rows??[]).map(x=>(x as any).id).filter(Boolean))).error).toBeNull();expect((await page.request.get(`/api/admin/bookings/00000000-0000-0000-0000-000000000000/payments/${firstId}/receipt`)).status()).toBe(404)}finally{await clean(f)}})
 
-test('Scenario G refund and reversal dialogs validate, cancel, retain focus and append corrections',async({page})=>{const f=await fixture();try{await login(page);const base={currency:'INR',method:'cash',paymentDate:now()};const x=await post(page,f,'/payments',{...base,idempotencyKey:key('r1'),amount:40}),y=await post(page,f,'/payments',{...base,idempotencyKey:key('r2'),amount:30});const xid=(await x.json()).paymentId,yid=(await y.json()).paymentId;const client=await db(),{data:targets}=await client.from('booking_payment_records').select('id,payment_reference').in('id',[xid,yid]);const target=targets!.find(x=>x.id===yid)!,refundTarget=targets!.find(x=>x.id===xid)!;await page.goto(`/admin/bookings/${f.bookingId}`);const payment=page.getByRole('heading',{name:'Customer payments'}).locator('xpath=ancestor::section');const refund=page.getByTestId('payment-history-row').filter({hasText:refundTarget.payment_reference}).getByRole('button',{name:'Refund',exact:true});await refund.focus();await refund.press('Enter');let d=page.getByRole('dialog');await expect(d.getByRole('heading',{name:'Record refund'})).toBeVisible();await expect(d.locator(':focus')).toHaveCount(1);await d.getByLabel('Amount').fill('10');await d.getByLabel('Reason').fill('customer request');await d.getByRole('button',{name:'Confirm refund'}).click();await expect(d).toBeHidden();const reverse=page.getByTestId('payment-history-row').filter({hasText:target.payment_reference}).getByRole('button',{name:'Reverse',exact:true});await reverse.focus();await reverse.press('Enter');d=page.getByRole('dialog');await expect(d.getByRole('heading',{name:'Reverse payment'})).toBeVisible();await d.getByRole('button',{name:'Cancel'}).click();await expect(reverse).toBeFocused();const reversalRequest=page.waitForRequest(r=>r.url().includes(`/payments/${yid}/reverse`)&&r.method()==='POST');await reverse.click();await d.getByLabel('Amount').fill('5');await d.getByLabel('Reason').fill('entry correction');await d.getByRole('button',{name:'Confirm reversal'}).click();await reversalRequest;await expect(d).toBeHidden();const c=await db(),{data:rows}=await c.from('booking_payment_records').select('transaction_type,original_payment_id,amount').eq('booking_id',f.bookingId);expect(rows?.filter(r=>r.transaction_type==='refund'&&r.original_payment_id===xid)).toHaveLength(1);expect(rows?.filter(r=>r.transaction_type==='reversal'&&r.original_payment_id===yid)).toHaveLength(1);expect((await c.rpc('booking_payment_summary',{p_booking_id:f.bookingId})).data?.[0]).toMatchObject({gross_received:70,total_refunded:10,total_reversed:5,net_received:55,outstanding_balance:45});}finally{await clean(f)}})
+test('Scenario G refund and reversal dialogs validate, cancel, retain focus and append corrections',async({page})=>{const f=await fixture();try{await login(page);const base={currency:'INR',method:'cash',paymentDate:now()};const x=await post(page,f,'/payments',{...base,idempotencyKey:key('r1'),amount:40}),y=await post(page,f,'/payments',{...base,idempotencyKey:key('r2'),amount:30});const xid=(await x.json()).paymentId,yid=(await y.json()).paymentId;const client=await db(),{data:targets}=await client.from('booking_payment_records').select('id,payment_reference').in('id',[xid,yid]);const target=targets!.find(x=>x.id===yid)!,refundTarget=targets!.find(x=>x.id===xid)!;await page.goto(`/admin/bookings/${f.bookingId}?tab=payments`);const payment=page.getByRole('heading',{name:'Customer payments'}).locator('xpath=ancestor::section');const refund=page.getByTestId('payment-history-row').filter({hasText:refundTarget.payment_reference}).getByRole('button',{name:'Refund',exact:true});await refund.focus();await refund.press('Enter');let d=page.getByRole('dialog');await expect(d.getByRole('heading',{name:'Record refund'})).toBeVisible();await expect(d.locator(':focus')).toHaveCount(1);await d.getByLabel('Amount').fill('10');await d.getByLabel('Reason').fill('customer request');await d.getByRole('button',{name:'Confirm refund'}).click();await expect(d).toBeHidden();const reverse=page.getByTestId('payment-history-row').filter({hasText:target.payment_reference}).getByRole('button',{name:'Reverse',exact:true});await expect(reverse).toBeEnabled();await reverse.focus();await reverse.press('Enter');d=page.getByRole('dialog');await expect(d.getByRole('heading',{name:'Reverse payment'})).toBeVisible();await d.getByRole('button',{name:'Cancel'}).click();await expect(reverse).toBeFocused();const reversalRequest=page.waitForRequest(r=>r.url().includes(`/payments/${yid}/reverse`)&&r.method()==='POST');await reverse.click();await d.getByLabel('Amount').fill('5');await d.getByLabel('Reason').fill('entry correction');await d.getByRole('button',{name:'Confirm reversal'}).click();await reversalRequest;await expect(d).toBeHidden();const c=await db(),{data:rows}=await c.from('booking_payment_records').select('transaction_type,original_payment_id,amount').eq('booking_id',f.bookingId);expect(rows?.filter(r=>r.transaction_type==='refund'&&r.original_payment_id===xid)).toHaveLength(1);expect(rows?.filter(r=>r.transaction_type==='reversal'&&r.original_payment_id===yid)).toHaveLength(1);expect((await c.rpc('booking_payment_summary',{p_booking_id:f.bookingId})).data?.[0]).toMatchObject({gross_received:70,total_refunded:10,total_reversed:5,net_received:55,outstanding_balance:45});}finally{await clean(f)}})
 
 test('Scenario G payment HTTP 500 recovery',async({page})=>{
   test.setTimeout(90000)
   const f=await fixture()
   try{
     await login(page)
-    await page.goto(`/admin/bookings/${f.bookingId}`)
+    await page.goto(`/admin/bookings/${f.bookingId}?tab=payments`)
     await page.getByRole('button',{name:'Record payment'}).click()
     const d=page.getByRole('dialog'),paymentPath=`/api/admin/bookings/${f.bookingId}/payments`,isPaymentMutation=(r:import('@playwright/test').Response)=>new URL(r.url()).pathname===paymentPath&&r.request().method()==='POST'
     await d.getByLabel('Amount').fill('25')
@@ -70,7 +70,7 @@ test('Scenario G refund HTTP 400 recovery retains the dialog and commits one rea
     const receiptId=(await receipt.json()).paymentId as string
     const c=await db(),{data:original,error:originalError}=await c.from('booking_payment_records').select('id,payment_reference').eq('id',receiptId).single()
     expect(originalError).toBeNull()
-    await page.goto(`/admin/bookings/${f.bookingId}`)
+    await page.goto(`/admin/bookings/${f.bookingId}?tab=payments`)
     const row=page.getByTestId('payment-history-row').filter({hasText:original!.payment_reference})
     await row.getByRole('button',{name:'Refund',exact:true}).click()
     const d=page.getByRole('dialog'),refundPath=`/api/admin/bookings/${f.bookingId}/payments/${receiptId}/refund`,isRefund=(r:import('@playwright/test').Response)=>new URL(r.url()).pathname===refundPath&&r.request().method()==='POST'
@@ -124,7 +124,7 @@ test('Scenario G refund HTTP 409 recovery refreshes financial state and commits 
     const receiptId=(await receipt.json()).paymentId as string
     const c=await db(),{data:original,error:originalError}=await c.from('booking_payment_records').select('id,payment_reference').eq('id',receiptId).single()
     expect(originalError).toBeNull()
-    await page.goto(`/admin/bookings/${f.bookingId}`)
+    await page.goto(`/admin/bookings/${f.bookingId}?tab=payments`)
     const row=page.getByTestId('payment-history-row').filter({hasText:original!.payment_reference})
     await row.getByRole('button',{name:'Refund',exact:true}).click()
     const d=page.getByRole('dialog'),refundPath=`/api/admin/bookings/${f.bookingId}/payments/${receiptId}/refund`,summaryPath=`/api/admin/bookings/${f.bookingId}/payment-summary`,isRefund=(r:import('@playwright/test').Response)=>new URL(r.url()).pathname===refundPath&&r.request().method()==='POST',isSummary=(r:import('@playwright/test').Response)=>new URL(r.url()).pathname===summaryPath&&r.request().method()==='GET'
@@ -146,8 +146,8 @@ test('Scenario G refund HTTP 409 recovery refreshes financial state and commits 
       await expect(page.locator('p[role="alert"]')).toContainText('Refund conflicts with the current receipt balance')
       await expect(d).toBeVisible()
       await expect(d.getByRole('button',{name:'Confirm refund'})).toBeEnabled()
-      await expect(page.locator('dt').filter({hasText:'Net received'}).locator('xpath=following-sibling::dd')).toHaveText('₹60.00')
-      await expect(page.locator('dt').filter({hasText:'Outstanding'}).locator('xpath=following-sibling::dd')).toHaveText('₹40.00')
+      await expect(page.getByRole('heading', { name: 'Customer Payments', exact: true, includeHidden: true }).locator('xpath=ancestor::section[1]').locator('dt').filter({hasText:'Net received'}).locator('xpath=following-sibling::dd')).toHaveText('₹60.00')
+      await expect(page.getByRole('heading', { name: 'Customer Payments', exact: true, includeHidden: true }).locator('xpath=ancestor::section[1]').locator('dt').filter({hasText:'Outstanding'}).locator('xpath=following-sibling::dd')).toHaveText('₹40.00')
       const failedRefunds=await c.from('booking_payment_records').select('id').eq('booking_id',f.bookingId).eq('transaction_type','refund')
       const failedAudit=await c.from('booking_payment_activities').select('id,booking_payment_records!inner(booking_id)').eq('booking_payment_records.booking_id',f.bookingId)
       expect(failedRefunds.data).toHaveLength(beforeRefunds.data!.length)
@@ -181,7 +181,7 @@ test('Scenario G reversal HTTP 500 recovery retains the dialog and commits one r
     const receiptId=(await receipt.json()).paymentId as string
     const c=await db(),{data:original,error:originalError}=await c.from('booking_payment_records').select('id,payment_reference').eq('id',receiptId).single()
     expect(originalError).toBeNull()
-    await page.goto(`/admin/bookings/${f.bookingId}`)
+    await page.goto(`/admin/bookings/${f.bookingId}?tab=payments`)
     const row=page.getByTestId('payment-history-row').filter({hasText:original!.payment_reference})
     await row.getByRole('button',{name:'Reverse',exact:true}).click()
     const d=page.getByRole('dialog'),reversalPath=`/api/admin/bookings/${f.bookingId}/payments/${receiptId}/reverse`,isReversal=(r:import('@playwright/test').Response)=>new URL(r.url()).pathname===reversalPath&&r.request().method()==='POST'
@@ -235,7 +235,7 @@ test('Scenario G reversal network-abort recovery retains the dialog and commits 
     const receiptId=(await receipt.json()).paymentId as string
     const c=await db(),{data:original,error:originalError}=await c.from('booking_payment_records').select('id,payment_reference').eq('id',receiptId).single()
     expect(originalError).toBeNull()
-    await page.goto(`/admin/bookings/${f.bookingId}`)
+    await page.goto(`/admin/bookings/${f.bookingId}?tab=payments`)
     const row=page.getByTestId('payment-history-row').filter({hasText:original!.payment_reference})
     await row.getByRole('button',{name:'Reverse',exact:true}).click()
     const d=page.getByRole('dialog'),reversalPath=`/api/admin/bookings/${f.bookingId}/payments/${receiptId}/reverse`,isReversalRequest=(r:import('@playwright/test').Request)=>new URL(r.url()).pathname===reversalPath&&r.method()==='POST',isReversalResponse=(r:import('@playwright/test').Response)=>new URL(r.url()).pathname===reversalPath&&r.request().method()==='POST'
@@ -284,37 +284,35 @@ test('Scenario G record payment prevents duplicate submission while the mutation
   const f=await fixture()
   try{
     await login(page)
-    await page.goto(`/admin/bookings/${f.bookingId}`)
-    await page.getByRole('button',{name:'Record payment',exact:true}).click()
+    await page.goto(`/admin/bookings/${f.bookingId}?tab=payments`)
+    await page.getByRole('button',{name:'Record Payment',exact:true}).click()
     const d=page.getByRole('dialog'),save=d.getByRole('button',{name:/^(Record payment|Saving…)$/}),paymentPath=`/api/admin/bookings/${f.bookingId}/payments`,isPayment=(r:import('@playwright/test').Response)=>new URL(r.url()).pathname===paymentPath&&r.request().method()==='POST'
     await d.getByLabel('Amount').fill('25')
     await d.getByLabel('Payment method').selectOption('upi')
-    let continueOriginal!:()=>Promise<void>,start!:()=>void,markContinued!:()=>void,mutationCount=0;const routed=true
-    const started=new Promise<void>(resolve=>{start=resolve}),continuedRoute=new Promise<void>(resolve=>{markContinued=resolve})
-    await page.route(`**${paymentPath}`,route=>{
-      const request=route.request()
-      if(new URL(request.url()).pathname!==paymentPath||request.method()!=='POST')return route.continue()
-      mutationCount+=1
-      start()
-      return new Promise<void>(resolve=>{continueOriginal=async()=>{await route.continue();markContinued();resolve()}})
+    let releaseRequest!: () => void, mutationCount = 0
+    const heldRequest = new Promise<void>(resolve => { releaseRequest = resolve })
+    await page.route(`**${paymentPath}`, async route => {
+      if (new URL(route.request().url()).pathname !== paymentPath || route.request().method() !== 'POST') return route.continue()
+      mutationCount += 1
+      await heldRequest
+      await route.continue()
     })
     try{
       const succeeded=page.waitForResponse(isPayment)
       await save.focus()
       await save.evaluate(button=>(button as HTMLButtonElement).click())
-      await started
+      await expect.poll(() => mutationCount).toBe(1)
       expect(mutationCount).toBe(1)
       await expect(d).toBeVisible()
       await expect(save).toBeDisabled()
       await save.evaluate(button=>(button as HTMLButtonElement).click())
       expect(mutationCount).toBe(1)
-      await continueOriginal()
-      await continuedRoute
+      releaseRequest()
       expect((await succeeded).status()).toBe(201)
       await expect(d).toBeHidden()
     }finally{
-      if(continueOriginal)await continueOriginal().catch(()=>undefined)
-      if(routed)await page.unroute(`**${paymentPath}`)
+      releaseRequest()
+      await page.unrouteAll({ behavior: 'wait' })
     }
     const c=await db(),{data:receipts,error:receiptError}=await c.from('booking_payment_records').select('id,transaction_type,amount').eq('booking_id',f.bookingId).eq('transaction_type','receipt')
     expect(receiptError).toBeNull()
@@ -338,37 +336,35 @@ test('Scenario G refund prevents duplicate submission while the mutation is pend
     const receiptId=(await receipt.json()).paymentId as string
     const c=await db(),{data:original,error:originalError}=await c.from('booking_payment_records').select('payment_reference').eq('id',receiptId).single()
     expect(originalError).toBeNull()
-    await page.goto(`/admin/bookings/${f.bookingId}`)
+    await page.goto(`/admin/bookings/${f.bookingId}?tab=payments`)
     await page.getByTestId('payment-history-row').filter({hasText:original!.payment_reference}).getByRole('button',{name:'Refund',exact:true}).click()
     const d=page.getByRole('dialog'),save=d.getByRole('button',{name:/^(Confirm refund|Saving…)$/}),refundPath=`/api/admin/bookings/${f.bookingId}/payments/${receiptId}/refund`,isRefund=(r:import('@playwright/test').Response)=>new URL(r.url()).pathname===refundPath&&r.request().method()==='POST'
     await d.getByLabel('Amount').fill('15')
     await d.getByLabel('Reason').fill('customer request')
-    let continueOriginal!:()=>Promise<void>,start!:()=>void,markContinued!:()=>void,mutationCount=0;const routed=true
-    const started=new Promise<void>(resolve=>{start=resolve}),continuedRoute=new Promise<void>(resolve=>{markContinued=resolve})
-    await page.route(`**${refundPath}`,route=>{
-      const request=route.request()
-      if(new URL(request.url()).pathname!==refundPath||request.method()!=='POST')return route.continue()
-      mutationCount+=1
-      start()
-      return new Promise<void>(resolve=>{continueOriginal=async()=>{await route.continue();markContinued();resolve()}})
+    let releaseRequest!: () => void, mutationCount = 0
+    const heldRequest = new Promise<void>(resolve => { releaseRequest = resolve })
+    await page.route(`**${refundPath}`, async route => {
+      if (new URL(route.request().url()).pathname !== refundPath || route.request().method() !== 'POST') return route.continue()
+      mutationCount += 1
+      await heldRequest
+      await route.continue()
     })
     try{
       const succeeded=page.waitForResponse(isRefund)
       await save.focus()
       await save.evaluate(button=>(button as HTMLButtonElement).click())
-      await started
+      await expect.poll(() => mutationCount).toBe(1)
       expect(mutationCount).toBe(1)
       await expect(d).toBeVisible()
       await expect(save).toBeDisabled()
       await save.evaluate(button=>(button as HTMLButtonElement).click())
       expect(mutationCount).toBe(1)
-      await continueOriginal()
-      await continuedRoute
+      releaseRequest()
       expect((await succeeded).status()).toBe(201)
       await expect(d).toBeHidden()
     }finally{
-      if(continueOriginal)await continueOriginal().catch(()=>undefined)
-      if(routed)await page.unroute(`**${refundPath}`)
+      releaseRequest()
+      await page.unrouteAll({ behavior: 'wait' })
     }
     const{data:refunds,error:refundError}=await c.from('booking_payment_records').select('id,original_payment_id,transaction_type,amount').eq('booking_id',f.bookingId).eq('transaction_type','refund')
     expect(refundError).toBeNull()
@@ -392,37 +388,35 @@ test('Scenario G reversal prevents duplicate submission while the mutation is pe
     const receiptId=(await receipt.json()).paymentId as string
     const c=await db(),{data:original,error:originalError}=await c.from('booking_payment_records').select('id,payment_reference,transaction_type,amount').eq('id',receiptId).single()
     expect(originalError).toBeNull()
-    await page.goto(`/admin/bookings/${f.bookingId}`)
+    await page.goto(`/admin/bookings/${f.bookingId}?tab=payments`)
     await page.getByTestId('payment-history-row').filter({hasText:original!.payment_reference}).getByRole('button',{name:'Reverse',exact:true}).click()
     const d=page.getByRole('dialog'),save=d.getByRole('button',{name:/^(Confirm reversal|Saving…)$/}),reversalPath=`/api/admin/bookings/${f.bookingId}/payments/${receiptId}/reverse`,isReversal=(r:import('@playwright/test').Response)=>new URL(r.url()).pathname===reversalPath&&r.request().method()==='POST'
     await d.getByLabel('Amount').fill('15')
     await d.getByLabel('Reason').fill('entry correction')
-    let continueOriginal!:()=>Promise<void>,start!:()=>void,markContinued!:()=>void,mutationCount=0;const routed=true
-    const started=new Promise<void>(resolve=>{start=resolve}),continuedRoute=new Promise<void>(resolve=>{markContinued=resolve})
-    await page.route(`**${reversalPath}`,route=>{
-      const request=route.request()
-      if(new URL(request.url()).pathname!==reversalPath||request.method()!=='POST')return route.continue()
-      mutationCount+=1
-      start()
-      return new Promise<void>(resolve=>{continueOriginal=async()=>{await route.continue();markContinued();resolve()}})
+    let releaseRequest!: () => void, mutationCount = 0
+    const heldRequest = new Promise<void>(resolve => { releaseRequest = resolve })
+    await page.route(`**${reversalPath}`, async route => {
+      if (new URL(route.request().url()).pathname !== reversalPath || route.request().method() !== 'POST') return route.continue()
+      mutationCount += 1
+      await heldRequest
+      await route.continue()
     })
     try{
       const succeeded=page.waitForResponse(isReversal)
       await save.focus()
       await save.evaluate(button=>(button as HTMLButtonElement).click())
-      await started
+      await expect.poll(() => mutationCount).toBe(1)
       expect(mutationCount).toBe(1)
       await expect(d).toBeVisible()
       await expect(save).toBeDisabled()
       await save.evaluate(button=>(button as HTMLButtonElement).click())
       expect(mutationCount).toBe(1)
-      await continueOriginal()
-      await continuedRoute
+      releaseRequest()
       expect((await succeeded).status()).toBe(201)
       await expect(d).toBeHidden()
     }finally{
-      if(continueOriginal)await continueOriginal().catch(()=>undefined)
-      if(routed)await page.unroute(`**${reversalPath}`)
+      releaseRequest()
+      await page.unrouteAll({ behavior: 'wait' })
     }
     const{data:reversals,error:reversalError}=await c.from('booking_payment_records').select('id,original_payment_id,transaction_type,amount').eq('booking_id',f.bookingId).eq('transaction_type','reversal')
     expect(reversalError).toBeNull()

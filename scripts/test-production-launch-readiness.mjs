@@ -78,22 +78,24 @@ test('celebration enquiry API follows release-critical server flow', async () =>
 })
 
 test('Turnstile and Upstash production paths fail safely when required config is missing', async () => {
-  const [bot, rate, core] = await Promise.all([
+  const [bot, rate, routeRate, core] = await Promise.all([
     read('src/lib/celebrations/bot-verification.ts'),
     read('src/lib/celebrations/rate-limit.ts'),
-    read('src/lib/celebrations/rate-limit-core.ts'),
+    read('src/lib/rate-limit.ts'),
+    read('src/lib/rate-limit-core.ts'),
   ])
   assert.match(bot, /TURNSTILE_SECRET_KEY/)
   assert.match(bot, /NODE_ENV !== 'production'\) return \{ status: 'valid' \}/)
   assert.match(bot, /status: 'misconfigured'/)
   assert.match(bot, /TURNSTILE_ALLOWED_HOSTNAMES/)
-  assert.match(rate, /UPSTASH_REDIS_REST_URL/)
-  assert.match(rate, /UPSTASH_REDIS_REST_TOKEN/)
+  assert.match(routeRate, /UPSTASH_REDIS_REST_URL/)
+  assert.match(routeRate, /UPSTASH_REDIS_REST_TOKEN/)
   assert.match(rate, /CELEBRATION_RATE_LIMIT_SALT/)
-  assert.match(rate, /NODE_ENV !== 'production'\) return \{ allowed: true \}/)
-  assert.match(rate, /allowed: false, unavailable: true/)
-  assert.match(core, /CELEBRATION_RATE_LIMIT_CAPACITY = 5/)
-  assert.match(core, /CELEBRATION_RATE_LIMIT_WINDOW_MS = 10 \* 60 \* 1000/)
+  assert.match(rate, /return checkRouteRateLimit\(request,/)
+  assert.match(rate, /capacity: 5/)
+  assert.match(rate, /windowMs: 10 \* 60 \* 1000/)
+  assert.match(routeRate, /NODE_ENV !== 'production'\) return \{ allowed: true \}/)
+  assert.match(routeRate, /allowed: false, unavailable: true/)
   assert.match(core, /createHmac\('sha256'/)
 })
 
@@ -106,8 +108,9 @@ test('sitemap includes approved public launch routes and excludes noindex plan p
   assert.match(source, /'\/privacy'/)
   assert.match(source, /'\/contact'/)
   assert.doesNotMatch(source, /'\/plan'/)
-  assert.match(source, /getPublishedBlogArticles\('en'\)\.map\(getBlogPath\)/)
-  assert.match(source, /getPublishedBlogArticles\('ta'\)\.map\(getBlogPath\)/)
+  assert.match(source, /await getPublicBlogEntriesForSitemap\(\)/)
+  assert.match(source, /\.\.\.blogEntries/)
+  assert.doesNotMatch(source, /content\/blog\/articles/)
 })
 
 test('contact and gallery launch gates remain truthful without approved assets or numbers', () => {

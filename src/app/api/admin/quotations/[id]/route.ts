@@ -5,7 +5,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 
 const itemSchema = z.object({ serviceId: z.string().uuid(), quantity: z.number().int().min(1).max(10000), unitPrice: z.number().finite().min(0).max(99_999_999), descriptionOverride: z.string().trim().max(1000).nullable().optional() })
 const updateSchema = z.object({
-  leadIds: z.array(z.string().uuid()).max(50).optional(),
+  leadIds: z.array(z.string().uuid()).max(1, 'A quotation can be linked to only one lead.').optional(),
   validUntil: z.string().date().nullable().optional(),
   notes: z.string().trim().max(2000).nullable().optional(),
   items: z.array(itemSchema).min(1).max(100).optional(),
@@ -41,7 +41,10 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     p_items: parsed.data.items?.map((item) => ({ service_id: item.serviceId, quantity: item.quantity, unit_price: item.unitPrice })) ?? null,
     p_replace_leads: parsed.data.leadIds !== undefined, p_lead_ids: parsed.data.leadIds ?? [],
   })
-  if (transactionError) return NextResponse.json({ error: 'Unable to update quotation' }, { status: 500 })
+  if (transactionError) {
+    const status = transactionError.code === '22023' ? 409 : transactionError.code === 'P0002' ? 404 : 500
+    return NextResponse.json({ error: status === 500 ? 'Unable to update quotation' : transactionError.message }, { status })
+  }
   if (parsed.data.items) {
     const overrideResults = await Promise.all(parsed.data.items.map((item) => supabase.from('quotation_items').update({ description_override: item.descriptionOverride || null }).eq('quotation_id', id).eq('celebration_service_id', item.serviceId)))
     if (overrideResults.some((result) => result.error)) return NextResponse.json({ error: 'Unable to update quotation descriptions' }, { status: 500 })

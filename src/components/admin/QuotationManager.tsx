@@ -1,10 +1,11 @@
 "use client";
 
-import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
+import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { GripVertical, History, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { QuotationBookingAction } from "@/components/admin/QuotationBookingAction";
+import { CopyQuotationButton } from "@/components/admin/CopyQuotationButton";
 import {
   Dialog,
   DialogContent,
@@ -50,6 +51,7 @@ type QuotationItem = {
   unit_price: number;
   line_total: number;
 };
+type QuotationState = Pick<Quotation, "id" | "status" | "valid_until">;
 type DraftItem = { serviceId: string; quantity: string; unitPrice: string; descriptionOverride: string };
 type Lead = {
   id: string;
@@ -90,6 +92,11 @@ export function QuotationManager({ quotationId, initialLeadId, returnTo }: { quo
   const [deletingQuotation, setDeletingQuotation] = useState(false);
   const [draggedServiceId, setDraggedServiceId] = useState<string | null>(null);
   const [dropTargetServiceId, setDropTargetServiceId] = useState<string | null>(null);
+  const currentQuotation = quotations.find((quotation) => quotation.id === quotationId);
+  const isReadOnly = !!currentQuotation && ["accepted", "rejected", "cancelled"].includes(currentQuotation.status);
+  const handleQuotationChange = useCallback((updated: QuotationState) => {
+    setQuotations((current) => current.map((quotation) => quotation.id === updated.id ? { ...quotation, ...updated } : quotation));
+  }, []);
 
   useEffect(() => {
     Promise.all([fetch("/api/admin/quotations"), initialLeadId ? fetch(`/api/admin/leads/${initialLeadId}`) : Promise.resolve(null)])
@@ -196,7 +203,7 @@ export function QuotationManager({ quotationId, initialLeadId, returnTo }: { quo
     );
   }
   function moveService(draggedId: string, targetId: string) {
-    if (draggedId === targetId) return;
+    if (isReadOnly || saving || draggedId === targetId) return;
     setDraftItems((current) => {
       const fromIndex = current.findIndex((item) => item.serviceId === draggedId);
       const targetIndex = current.findIndex((item) => item.serviceId === targetId);
@@ -208,18 +215,17 @@ export function QuotationManager({ quotationId, initialLeadId, returnTo }: { quo
     });
   }
   function addLead(leadId: string) {
-    if (leadId)
-      setLeadIds((current) =>
-        current.includes(leadId) ? current : [...current, leadId],
-      );
+    setLeadIds(leadId ? [leadId] : []);
   }
   function removeLead(leadId: string) {
     setLeadIds((current) => current.filter((id) => id !== leadId));
   }
   async function createQuotation(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (isReadOnly || loading || saving) return;
     setError("");
     if (!draftItems.length) return setError("Select at least one service.");
+    if (leadIds.length > 1) return setError("Link this quotation to one lead only. Copy it for another customer.");
     setSaving(true);
     try {
       const payload = {
@@ -317,12 +323,15 @@ export function QuotationManager({ quotationId, initialLeadId, returnTo }: { quo
   }
   return (
     <section className="min-w-0 rounded-xl border bg-white p-4 sm:p-5">
-      <div>
-        <h2 className="font-semibold text-slate-900">Quotations</h2>
-        <p className="mt-1 text-sm text-slate-600">
-          Create quotations from celebration services and optionally link them
-          to one or more leads.
-        </p>
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h2 className="font-semibold text-slate-900">{currentQuotation?.quotation_number || "Quotations"}</h2>
+          <p className="mt-1 text-sm text-slate-600">
+            Create quotations from celebration services and optionally link each
+            quotation to one customer lead.
+          </p>
+        </div>
+        {quotationId && <CopyQuotationButton key={quotationId} quotationId={quotationId} />}
       </div>
       {error && (
         <p
@@ -333,7 +342,16 @@ export function QuotationManager({ quotationId, initialLeadId, returnTo }: { quo
         </p>
       )}
       <form onSubmit={createQuotation} className="mt-5 border-t pt-5">
-        <h3 className="text-sm font-semibold text-slate-800">New quotation</h3>
+        <h3 className="text-sm font-semibold text-slate-800">{quotationId ? "Quotation details" : "New quotation"}</h3>
+        {isReadOnly && (
+          <p role="status" className="mt-3 rounded-md bg-amber-50 p-3 text-sm text-amber-900">
+            This quotation is {currentQuotation.status} and cannot be edited. Create a new quotation to make changes.
+          </p>
+        )}
+        {currentQuotation?.status === "draft" && leadIds.length === 0 && (
+          <p className="mt-3 text-sm text-slate-600">Choose the customer lead and review the validity date and family notes before sending this draft.</p>
+        )}
+        <fieldset disabled={loading || saving || isReadOnly} className="min-w-0">
         {loading ? (
           <p className="mt-3 text-sm text-slate-500">
             Loading service catalogue…
@@ -446,7 +464,7 @@ export function QuotationManager({ quotationId, initialLeadId, returnTo }: { quo
                   >
                     <button
                       type="button"
-                      draggable
+                      draggable={!isReadOnly && !saving}
                       aria-label={`Drag ${service.name} to change its position`}
                       title="Drag to reorder"
                       onDragStart={(event) => {
@@ -558,7 +576,7 @@ export function QuotationManager({ quotationId, initialLeadId, returnTo }: { quo
         </div>
         <div className="mt-4">
           <label className="block text-sm text-slate-700">
-            Link leads (optional)
+            Customer lead (optional)
             <select
               value=""
               onChange={(event) => {
@@ -595,9 +613,9 @@ export function QuotationManager({ quotationId, initialLeadId, returnTo }: { quo
             })}
           </div>
           <span className="mt-1 block text-xs text-slate-500">
-            Select a lead from the dropdown. Selected leads can be removed with
-            ×.
+            Select one lead. Choosing another replaces the selection. Use Copy quotation for another customer.
           </span>
+          {leadIds.length > 1 && <p role="alert" className="mt-2 text-sm text-amber-800">This existing quotation has multiple leads. Keep one lead before saving, and copy the quotation for each additional customer.</p>}
         </div>
         <label className="mt-4 block text-sm text-slate-700">
           Notes for the family
@@ -611,16 +629,17 @@ export function QuotationManager({ quotationId, initialLeadId, returnTo }: { quo
         </label>
         <div className="mt-4 flex justify-end">
           <Button
-            disabled={saving || loading || !draftItems.length}
+            disabled={saving || loading || isReadOnly || !draftItems.length}
             type="submit"
           >
-            {saving ? "Saving…" : "Create draft quotation"}
+            {saving ? "Saving…" : quotationId ? "Save quotation" : "Create draft quotation"}
           </Button>
         </div>
+        </fieldset>
       </form>
       {quotationId && <>
         <QuotationBookingAction quotationId={quotationId} status={quotations.find((candidate) => candidate.id === quotationId)?.status || ''} />
-        <QuotationLifecycle quotationId={quotationId} quotation={quotations.find((candidate) => candidate.id === quotationId) || null} />
+        <QuotationLifecycle quotationId={quotationId} quotation={currentQuotation || null} onQuotationChange={handleQuotationChange} />
         <section className="mt-6 border-t border-rose-200 pt-5">
           <h3 className="text-sm font-semibold text-rose-900">Delete quotation</h3>
           <p className="mt-1 text-sm text-rose-800">This permanently removes the quotation and its related history. Quotations linked to a booking cannot be deleted.</p>
@@ -741,7 +760,7 @@ export function QuotationManager({ quotationId, initialLeadId, returnTo }: { quo
                     })}
                 </ul>
                 <p className="mt-4 text-sm text-slate-700">
-                  <span className="font-medium">Linked leads:</span>{" "}
+                  <span className="font-medium">Customer lead:</span>{" "}
                   {links
                     .filter((link) => link.quotation_id === quotation.id)
                     .map(
@@ -782,15 +801,15 @@ export function QuotationManager({ quotationId, initialLeadId, returnTo }: { quo
   );
 }
 
-function QuotationLifecycle({ quotationId, quotation }: { quotationId: string; quotation: Quotation | null }) {
+function QuotationLifecycle({ quotationId, quotation, onQuotationChange }: { quotationId: string; quotation: Quotation | null; onQuotationChange: (quotation: QuotationState) => void }) {
   const [activity, setActivity] = useState<Array<{ id: string; event_type: string; previous_status: string | null; new_status: string | null; created_at: string }>>([])
   const [deliveries, setDeliveries] = useState<Array<{ id: string; recipient_name: string; recipient_contact: string; channel: string; delivered_at: string }>>([])
   const [error, setError] = useState(''); const [saving, setSaving] = useState(false); const [action, setAction] = useState<string | null>(null); const [validUntil, setValidUntil] = useState(''); const [recipientName, setRecipientName] = useState(''); const [recipientContact, setRecipientContact] = useState(''); const [channel, setChannel] = useState('manual')
   const [actions, setActions] = useState<string[]>([]); const [effectiveStatus, setEffectiveStatus] = useState('')
   const triggerRef = useRef<HTMLButtonElement | null>(null)
   const closeDialog = () => { setAction(null); queueMicrotask(() => triggerRef.current?.focus()) }
-  const load = () => fetch(`/api/admin/quotations/${quotationId}/lifecycle`).then(async (response) => { const data = await response.json(); if (!response.ok) throw new Error(data.error); setActivity(data.activity); setDeliveries(data.deliveries); setActions(data.allowedActions || []); setEffectiveStatus(data.effectiveStatus || data.quotation.status) }).catch(() => setError('Quotation activity could not be loaded.'))
-  useEffect(() => { void load() }, [quotationId])
+  const load = useCallback(() => fetch(`/api/admin/quotations/${quotationId}/lifecycle`).then(async (response) => { const data = await response.json(); if (!response.ok) throw new Error(data.error); setActivity(data.activity); setDeliveries(data.deliveries); setActions(data.allowedActions || []); setEffectiveStatus(data.effectiveStatus || data.quotation.status); onQuotationChange(data.quotation) }).catch(() => setError('Quotation activity could not be loaded.')), [quotationId, onQuotationChange])
+  useEffect(() => { void load() }, [load])
   async function submit() { if (!action) return; if (action === 'delivery' && (!recipientName || !recipientContact)) return setError('Recipient name and contact are required.'); if (action === 'draft' && !validUntil) return setError('A renewed validity date is required.'); setSaving(true); setError(''); try { const response = await fetch(action === 'delivery' ? `/api/admin/quotations/${quotationId}/deliveries` : `/api/admin/quotations/${quotationId}/lifecycle`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(action === 'delivery' ? { recipientName, recipientContact, channel, notes: null } : { toStatus: action, reopenValidUntil: action === 'draft' ? validUntil : null }) }); const data = await response.json().catch(() => ({})); if (!response.ok) { if (response.status === 409) await load(); throw new Error(data.error || `Unable to save lifecycle action (${response.status}).`) }; setAction(null); await load() } catch (err) { setError(err instanceof Error ? err.message : 'Unable to save lifecycle action.') } finally { setSaving(false) } }
   if (!quotation) return null
   const actionLabel = (status: string) => {

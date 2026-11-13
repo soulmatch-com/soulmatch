@@ -7,7 +7,7 @@ const itemSchema = z.object({ serviceId: z.string().uuid(), quantity: z.number()
 const createQuotationSchema = z.object({
   validUntil: z.string().date().nullable().optional(),
   notes: z.string().trim().max(2000).nullable().optional(),
-  leadIds: z.array(z.string().uuid()).max(50).default([]),
+  leadIds: z.array(z.string().uuid()).max(1, 'A quotation can be linked to only one lead.').default([]),
   items: z.array(itemSchema).min(1).max(100),
 }).superRefine(({ items, leadIds }, context) => {
   for (const [values, path] of [[items.map((item) => item.serviceId), 'items'] as const, [leadIds, 'leadIds'] as const]) {

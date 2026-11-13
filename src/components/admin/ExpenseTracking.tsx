@@ -1,24 +1,25 @@
 'use client'
 
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import { Pencil, Plus, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { BookingDialogContent, BookingAlertDialogContent } from '@/components/admin/BookingDialog'
 import { Dialog, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog'
 import { formatBookingDate } from '@/lib/utils'
-import { subscribeToBookingUpdates } from '@/lib/admin/booking-updates'
+import { notifyBookingUpdated } from '@/lib/admin/booking-updates'
+import { useBookingResource } from './booking-workspace-data'
 
 const money = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' })
 type Assignment = { id: string; agreed_cost: number | null; event_vendors: { vendor_name: string } | null; celebration_booking_services: { service_name_snapshot: string } | null }
 type Expense = { id: string; expense_reference: string; vendor_assignment_id: string | null; category: string; amount: number; expense_date: string; notes: string | null; event_vendor_assignments: Assignment | null }
 type Data = { summary: { net_received: number; expenses_recorded: number; available_to_allocate: number }; expenses: Expense[]; assignments: Assignment[] }
 
-export function ExpenseTracking({ bookingId }: { bookingId: string }) {
-  const [data, setData] = useState<Data | null>(null)
+export function ExpenseTracking({ bookingId, initialAction = false }: { bookingId: string; initialAction?: boolean }) {
+  const { data, refetch, error: loadError } = useBookingResource<Data>(bookingId, 'expenses')
   const [error, setError] = useState('')
   const [formError, setFormError] = useState('')
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(initialAction)
   const [saving, setSaving] = useState(false)
   const [deletingExpense, setDeletingExpense] = useState<Expense | null>(null)
   const [deleting, setDeleting] = useState(false)
@@ -28,22 +29,11 @@ export function ExpenseTracking({ bookingId }: { bookingId: string }) {
   const [category, setCategory] = useState('')
   const [assignment, setAssignment] = useState('')
   const [notes, setNotes] = useState('')
-  const [expenseDate, setExpenseDate] = useState('')
-  const requestKey = useRef('')
+  const [expenseDate, setExpenseDate] = useState(initialAction ? new Date().toISOString().slice(0, 10) : '')
+  const requestKey = useRef(crypto.randomUUID())
   const actionTrigger = useRef<HTMLButtonElement | null>(null)
   const recordTrigger = useRef<HTMLButtonElement>(null)
-  const load = useCallback(async () => {
-    const response = await fetch(`/api/admin/bookings/${bookingId}/expenses`)
-    const value = await response.json()
-    if (!response.ok) throw new Error(value.error)
-    setData(value)
-    setError('')
-  }, [bookingId])
-  useEffect(() => {
-    const refresh = () => { void load().catch(e => setError(e instanceof Error ? e.message : 'Unable to load expenses')) }
-    refresh()
-    return subscribeToBookingUpdates(bookingId, refresh)
-  }, [bookingId, load])
+  const load = useCallback(async () => { await refetch({ throwOnError: true }); setError('') }, [refetch])
 
   function openForm(expense: Expense | null) {
     setEditing(expense)
@@ -76,6 +66,7 @@ export function ExpenseTracking({ bookingId }: { bookingId: string }) {
       const result = await response.json()
       if (!response.ok) throw new Error(result.error)
       setOpen(false)
+      notifyBookingUpdated(bookingId)
       // A refresh failure must not leave the form open to submit a saved expense again.
       await load().catch(e => setError(e instanceof Error ? e.message : 'Unable to refresh expenses'))
     } catch (e) {
@@ -95,6 +86,7 @@ export function ExpenseTracking({ bookingId }: { bookingId: string }) {
       if (!response.ok) throw new Error(result.error || 'Unable to delete expense')
       await load().catch(e => setError(e instanceof Error ? e.message : 'Unable to refresh expenses'))
       setDeletingExpense(null)
+      notifyBookingUpdated(bookingId)
     } catch (e) {
       setDeleteError(e instanceof Error ? e.message : 'Unable to delete expense')
     } finally {
@@ -125,7 +117,7 @@ export function ExpenseTracking({ bookingId }: { bookingId: string }) {
       <div><h2 className="font-semibold">Received Amount & Expenses</h2><p className="text-sm text-slate-500">Allocate verified customer receipts to vendor or operational expenses.</p></div>
       <Button ref={recordTrigger} size="sm" disabled={!data || Number(data.summary.available_to_allocate) <= 0} onClick={event => { actionTrigger.current = event.currentTarget; openForm(null) }}><Plus aria-hidden="true" className="h-4 w-4" />Record Expense</Button>
     </div>
-    {error && <p role="alert" className="mt-3 text-sm text-rose-700">{error}</p>}
+    {(error || loadError) && <p role="alert" className="mt-3 text-sm text-rose-700">{error || loadError?.message}</p>}
     {data ? <>
       <dl className="mt-4 grid grid-cols-1 gap-3 text-sm sm:grid-cols-3">
         <div><dt className="text-slate-500">Net Received</dt><dd className="font-semibold">{money.format(Number(data.summary.net_received))}</dd></div>
@@ -156,15 +148,15 @@ export function ExpenseTracking({ bookingId }: { bookingId: string }) {
         </DialogHeader>
         <form onSubmit={submit} className="grid gap-4">
           {formError && <p role="alert" className="text-sm text-rose-700">{formError}</p>}
-          <fieldset disabled={saving} className="grid gap-4">
-            <label className="text-sm">Category<input aria-label="Expense category" required maxLength={100} className="mt-1 h-9 w-full rounded border px-2" value={category} onChange={e => setCategory(e.target.value)} placeholder="e.g. Catering advance" /></label>
-            <label className="text-sm">Amount<input aria-label="Expense amount" required className="mt-1 h-9 w-full rounded border px-2" type="number" min="0.01" max="9999999999.99" step="0.01" value={amount} onChange={e => setAmount(e.target.value)} /></label>
+          <fieldset disabled={saving} className="grid gap-4 sm:grid-cols-2">
+            <label className="text-sm sm:col-span-2">Category<input aria-label="Expense category" required maxLength={100} className="mt-1 h-9 w-full rounded border px-2" value={category} onChange={e => setCategory(e.target.value)} placeholder="e.g. Catering advance" /></label>
+            <label className="text-sm">Amount (₹)<input aria-label="Expense amount" required className="mt-1 h-9 w-full rounded border px-2" type="number" min="0.01" max="9999999999.99" step="0.01" value={amount} onChange={e => setAmount(e.target.value)} /></label>
             <label className="text-sm">Expense Date<input aria-label="Expense date" required className="mt-1 h-9 w-full rounded border px-2" type="date" value={expenseDate} onChange={e => setExpenseDate(e.target.value)} /></label>
-            <label className="text-sm">Related Vendor Assignment (Optional)<select aria-label="Related vendor assignment" className="mt-1 h-9 w-full rounded border px-2" value={assignment} onChange={e => setAssignment(e.target.value)}>
+            <label className="text-sm sm:col-span-2">Related Vendor Assignment (Optional)<select aria-label="Related vendor assignment" className="mt-1 h-9 w-full rounded border px-2" value={assignment} onChange={e => setAssignment(e.target.value)}>
               <option value="">General Operational Expense</option>
               {assignments.map(x => <option key={x.id} value={x.id}>{x.event_vendors?.vendor_name || 'Vendor'} — {x.celebration_booking_services?.service_name_snapshot || 'Service'}{x.agreed_cost !== null ? ` (${money.format(Number(x.agreed_cost))})` : ''}</option>)}
             </select></label>
-            <label className="text-sm">Notes (Optional)<textarea aria-label="Expense notes" maxLength={2000} className="mt-1 w-full rounded border p-2" value={notes} onChange={e => setNotes(e.target.value)} /></label>
+            <label className="text-sm sm:col-span-2">Notes (Optional)<textarea aria-label="Expense notes" maxLength={2000} className="mt-1 w-full rounded border p-2" value={notes} onChange={e => setNotes(e.target.value)} /></label>
           </fieldset>
           <DialogFooter className="gap-2 sm:space-x-0"><Button type="button" variant="outline" disabled={saving} onClick={() => setOpen(false)}>Cancel</Button><Button type="submit" disabled={saving}>{saving ? 'Saving…' : editing ? 'Save changes' : 'Record expense'}</Button></DialogFooter>
         </form>

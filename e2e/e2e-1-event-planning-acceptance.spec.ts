@@ -11,6 +11,7 @@ type Fixture = {
   quotationId?: string;
   bookingId?: string;
   adminId?: string;
+  templateId?: string;
 };
 const date = (days: number) =>
   new Date(Date.now() + days * 86_400_000).toISOString().slice(0, 10);
@@ -60,6 +61,9 @@ async function fixture(): Promise<Fixture> {
     .limit(1);
   expect(admins).toHaveLength(1);
   value.adminId = admins![0].id;
+  const template = await client.from('event_task_templates').insert({ ceremony_type: 'all', title: 'Fixture ceremony checklist', category: 'ceremony_preparation', priority: 'medium' }).select('id').single();
+  expect(template.error).toBeNull();
+  value.templateId = template.data!.id;
   const { data: enquiry, error: enquiryError } = await client
     .from("celebration_enquiries")
     .insert({
@@ -156,6 +160,7 @@ async function clean(value: Fixture) {
         .error,
     ).toBeNull();
   }
+  if (value.templateId) expect((await client.from('event_task_templates').delete().eq('id', value.templateId)).error).toBeNull();
   if (value.leadId)
     expect(
       (await client.from("leads").delete().eq("id", value.leadId)).error,
@@ -204,6 +209,7 @@ async function booking(page: Page, value: Fixture) {
     .click();
   await expect(page).toHaveURL(/\/admin\/bookings\/[0-9a-f-]+$/);
   value.bookingId = page.url().split("/").pop()!;
+  await page.getByRole('button', { name: 'Change Status' }).click();
   const response = page.waitForResponse(
     (r) =>
       r.url().includes(`/api/admin/bookings/${value.bookingId}/lifecycle`) &&
@@ -211,7 +217,8 @@ async function booking(page: Page, value: Fixture) {
   );
   await page.getByRole("button", { name: "Confirmed", exact: true }).click();
   expect((await response).status()).toBe(200);
-  await expect(page.getByText("Confirmed", { exact: true })).toBeVisible();
+  await expect(page.getByRole('region', { name: 'Booking summary' }).getByText("Confirmed", { exact: true })).toBeVisible();
+  await page.getByRole('tab', { name: 'Event Planning', exact: true }).click();
 }
 const taskUrl = (id: string) => (url: URL) =>
   url.pathname === `/api/admin/bookings/${id}/tasks`;
@@ -450,7 +457,7 @@ test("Scenario E applies booking task filters on the server using Asia/Kolkata b
       r.url().includes(`assignedAdminId=${activeAdmin!.id}`),
     );
     await planning
-      .getByLabel("assignedAdminId filter")
+      .getByLabel("Assigned Administrator filter")
       .selectOption(activeAdmin!.id);
     expect((await assignedResponse).status()).toBe(200);
     await expect(
@@ -459,7 +466,7 @@ test("Scenario E applies booking task filters on the server using Asia/Kolkata b
     await expect(
       planning.getByText(`${value.marker} upcoming`, { exact: false }),
     ).toHaveCount(0);
-    await planning.getByLabel("assignedAdminId filter").selectOption("");
+    await planning.getByLabel("Assigned Administrator filter").selectOption("");
     const overdueResponse = page.waitForResponse((r) =>
       r.url().includes("overdue=true"),
     );
@@ -535,8 +542,8 @@ test("Scenario E recovers from edit failures and rejects a genuine stale browser
       .eq("id", taskId)
       .single();
     expect(initial.data?.lock_version).toBeTruthy();
-    const url = `/admin/bookings/${value.bookingId}`;
-    second = await browser.newContext();
+    const url = `/admin/bookings/${value.bookingId}?tab=planning`;
+    second = await browser.newContext({ baseURL: new URL(page.url()).origin, extraHTTPHeaders: { Origin: new URL(page.url()).origin } });
     const other = await second.newPage();
     await login(other);
     await page.goto(url);
@@ -718,7 +725,7 @@ test("Scenario E enforces active assignment, booking-service ownership, and life
     );
     expect(inactiveRequest.status()).toBe(400);
     expect((await inactiveRequest.json()).error).toContain("not active");
-    await page.goto(`/admin/bookings/${a.bookingId}`);
+    await page.goto(`/admin/bookings/${a.bookingId}?tab=planning`);
     const planning = page
       .getByRole("heading", { name: "Event planning" })
       .locator("xpath=ancestor::section");
@@ -773,7 +780,7 @@ test("Scenario E edit/create failures recover and loading prevents duplicate sub
       value.bookingId!,
       `${value.marker} retry`,
     );
-    await page.goto(`/admin/bookings/${value.bookingId}`);
+    await page.goto(`/admin/bookings/${value.bookingId}?tab=planning`);
     const row = taskRow(page, `${value.marker} retry`);
     await row.getByRole("button", { name: "Edit" }).click();
     const dialog = page.getByRole("dialog");

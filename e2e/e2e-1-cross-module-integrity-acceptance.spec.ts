@@ -132,11 +132,12 @@ test('Scenario H2 preserves cross-module history and financial snapshots through
     await page.goto(`/admin/bookings/${f.bookingId}`)
     await expect(page.getByText(taskTitle, { exact: true })).toBeVisible()
     await expect(page.getByText(f.marker, { exact: true }).first()).toBeVisible()
+    await page.getByRole('button', { name: 'Change Status' }).click()
     const controls = page.getByRole('heading', { name: 'Status controls' }).locator('xpath=ancestor::section')
-    for (const [to, label] of [['ready', 'Ready'], ['completed', 'Completed']] as const) {
+    for (const [to, label] of [['ready', 'Ready for Event'], ['completed', 'Completed']] as const) {
       const done = page.waitForResponse(response => new URL(response.url()).pathname === path(f.bookingId!, '/lifecycle') && response.request().method() === 'POST')
       await controls.getByRole('button', { name: label, exact: true }).click(); expect((await done).status()).toBe(200)
-      await expect(page.getByText(to[0].toUpperCase() + to.slice(1), { exact: true })).toBeVisible()
+      await expect(page.getByRole('region', { name: 'Booking summary' }).getByText(to === 'ready' ? 'Ready for Event' : to[0].toUpperCase() + to.slice(1), { exact: true })).toBeVisible()
     }
     expect((await c.from('celebration_bookings').select('status').eq('id', f.bookingId).single()).data?.status).toBe('completed')
 

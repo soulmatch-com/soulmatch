@@ -49,7 +49,7 @@ test('edit and delete booking expenses using icon actions and refresh totals', a
     await page.getByLabel('Password').fill(credentials.password)
     await page.getByRole('button', { name: 'Sign in as Admin' }).click()
     await expect(page).toHaveURL(/\/admin\/dashboard$/)
-    await page.goto(`/admin/bookings/${bookingId}`)
+    await page.goto(`/admin/bookings/${bookingId}?tab=payments`)
     const section = page.getByRole('heading', { name: 'Received Amount & Expenses', exact: true, includeHidden: true }).locator('xpath=ancestor::section[1]')
     const row = section.getByTestId('expense-history-row')
     const dialog = page.getByRole('dialog', { name: 'Edit Expense', exact: true })

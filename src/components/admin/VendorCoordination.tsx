@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Ban, Check, CircleX, History, Pencil, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { BookingDialogContent } from "@/components/admin/BookingDialog";
 import { notifyBookingUpdated } from "@/lib/admin/booking-updates";
@@ -52,6 +53,11 @@ const emptyDraft: Draft = {
 const inputClass = "mt-1.5 h-10 w-full rounded-md border border-slate-300 bg-white px-3 text-sm text-slate-900";
 const textareaClass = "mt-1.5 w-full rounded-md border border-slate-300 bg-white p-3 text-sm text-slate-900";
 const title = (value: string) => value.replaceAll("_", " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
+const assignmentActions = [
+  { status: "confirmed", Icon: Check },
+  { status: "declined", Icon: CircleX },
+  { status: "cancelled", Icon: Ban },
+];
 async function body(response: Response) {
   const value: Record<string, any> = await response.json().catch(() => ({}));
   if (!response.ok)
@@ -226,24 +232,32 @@ export function VendorCoordination({ bookingId, initialAction = false }: { booki
         : "No additional details";
   return (
     <section className="rounded-xl border bg-white p-5">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <h2 className="font-semibold">Vendor Coordination</h2>
-        <div className="flex w-full flex-wrap gap-2 sm:w-auto">
+      <div className="flex flex-wrap items-center justify-between gap-3 sm:flex-nowrap">
+        <h2 className="min-w-0 font-semibold">Vendor Coordination</h2>
+        <div className="ml-auto flex shrink-0 gap-2">
           <Button
-            size="sm"
+            type="button"
+            size="icon"
+            className="size-11 xl:size-9"
+            aria-label="Create assignment"
+            title="Create assignment"
             onClick={() => {
               setDialogError("");
               setCreating(true);
             }}
           >
-            Create assignment
+            <Plus aria-hidden="true" className="size-4" />
           </Button>
           <Button
-            size="sm"
+            type="button"
+            size="icon"
+            className="size-11 xl:size-9"
             variant="outline"
+            aria-label="History"
+            title="Coordination history"
             onClick={() => void refreshHistory()}
           >
-            History
+            <History aria-hidden="true" className="size-4" />
           </Button>
         </div>
       </div>
@@ -254,46 +268,60 @@ export function VendorCoordination({ bookingId, initialAction = false }: { booki
       )}
       <div className="divide-y">
         {assignments.map((x) => (
-          <div className="py-3" key={x.id}>
-            <b>{x.celebration_booking_services?.service_name_snapshot}</b> —{" "}
-            {x.event_vendors?.vendor_name || "Former vendor"} · {title(x.status)}
-            <p>
-              ₹{x.agreed_cost ?? "—"} · {x.scheduled_date ? formatBookingDate(x.scheduled_date) : "No date"}
-            </p>
-            <div className="mt-2 flex flex-wrap gap-2">{x.status === "pending" && (
+          <div className="flex min-w-0 flex-col gap-3 py-3 sm:flex-row sm:items-center sm:justify-between" key={x.id}>
+            <div className="min-w-0 flex-1">
+              <b>{x.celebration_booking_services?.service_name_snapshot}</b> —{" "}
+              {x.event_vendors?.vendor_name || "Former vendor"} · {title(x.status)}
+              <p>
+                ₹{x.agreed_cost ?? "—"} · {x.scheduled_date ? formatBookingDate(x.scheduled_date) : "No date"}
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-2 sm:shrink-0 sm:flex-nowrap">{x.status === "pending" && (
               <Button
-                size="sm"
+                type="button"
+                size="icon"
+                className="size-11 xl:size-9"
                 variant="outline"
+                aria-label="Edit"
+                title="Edit assignment"
                 onClick={() => {
                   setDialogError("");
                   setEdit({ ...x });
                 }}
               >
-                Edit
+                <Pencil aria-hidden="true" className="size-4" />
               </Button>
             )}
             {x.status === "pending" &&
-              ["confirmed", "declined", "cancelled"].map((to) => (
+              assignmentActions.map(({ status: to, Icon }) => (
                 <Button
                   key={to}
-                  size="sm"
+                  type="button"
+                  size="icon"
+                  className="size-11 xl:size-9"
+                  aria-label={title(to)}
+                  title={title(to)}
                   onClick={() => {
                     setDialogError("");
                     setAction({ a: x, to });
                   }}
                 >
-                  {title(to)}
+                  <Icon aria-hidden="true" className="size-4" />
                 </Button>
               ))}
             {x.status === "confirmed" && (
               <Button
-                size="sm"
+                type="button"
+                size="icon"
+                className="size-11 xl:size-9"
+                aria-label="Cancel"
+                title="Cancel assignment"
                 onClick={() => {
                   setDialogError("");
                   setAction({ a: x, to: "cancelled" });
                 }}
               >
-                Cancel
+                <Ban aria-hidden="true" className="size-4" />
               </Button>
             )}</div>
           </div>

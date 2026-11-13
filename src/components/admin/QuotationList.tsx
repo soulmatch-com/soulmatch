@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
 import { Download, Pencil, Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { CopyQuotationButton } from '@/components/admin/CopyQuotationButton'
 
 type Quotation = {
   id: string
@@ -59,12 +60,12 @@ export function QuotationList() {
       <table className="block w-full text-left text-sm xl:table xl:table-fixed">
         <thead className="hidden border-b bg-slate-50 text-xs uppercase tracking-wide text-slate-500 xl:table-header-group">
           <tr>
-            <th scope="col" className="w-[19%] px-4 py-3 font-medium">Quotation</th>
-            <th scope="col" className="w-[21%] px-4 py-3 font-medium">Customer</th>
-            <th scope="col" className="w-[13%] px-4 py-3 font-medium">Valid until</th>
-            <th scope="col" className="w-[17%] px-4 py-3 text-right font-medium">Total</th>
-            <th scope="col" className="w-[13%] px-4 py-3 font-medium">Status</th>
-            <th scope="col" className="w-[17%] px-4 py-3 text-right font-medium">Actions</th>
+            <th scope="col" className="w-[18%] px-4 py-3 font-medium">Quotation</th>
+            <th scope="col" className="w-[19%] px-4 py-3 font-medium">Customer</th>
+            <th scope="col" className="w-[12%] px-4 py-3 font-medium">Valid until</th>
+            <th scope="col" className="w-[16%] px-4 py-3 text-right font-medium">Total</th>
+            <th scope="col" className="w-[12%] px-4 py-3 font-medium">Status</th>
+            <th scope="col" className="w-[23%] px-4 py-3 text-right font-medium">Actions</th>
           </tr>
         </thead>
         <tbody className="block xl:table-row-group">
@@ -98,13 +99,14 @@ export function QuotationList() {
                   <span className="inline-block rounded bg-slate-100 px-2 py-1 [overflow-wrap:anywhere]">{title(effectiveStatus)}</span>
                 </td>
                 <td className="col-span-2 row-start-4 block min-w-0 xl:table-cell xl:px-4 xl:py-3">
-                  <div className="grid grid-cols-2 gap-2 xl:flex xl:justify-end">
-                    <Button asChild size="sm" variant="outline" className="h-11 xl:h-9">
-                      <Link href={`/admin/quotations/${quotation.id}/edit`}><Pencil className="mr-1 h-3 w-3" />Open</Link>
+                  <div className="grid grid-cols-2 gap-2 xl:flex xl:flex-wrap xl:justify-end">
+                    <Button asChild size="icon" variant="outline" className="size-11 xl:size-9">
+                      <Link href={`/admin/quotations/${quotation.id}/edit`} aria-label={`Open ${quotation.quotation_number}`} title="Open quotation"><Pencil aria-hidden="true" className="h-4 w-4" /></Link>
                     </Button>
                     <Button asChild variant="outline" className="h-11 px-2 xl:size-9 xl:shrink-0 xl:p-0">
                       <a href={`/api/admin/quotations/${quotation.id}/pdf`} aria-label={`Download ${quotation.quotation_number} PDF`}><Download className="h-4 w-4 shrink-0" /><span className="xl:hidden">PDF</span></a>
                     </Button>
+                    <CopyQuotationButton quotationId={quotation.id} />
                   </div>
                 </td>
               </tr>

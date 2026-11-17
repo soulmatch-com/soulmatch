@@ -11,6 +11,12 @@ import { notifyBookingUpdated } from '@/lib/admin/booking-updates'
 import { useBookingResource } from './booking-workspace-data'
 
 const money = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' })
+
+function currentLocalDate() {
+  const now = new Date()
+  const offset = now.getTimezoneOffset() * 60_000
+  return new Date(now.getTime() - offset).toISOString().slice(0, 10)
+}
 type Assignment = { id: string; agreed_cost: number | null; event_vendors: { vendor_name: string } | null; celebration_booking_services: { service_name_snapshot: string } | null }
 type Expense = { id: string; expense_reference: string; vendor_assignment_id: string | null; category: string; amount: number; expense_date: string; notes: string | null; event_vendor_assignments: Assignment | null }
 type Data = { summary: { net_received: number; expenses_recorded: number; available_to_allocate: number }; expenses: Expense[]; assignments: Assignment[] }
@@ -29,7 +35,7 @@ export function ExpenseTracking({ bookingId, initialAction = false }: { bookingI
   const [category, setCategory] = useState('')
   const [assignment, setAssignment] = useState('')
   const [notes, setNotes] = useState('')
-  const [expenseDate, setExpenseDate] = useState(initialAction ? new Date().toISOString().slice(0, 10) : '')
+  const [expenseDate, setExpenseDate] = useState(initialAction ? currentLocalDate() : '')
   const requestKey = useRef(crypto.randomUUID())
   const actionTrigger = useRef<HTMLButtonElement | null>(null)
   const recordTrigger = useRef<HTMLButtonElement>(null)
@@ -41,7 +47,7 @@ export function ExpenseTracking({ bookingId, initialAction = false }: { bookingI
     setCategory(expense?.category ?? '')
     setAssignment(expense?.vendor_assignment_id ?? '')
     setNotes(expense?.notes ?? '')
-    setExpenseDate(expense?.expense_date ?? new Date().toISOString().slice(0, 10))
+    setExpenseDate(expense?.expense_date ?? currentLocalDate())
     setFormError('')
     requestKey.current = crypto.randomUUID()
     setOpen(true)

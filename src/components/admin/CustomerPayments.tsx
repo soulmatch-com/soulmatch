@@ -15,6 +15,12 @@ type Payment=EditablePayment & {transaction_type:string;original_payment_id:stri
 type Mode='receipt'|'refund'|'reversal'|null
 type PendingPayment = { path: string; body: Record<string, unknown> }
 
+function currentLocalDateTime() {
+ const now = new Date()
+ const offset = now.getTimezoneOffset() * 60_000
+ return new Date(now.getTime() - offset).toISOString().slice(0, 16)
+}
+
 export function CustomerPayments({bookingId,initialAction=false}:{bookingId:string;initialAction?:boolean}){
  const {data:summaryData,refetch:refreshSummary,error:summaryError}=useBookingSummary(bookingId)
  const summary=summaryData?.summary
@@ -27,7 +33,7 @@ export function CustomerPayments({bookingId,initialAction=false}:{bookingId:stri
  const [error, setError] = useState(''), [mode, setMode] = useState<Mode>(initialAction ? 'receipt' : null)
  const [original, setOriginal] = useState<Payment | null>(null), [saving, setSaving] = useState(false)
  const [amount, setAmount] = useState(''), [method, setMethod] = useState<typeof methods[number]>('upi')
- const [reason, setReason] = useState(''), [external, setExternal] = useState(''), [remarks, setRemarks] = useState('')
+ const [reason, setReason] = useState(''), [external, setExternal] = useState(''), [remarks, setRemarks] = useState(''), [paymentDate, setPaymentDate] = useState(initialAction ? currentLocalDateTime() : '')
  const [uncertain, setUncertain] = useState(false)
  const triggerRef = useRef<HTMLButtonElement | null>(null)
  const savingRef = useRef(false)
@@ -38,28 +44,29 @@ export function CustomerPayments({bookingId,initialAction=false}:{bookingId:stri
  }, [refreshPayments, refreshAudit, refreshSummary])
  const loadError = paymentQuery.error || auditQuery.error || summaryError
  function resetForm() {
-   setMode(null); setOriginal(null); setAmount(''); setReason(''); setExternal(''); setRemarks('')
+   setMode(null); setOriginal(null); setAmount(''); setReason(''); setExternal(''); setRemarks(''); setPaymentDate('')
    setUncertain(false); pendingPayment.current = null
  }
  function openForm(next: Exclude<Mode, null>, trigger: HTMLButtonElement, payment: Payment | null = null) {
    if (savingRef.current) return
-   resetForm(); setError(''); triggerRef.current = trigger; setOriginal(payment); setMode(next)
+   resetForm(); setError(''); triggerRef.current = trigger; setOriginal(payment); setPaymentDate(currentLocalDateTime()); setMode(next)
  }
  const close = () => { if (!savingRef.current) resetForm() }
  async function submit() {
    if (savingRef.current || !mode) return
    const value = Number(amount)
    if (!Number.isFinite(value) || value <= 0) { setError('Enter a positive amount.'); return }
+   if (!paymentDate || Number.isNaN(new Date(paymentDate).getTime())) { setError('Select a valid payment date and time.'); return }
    if (mode !== 'receipt' && !reason.trim()) { setError('A reason is required.'); return }
    if (mode !== 'receipt' && !original) { setError('Select the original receipt.'); return }
    savingRef.current = true; setSaving(true); setError('')
    if (!pendingPayment.current) {
-     const paymentDate = new Date().toISOString(), idempotencyKey = crypto.randomUUID()
+     const paymentDateValue = new Date(paymentDate).toISOString(), idempotencyKey = crypto.randomUUID()
      pendingPayment.current = {
        path: mode === 'receipt' ? `/api/admin/bookings/${bookingId}/payments` : `/api/admin/bookings/${bookingId}/payments/${original!.id}/${mode === 'refund' ? 'refund' : 'reverse'}`,
        body: mode === 'receipt'
-         ? { idempotencyKey, amount: value, currency: 'INR', method, externalReference: external || undefined, notes: remarks || undefined, paymentDate }
-         : { idempotencyKey, amount: value, currency: 'INR', reason, paymentDate },
+         ? { idempotencyKey, amount: value, currency: 'INR', method, externalReference: external || undefined, notes: remarks || undefined, paymentDate: paymentDateValue }
+         : { idempotencyKey, amount: value, currency: 'INR', reason, paymentDate: paymentDateValue },
      }
    }
    try {
@@ -141,6 +148,7 @@ export function CustomerPayments({bookingId,initialAction=false}:{bookingId:stri
       <BookingField label="Payment method"><select aria-label="Payment method" value={method} onChange={e=>setMethod(e.target.value as typeof method)}>{methods.map(m=><option key={m} value={m}>{paymentMethodLabel[m]}</option>)}</select></BookingField>
       <BookingField label="External reference (optional)"><input aria-label="External reference" value={external} maxLength={200} onChange={e=>setExternal(e.target.value)} placeholder="Transaction or receipt ID"/></BookingField>
      </BookingFormGrid>
+     <BookingField label="Payment date and time"><input aria-label="Payment date and time" required type="datetime-local" step="60" value={paymentDate} onChange={e=>setPaymentDate(e.target.value)}/></BookingField>
      <BookingField label="Remarks (optional)"><textarea aria-label="Remarks" value={remarks} onChange={e=>setRemarks(e.target.value)} maxLength={2000} placeholder="e.g. Advance for ceremony arrangements" rows={3}/></BookingField>
     </> : <BookingField label="Reason (required)"><textarea aria-label="Reason" value={reason} onChange={e=>setReason(e.target.value)} maxLength={2000} placeholder="Explain the reason for this adjustment" rows={3}/></BookingField>}
     </fieldset>

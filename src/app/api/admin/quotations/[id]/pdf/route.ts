@@ -177,7 +177,7 @@ function sessionName(value: 'one_session' | 'two_sessions' | null) {
 }
 
 function packageName(value: 'basic' | 'premium' | null) {
-  return value === 'basic' ? 'Basic' : value === 'premium' ? 'Premium' : 'Not provided'
+  return value === 'basic' ? 'Standard' : value === 'premium' ? 'Premium' : 'Not provided'
 }
 
 function wrap(text: string, maxCharacters: number) {
@@ -296,7 +296,7 @@ export async function GET(_: Request, { params }: { params: Promise<{ id: string
   text('Amount (INR)', amountLeft + 30, y - 10, 7, bold, rgb(1, 1, 1))
   y -= 14
   for (const [index, item] of (items ?? []).entries()) {
-    const serviceName = item.quantity > 1 ? `${item.service_name} (${numberFormatter.format(item.unit_price)} x ${item.quantity})` : item.service_name
+    const serviceName = item.service_name
     const service = servicesById.get(item.celebration_service_id)
     const description = service?.show_description_in_quotation ? (item.description_override ?? service.description)?.trim() : null
     const particularsLines = wrap(`${serviceName}${description ? ` (${description})` : ''}`, 46)

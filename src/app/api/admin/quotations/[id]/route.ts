@@ -38,16 +38,12 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     p_set_valid_until: parsed.data.validUntil !== undefined, p_valid_until: parsed.data.validUntil ?? null,
     p_set_notes: parsed.data.notes !== undefined, p_notes: parsed.data.notes ?? null,
     p_replace_items: parsed.data.items !== undefined,
-    p_items: parsed.data.items?.map((item) => ({ service_id: item.serviceId, quantity: item.quantity, unit_price: item.unitPrice })) ?? null,
+    p_items: parsed.data.items?.map((item) => ({ service_id: item.serviceId, quantity: item.quantity, unit_price: item.unitPrice, description_override: item.descriptionOverride ?? null })) ?? null,
     p_replace_leads: parsed.data.leadIds !== undefined, p_lead_ids: parsed.data.leadIds ?? [],
   })
   if (transactionError) {
     const status = transactionError.code === '22023' ? 409 : transactionError.code === 'P0002' ? 404 : 500
     return NextResponse.json({ error: status === 500 ? 'Unable to update quotation' : transactionError.message }, { status })
-  }
-  if (parsed.data.items) {
-    const overrideResults = await Promise.all(parsed.data.items.map((item) => supabase.from('quotation_items').update({ description_override: item.descriptionOverride || null }).eq('quotation_id', id).eq('celebration_service_id', item.serviceId)))
-    if (overrideResults.some((result) => result.error)) return NextResponse.json({ error: 'Unable to update quotation descriptions' }, { status: 500 })
   }
   const { data, error } = await supabase.from('quotations').select('*').eq('id', id).maybeSingle()
   if (error) return NextResponse.json({ error: 'Unable to load updated quotation' }, { status: 500 })

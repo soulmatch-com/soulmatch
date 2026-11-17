@@ -10,7 +10,7 @@ export async function GET(_: NextRequest, { params }: { params: Promise<{ id: st
   if ('response' in authorization) return authorization.response
   const { id } = await params; const supabase = createAdminClient()
   const [{ data: quotation, error: quotationError }, { data: activity, error: activityError }, { data: deliveries, error: deliveriesError }] = await Promise.all([
-    supabase.from('quotations').select('id, quotation_number, status, valid_until').eq('id', id).maybeSingle(),
+    supabase.from('quotations').select('id, quotation_number, status, valid_until, created_at, updated_at').eq('id', id).maybeSingle(),
     supabase.from('quotation_activity').select('id, event_type, previous_status, new_status, metadata, created_at, admin_id').eq('quotation_id', id).order('created_at', { ascending: false }),
     supabase.from('quotation_deliveries').select('id, recipient_name, recipient_contact, channel, delivery_kind, notes, delivered_at, created_at, recorded_by').eq('quotation_id', id).order('delivered_at', { ascending: false }),
   ])

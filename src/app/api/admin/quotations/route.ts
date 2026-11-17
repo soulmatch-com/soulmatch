@@ -25,7 +25,7 @@ export async function GET() {
   const supabase = createAdminClient()
   const [{ data: quotations, error: quotationsError }, { data: services, error: servicesError }, { data: leads, error: leadsError }] = await Promise.all([
     supabase.from('quotations').select('*').order('created_at', { ascending: false }),
-    supabase.from('celebration_services').select('id, code, name, description, show_description_in_quotation, display_order').eq('is_active', true).order('display_order', { ascending: true }),
+    supabase.from('celebration_services').select('id, code, name, description, show_description_in_quotation, display_order, is_active').eq('is_active', true).order('display_order', { ascending: true }),
     supabase.from('leads').select('id, contact_name, mobile, email').neq('status', 'expired').order('created_at', { ascending: false }).limit(200),
   ])
   if (quotationsError || servicesError || leadsError) return NextResponse.json({ error: 'Unable to load quotations' }, { status: 500 })
@@ -35,7 +35,18 @@ export async function GET() {
     supabase.from('quotation_leads').select('quotation_id, lead_id').in('quotation_id', quotationIds),
   ]) : [{ data: [], error: null }, { data: [], error: null }]
   if (itemsResult.error || linksResult.error) return NextResponse.json({ error: 'Unable to load quotation details' }, { status: 500 })
-  return NextResponse.json({ quotations: quotations ?? [], items: itemsResult.data ?? [], links: linksResult.data ?? [], services: services ?? [], leads: leads ?? [] })
+  // Existing quotations can reference inactive services or leads older than the
+  // selector's recent-lead window. Keep those references visible when editing.
+  const serviceIds = new Set((services ?? []).map(service => service.id))
+  const leadIds = new Set((leads ?? []).map(lead => lead.id))
+  const missingServiceIds = [...new Set((itemsResult.data ?? []).map(item => item.celebration_service_id))].filter(id => !serviceIds.has(id))
+  const missingLeadIds = [...new Set((linksResult.data ?? []).map(link => link.lead_id))].filter(id => !leadIds.has(id))
+  const [referencedServices, referencedLeads] = await Promise.all([
+    missingServiceIds.length ? supabase.from('celebration_services').select('id, code, name, description, show_description_in_quotation, display_order, is_active').in('id', missingServiceIds) : { data: [], error: null },
+    missingLeadIds.length ? supabase.from('leads').select('id, contact_name, mobile, email').neq('status', 'expired').in('id', missingLeadIds) : { data: [], error: null },
+  ])
+  if (referencedServices.error || referencedLeads.error) return NextResponse.json({ error: 'Unable to load quotation references' }, { status: 500 })
+  return NextResponse.json({ quotations: quotations ?? [], items: itemsResult.data ?? [], links: linksResult.data ?? [], services: [...(services ?? []), ...(referencedServices.data ?? [])], leads: [...(leads ?? []), ...(referencedLeads.data ?? [])] })
 }
 
 export async function POST(request: NextRequest) {
@@ -55,12 +66,10 @@ export async function POST(request: NextRequest) {
   const { data: quotationId, error: transactionError } = await supabase.rpc('create_admin_quotation', {
     p_quotation_number: quotationNumber(), p_valid_until: parsed.data.validUntil ?? null,
     p_notes: parsed.data.notes ?? null, p_created_by: authorization.admin.id,
-    p_items: parsed.data.items.map((item) => ({ service_id: item.serviceId, quantity: item.quantity, unit_price: item.unitPrice })),
+    p_items: parsed.data.items.map((item) => ({ service_id: item.serviceId, quantity: item.quantity, unit_price: item.unitPrice, description_override: item.descriptionOverride ?? null })),
     p_lead_ids: parsed.data.leadIds,
   })
   if (transactionError || !quotationId) return NextResponse.json({ error: 'Unable to save quotation details' }, { status: 500 })
-  const overrideResults = await Promise.all(parsed.data.items.map((item) => supabase.from('quotation_items').update({ description_override: item.descriptionOverride || null }).eq('quotation_id', quotationId).eq('celebration_service_id', item.serviceId)))
-  if (overrideResults.some((result) => result.error)) return NextResponse.json({ error: 'Unable to save quotation descriptions' }, { status: 500 })
   const [quotationResult, itemsResult, linksResult] = await Promise.all([
     supabase.from('quotations').select('*').eq('id', quotationId).maybeSingle(),
     supabase.from('quotation_items').select('*').eq('quotation_id', quotationId).order('item_order', { ascending: true }),

@@ -29,6 +29,7 @@ export default function LeadsPage() {
   const [source, setSource] = useState('all')
   const [search, setSearch] = useState('')
   const [stats, setStats] = useState<LeadStats | null>(null)
+  const [error, setError] = useState('')
 
   useEffect(() => { fetch('/api/admin/leads/stats').then(async (response) => { if (response.ok) setStats(await response.json()) }).catch(() => undefined) }, [])
 
@@ -42,7 +43,12 @@ export default function LeadsPage() {
       if (search.trim()) params.set('q', search.trim())
       try {
         const response = await fetch(`/api/admin/leads?${params}`, { signal: controller.signal })
-        if (response.ok) setLeads((await response.json()).leads)
+        const data = await response.json()
+        if (!response.ok) throw new Error(data.error || 'Unable to load leads.')
+        setLeads(data.leads)
+        setError('')
+      } catch (reason) {
+        if (!controller.signal.aborted) setError(reason instanceof Error ? reason.message : 'Unable to load leads.')
       } finally { if (!controller.signal.aborted) setLoading(false) }
     }, 250)
     return () => { controller.abort(); clearTimeout(timer) }
@@ -52,6 +58,7 @@ export default function LeadsPage() {
     <div className="mb-5 flex justify-end">
       <Button asChild className="h-11 w-full sm:w-auto xl:h-10"><Link href="/admin/leads/new"><Plus className="mr-2 h-4 w-4" />Add lead</Link></Button>
     </div>
+    {error && <p role="alert" className="mb-5 rounded-xl bg-rose-50 px-4 py-3 text-sm text-rose-800">{error}</p>}
     {stats && <div className="mb-5 grid grid-cols-2 gap-3 xl:grid-cols-4">
       {[['New today', stats.newToday, 'text-blue-700'], ['Follow-ups due', stats.pendingFollowUps, 'text-amber-700'], ['Overdue', stats.overdueFollowUps, 'text-rose-700'], ['Confirmed', stats.confirmed, 'text-emerald-700']].map(([title, value, colour]) => <div key={String(title)} className="min-w-0 rounded-xl border bg-white p-4"><p className="text-sm text-slate-600">{title}</p><p className={`mt-1 break-words text-2xl font-bold ${colour}`}>{value}</p></div>)}
     </div>}

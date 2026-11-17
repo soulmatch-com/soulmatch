@@ -54,7 +54,7 @@ for (const status of ['accepted', 'rejected', 'cancelled'] as const) {
       }
       await openLifecycle(page, fixture)
       await expect(page.getByRole('status')).toContainText(`This quotation is ${status} and cannot be edited.`)
-      await expect(page.getByRole('button', { name: 'Save quotation', exact: true })).toBeDisabled()
+      await expect(page.getByRole('button', { name: 'Save Changes', exact: true })).toBeDisabled()
       await expect(page.getByLabel('Notes for the family')).toBeDisabled()
       await expect(page.getByRole('button', { name: 'Record manual delivery' })).toBeEnabled()
 
@@ -74,7 +74,7 @@ test('quotation details remain editable until approval and lock immediately afte
   const fixture = await createFixture()
   try {
     await openLifecycle(page, fixture)
-    const save = page.getByRole('button', { name: 'Save quotation', exact: true })
+    const save = page.getByRole('button', { name: 'Save Changes', exact: true })
     await expect(save).toBeEnabled()
     await expect(page.getByLabel('Notes for the family')).toBeEnabled()
     const response = await page.request.patch(`/api/admin/quotations/${fixture.quotationId}`, { data: { notes: fixture.marker } })
@@ -87,6 +87,7 @@ test('quotation details remain editable until approval and lock immediately afte
       await expect(dialog).toBeHidden()
     }
     await expect(page.getByRole('status')).toContainText('This quotation is accepted and cannot be edited.')
+    await expect(page.getByRole('region', { name: 'Quotation information' }).getByText('Accepted', { exact: true })).toBeVisible()
     await expect(save).toBeDisabled()
     await expect(page.getByLabel('Notes for the family')).toBeDisabled()
   } finally { await cleanup(fixture) }
@@ -109,7 +110,7 @@ test('E2E-1C lifecycle dialog traps focus, dismisses safely, returns focus, and 
     await openLifecycle(page, fixture); const trigger = page.getByRole('button', { name: 'Sent', exact: true }); await trigger.focus(); await trigger.press('Enter'); const dialog = page.getByRole('dialog'); await expect(dialog).toBeVisible(); await expect(dialog.locator(':focus')).toHaveCount(1)
     await page.keyboard.press('Tab'); await expect(dialog.locator(':focus')).toHaveCount(1); await page.keyboard.press('Escape'); await expect(dialog).toBeHidden(); await expect(trigger).toBeFocused()
     await trigger.click(); await dialog.getByRole('button', { name: 'Cancel' }).click(); await expect(dialog).toBeHidden(); await expect(trigger).toBeFocused()
-    let requests = 0; let release: () => void = () => {}; const held = new Promise<void>(resolve => { release = resolve }); await page.route(lifecyclePost(fixture), async route => { requests += 1; await held; await fulfillError(route, 500, 'Temporarily unavailable') })
+    let requests = 0; let release: () => void = () => {}; const held = new Promise<void>(resolve => { release = resolve }); await page.route(lifecyclePost(fixture), async route => { if (route.request().method() !== 'POST') return route.continue(); requests += 1; await held; await fulfillError(route, 500, 'Temporarily unavailable') })
     await trigger.click(); await dialog.getByRole('button', { name: 'Confirm' }).click(); await expect.poll(() => requests).toBe(1); await expect(dialog.getByRole('button', { name: 'Saving…' })).toBeDisabled(); release(); await expect(dialog.getByRole('button', { name: 'Confirm' })).toBeEnabled(); await expect(dialog.getByRole('alert')).toContainText('Temporarily unavailable'); await expect(dialog).toBeVisible()
   } finally { await cleanup(fixture) }
 })
@@ -117,22 +118,23 @@ test('E2E-1C lifecycle dialog traps focus, dismisses safely, returns focus, and 
 for (const failure of [{ name: '400 validation error', status: 400, error: 'Please check the lifecycle action' }, { name: '500 server error', status: 500, error: 'Unable to change quotation status' }]) {
   test(`E2E-1D handles ${failure.name} without false success and permits retry`, async ({ page }) => {
     const fixture = await createFixture()
-    try { await openLifecycle(page, fixture); await page.route(lifecyclePost(fixture), route => fulfillError(route, failure.status, failure.error)); await page.getByRole('button', { name: 'Sent', exact: true }).click(); const dialog = page.getByRole('dialog'); await dialog.getByRole('button', { name: 'Confirm' }).click(); await expect(page.getByRole('alert')).toContainText(failure.error); await expect(dialog).toBeVisible(); await expect(dialog.getByRole('button', { name: 'Confirm' })).toBeEnabled(); await expect(page.getByText('Status:').getByText('Draft')).toBeVisible() } finally { await cleanup(fixture) }
+    try { await openLifecycle(page, fixture); await page.route(lifecyclePost(fixture), route => route.request().method() === 'POST' ? fulfillError(route, failure.status, failure.error) : route.continue()); await page.getByRole('button', { name: 'Sent', exact: true }).click(); const dialog = page.getByRole('dialog'); await dialog.getByRole('button', { name: 'Confirm' }).click(); await expect(page.getByRole('dialog').getByRole('alert')).toContainText(failure.error); await expect(dialog).toBeVisible(); await expect(dialog.getByRole('button', { name: 'Confirm' })).toBeEnabled(); await expect(page.getByText('Status:').getByText('Draft')).toBeVisible() } finally { await cleanup(fixture) }
   })
 }
 
 test('E2E-1D handles an aborted lifecycle request without a stuck dialog', async ({ page }) => {
   const fixture = await createFixture()
-  try { await openLifecycle(page, fixture); await page.route(lifecyclePost(fixture), route => route.abort('failed')); await page.getByRole('button', { name: 'Sent', exact: true }).click(); const dialog = page.getByRole('dialog'); await dialog.getByRole('button', { name: 'Confirm' }).click(); await expect(page.getByRole('alert')).toContainText('Failed to fetch'); await expect(dialog).toBeVisible(); await expect(dialog.getByRole('button', { name: 'Confirm' })).toBeEnabled(); await expect(page.getByText('Status:').getByText('Draft')).toBeVisible() } finally { await cleanup(fixture) }
+  try { await openLifecycle(page, fixture); await page.route(lifecyclePost(fixture), route => route.request().method() === 'POST' ? route.abort('failed') : route.continue()); await page.getByRole('button', { name: 'Sent', exact: true }).click(); const dialog = page.getByRole('dialog'); await dialog.getByRole('button', { name: 'Confirm' }).click(); await expect(page.getByRole('dialog').getByRole('alert')).toContainText('Failed to fetch'); await expect(dialog).toBeVisible(); await expect(dialog.getByRole('button', { name: 'Confirm' })).toBeEnabled(); await expect(page.getByText('Status:').getByText('Draft')).toBeVisible() } finally { await cleanup(fixture) }
 })
 
 test('E2E-1E derives expiry, rejects invalid renewal, reopens with a future date, and preserves snapshots', async ({ page }) => {
   test.setTimeout(90_000); const fixture = await createFixture(true)
   try {
     const db = await localDb(); const { data: beforeItems } = await db.from('quotation_items').select('service_name,quantity,unit_price,line_total').eq('quotation_id', fixture.quotationId); await openLifecycle(page, fixture)
-    await expect(page.getByText('Status:').getByText('Expired')).toBeVisible(); const reopen = page.getByRole('button', { name: 'Reopen', exact: true }); await expect(reopen).toBeVisible(); await reopen.click(); const dialog = page.getByRole('dialog'); const date = dialog.getByLabel('Renewed validity date'); await expect(date).toBeVisible(); await dialog.getByRole('button', { name: 'Confirm' }).click(); await expect(page.getByRole('alert')).toContainText('renewed validity date is required')
-    await date.fill(isoDate(-1)); await dialog.getByRole('button', { name: 'Confirm' }).click(); await expect(page.getByRole('alert')).toContainText('today or later'); await expect(dialog).toBeVisible()
+    await expect(page.getByText('Status:').getByText('Expired')).toBeVisible(); await expect(page.getByRole('region', { name: 'Quotation information' }).getByText('Expired', { exact: true })).toBeVisible(); const reopen = page.getByRole('button', { name: 'Reopen', exact: true }); await expect(reopen).toBeVisible(); await reopen.click(); const dialog = page.getByRole('dialog'); const date = dialog.getByLabel('Renewed validity date'); await expect(date).toBeVisible(); await dialog.getByRole('button', { name: 'Confirm' }).click(); await expect(page.getByRole('dialog').getByRole('alert')).toContainText('renewed validity date is required')
+    await date.fill(isoDate(-1)); await dialog.getByRole('button', { name: 'Confirm' }).click(); await expect(page.getByRole('dialog').getByRole('alert')).toContainText('today or later'); await expect(dialog).toBeVisible()
     const renewed = isoDate(30); await date.fill(renewed); await dialog.getByRole('button', { name: 'Confirm' }).click(); await expect(dialog).toBeHidden(); await expect(page.getByText('Status:').getByText('Draft')).toBeVisible()
+    await expect(page.getByLabel('Valid until')).toHaveValue(renewed)
     const { data: quotation } = await db.from('quotations').select('status,valid_until').eq('id', fixture.quotationId).single(); expect(quotation).toMatchObject({ status: 'draft', valid_until: renewed }); const { data: activity } = await db.from('quotation_activity').select('event_type,previous_status,new_status,metadata').eq('quotation_id', fixture.quotationId); expect(activity?.some(item => item.event_type === 'reopened' && item.previous_status === 'expired' && item.new_status === 'draft')).toBe(true); const { data: afterItems } = await db.from('quotation_items').select('service_name,quantity,unit_price,line_total').eq('quotation_id', fixture.quotationId); expect(afterItems).toEqual(beforeItems)
   } finally { await cleanup(fixture) }
 })

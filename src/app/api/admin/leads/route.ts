@@ -46,7 +46,6 @@ export async function GET(request: NextRequest) {
   const { error: expiryError } = await supabase.from('leads').update({ status: 'expired' }).lt('event_date', indiaToday()).in('status', expirableLeadStatuses)
   if (expiryError) {
     console.error('Unable to expire past-event leads', { code: expiryError.code, message: expiryError.message })
-    return NextResponse.json({ error: 'Unable to update expired leads. Apply the expired lead status database migration first.' }, { status: 500 })
   }
 
   let leadsQuery = supabase.from('leads').select('*').order('created_at', { ascending: false }).limit(200)

@@ -11,7 +11,8 @@ import { CelebrationContactActions } from '@/components/celebrations/Celebration
 import { GalleryGrid } from '@/components/celebrations/GalleryGrid'
 import { loadCelebrationServices } from '@/lib/celebrations/page-data'
 export const dynamic = 'force-dynamic'
-import { homepageGalleryPreviewItems } from '@/lib/celebrations/gallery'
+import type { CelebrationGalleryItem } from '@/lib/celebrations/gallery'
+import { getPublishedGalleryPage } from '@/lib/celebrations/gallery-repository'
 
 const url = 'https://mythirumanam.com/'
 const socialImage = {
@@ -70,7 +71,10 @@ const tamilContent = {
 } as const
 
 export default async function ThirukadaiyurPage() {
-  const { services, failed } = await loadCelebrationServices()
+  const [{ services, failed }, { items: galleryItems }] = await Promise.all([loadCelebrationServices(), getPublishedGalleryPage(0, 6)])
+  const homepageGalleryPreviewItems: CelebrationGalleryItem[] = galleryItems.map((item) => ({
+    id: item.id, src: item.image_url, alt: item.alt_text, title: item.title, caption: item.caption, category: item.category, width: item.width, height: item.height, publicationType: 'approved-event-photo',
+  }))
 
   return (
     <>

@@ -4,10 +4,12 @@ import { ArrowRight } from 'lucide-react'
 import { CelebrationBreadcrumbs } from '@/components/celebrations/CelebrationBreadcrumbs'
 import { CeremonyGrid } from '@/components/celebrations/CeremonyGrid'
 import { GalleryGrid } from '@/components/celebrations/GalleryGrid'
+import { GalleryCollection } from '@/components/celebrations/GalleryCollection'
 import { JsonLd } from '@/components/seo/JsonLd'
 import { CelebrationCTA } from '@/components/celebrations/CelebrationCTA'
 import { IndependentServiceNotice } from '@/components/celebrations/IndependentServiceNotice'
-import { approvedCelebrationGalleryItems, celebrationGalleryItems, galleryBrandArtwork } from '@/lib/celebrations/gallery'
+import { celebrationGalleryItems, galleryBrandArtwork, type CelebrationGalleryItem } from '@/lib/celebrations/gallery'
+import { getPublishedGalleryPage } from '@/lib/celebrations/gallery-repository'
 
 const url = 'https://mythirumanam.com/gallery'
 const title = 'Thirukadaiyur Celebration Gallery | MyThirumanam'
@@ -28,7 +30,19 @@ export const metadata: Metadata = {
   },
 }
 
-export default function GalleryPage() {
+export default async function GalleryPage() {
+  const galleryPage = await getPublishedGalleryPage()
+  const approvedCelebrationGalleryItems: CelebrationGalleryItem[] = galleryPage.items.map((item) => ({
+    id: item.id,
+    src: item.image_url,
+    alt: item.alt_text,
+    title: item.title,
+    caption: item.caption,
+    category: item.category,
+    width: item.width,
+    height: item.height,
+    publicationType: 'approved-event-photo',
+  }))
   const hasApprovedEventPhotos = approvedCelebrationGalleryItems.length > 0
 
   return (
@@ -72,7 +86,7 @@ export default function GalleryPage() {
             )}
             <IndependentServiceNotice className="mt-4 max-w-3xl text-stone-600" />
           </div>
-          {hasApprovedEventPhotos && <GalleryGrid items={approvedCelebrationGalleryItems} />}
+          {hasApprovedEventPhotos && <GalleryCollection initialItems={approvedCelebrationGalleryItems} initialHasMore={galleryPage.hasMore} />}
         </section>
 
         <section aria-labelledby="gallery-artwork-heading" className="border-y border-amber-200 bg-white py-16">

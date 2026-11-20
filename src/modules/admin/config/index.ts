@@ -15,6 +15,7 @@ export const ADMIN_CONFIG = {
     LEADS: '/admin/leads',
     QUOTATIONS: '/admin/quotations',
     CELEBRATION_SERVICES: '/admin/celebration-services',
+    GALLERY: '/admin/gallery',
     BLOGS: '/admin/blogs',
     SETTINGS: '/admin/settings',
   },

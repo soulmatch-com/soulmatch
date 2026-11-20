@@ -15,6 +15,7 @@ const moduleHeaders: Record<string, { eyebrow: string; title: string; descriptio
   '/admin/leads': { eyebrow: 'Customer workspace', title: 'Leads', description: 'Track celebration enquiries and follow-up activity.' },
   '/admin/quotations': { eyebrow: 'Commercial workspace', title: 'Quotations', description: 'Create, review, and manage quotations from the complete list.' },
   '/admin/celebration-services': { eyebrow: 'Catalogue management', title: 'Celebration Services', description: 'Manage services available for enquiries and quotations.' },
+  '/admin/gallery': { eyebrow: 'Content management', title: 'Gallery', description: 'Upload, review, and publish approved celebration photographs.' },
   '/admin/blogs': { eyebrow: 'Content management', title: 'Blog Management', description: 'Create, publish, and manage planning guides.' },
   '/admin/settings': { eyebrow: 'Admin workspace', title: 'Settings', description: 'Manage account and workspace settings.' },
 }

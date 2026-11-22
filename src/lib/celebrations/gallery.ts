@@ -5,7 +5,7 @@
  */
 export type CelebrationGalleryItem = {
   id: string
-  src: `/${string}`
+  src: string
   alt: string
   title: string
   caption: string
@@ -15,7 +15,7 @@ export type CelebrationGalleryItem = {
   publicationType: 'approved-event-photo' | 'brand-artwork'
 }
 
-export type GalleryCategory = 'Brand Artwork'
+export type GalleryCategory = 'Brand Artwork' | string
 
 export const galleryBrandArtwork = {
   id: 'mythirumanam-emblem',

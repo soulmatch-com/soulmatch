@@ -17,6 +17,7 @@
 .heading { display: flex; align-items: center; gap: 15px; }
 .pageIcon { display: grid; place-items: center; width: 52px; height: 52px; border-radius: 15px; color: var(--purple); background: #eee2fc; flex-shrink: 0; }
 .heading h1 { font-size: 28px; line-height: 1.25; font-weight: 750; letter-spacing: -.7px; }
+.eyebrow { margin-bottom: 4px; color: #7c3eb1 !important; font-size: 11px !important; font-weight: 750; letter-spacing: .12em; text-transform: uppercase; }
 .heading p { color: #4d416b; margin-top: 5px; font-size: 14px; }
 .toolbar { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-start; }
 .workspace .outlineButton { height: 46px; padding-inline: 21px; border: 1px solid #d8cee7; border-radius: 10px; color: var(--ink); background: #ffffffb8; }
@@ -26,6 +27,12 @@
 .toolbar .primaryButton { height: 46px; padding-inline: 23px; border-radius: 10px; }
 .card { min-width: 0; border: 1px solid var(--line); border-radius: 15px; background: #ffffffdb; box-shadow: 0 2px 4px #2a0e4d06, 0 1px 2px #2a0e4d05; }
 .metadata { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) minmax(0, 1fr); align-items: center; gap: 22px; padding: 20px 24px; margin-bottom: 27px; }
+.createIntro { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; margin-bottom: 27px; overflow: hidden; background: linear-gradient(100deg, #2a104d, #5c278b 62%, #863eb1); color: white; }
+.createIntro > div { position: relative; min-height: 112px; padding: 23px 22px 20px 70px; }
+.createIntro > div + div { border-left: 1px solid #ffffff2b; }
+.createIntro strong { display: block; font-size: 15px; font-weight: 700; }
+.createIntro p { margin-top: 7px; color: #f3eafd; font-size: 12px; line-height: 1.5; }
+.stepNumber { position: absolute; top: 22px; left: 20px; display: grid; place-items: center; width: 34px; height: 34px; border: 1px solid #ffffff75; border-radius: 50%; color: #fff; font-size: 11px; font-weight: 750; }
 .identity { display: flex; align-items: center; flex-wrap: wrap; gap: 20px; min-width: 0; }
 .quotationNumber { display: inline-flex; align-items: center; gap: 14px; min-width: 0; padding: 9px 14px; border-radius: 9px; border: 1px solid #e7daf6; background: #f0e7fa; text-align: left; font-size: 16px; font-weight: 700; }
 .quotationNumber span { overflow-wrap: anywhere; }
@@ -157,6 +164,10 @@
   .toolbar > div { width: 100%; }
   .workspace .outlineButton, .toolbar .primaryButton { width: 100%; padding-inline: 10px; height: 44px; font-size: 12px; gap: 6px; }
   .metadata { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; padding: 16px; margin-bottom: 20px; }
+  .createIntro { grid-template-columns: 1fr; margin-bottom: 20px; }
+  .createIntro > div { min-height: auto; padding: 16px 16px 16px 62px; }
+  .createIntro > div + div { border-top: 1px solid #ffffff2b; border-left: 0; }
+  .stepNumber { top: 15px; left: 16px; width: 30px; height: 30px; }
   .identity { grid-column: 1 / -1; gap: 10px; justify-content: space-between; }
   .timestamp { padding-left: 0; border-left: 0; gap: 8px; }
   .timestamp svg { width: 18px; }

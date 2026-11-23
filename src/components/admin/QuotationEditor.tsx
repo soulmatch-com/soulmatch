@@ -13,6 +13,7 @@ import styles from "./QuotationEditor.module.css";
 
 type Props = {
   quotationId: string;
+  createMode?: boolean;
   quotation?: Quotation;
   services: Service[];
   leads: Lead[];
@@ -50,6 +51,7 @@ const title = (value: string) => value.charAt(0).toUpperCase() + value.slice(1);
 
 export function QuotationEditor(props: Props) {
   const { quotationId, quotation, services, leads, leadIds, draftItems, validUntil, notes, total, loading, saving, readOnly, error } = props;
+  const createMode = props.createMode ?? false;
   const [adding, setAdding] = useState(false);
   const [previewing, setPreviewing] = useState(false);
   const [draggedId, setDraggedId] = useState<string | null>(null);
@@ -57,7 +59,7 @@ export function QuotationEditor(props: Props) {
   const [copied, setCopied] = useState(false);
   const [copyError, setCopyError] = useState("");
   const copyTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const disabled = loading || props.loadFailed || saving || readOnly || !quotation;
+  const disabled = loading || props.loadFailed || saving || readOnly || (!createMode && !quotation);
   const availableServices = services.filter((service) => service.is_active !== false && !draftItems.some((item) => item.serviceId === service.id));
   useEffect(() => () => { if (copyTimer.current) clearTimeout(copyTimer.current); }, []);
 
@@ -75,22 +77,22 @@ export function QuotationEditor(props: Props) {
   return <div className={styles.workspace}>
     <nav aria-label="Breadcrumb" className={styles.breadcrumb}>
       <Link href="/admin/quotations" aria-label="Back to quotations"><ArrowLeft size={17} /></Link>
-      <ChevronRight size={14} /><Link href="/admin/quotations">Quotations</Link><ChevronRight size={14} /><span aria-current="page">Edit Quotation</span>
+      <ChevronRight size={14} /><Link href="/admin/quotations">Quotations</Link><ChevronRight size={14} /><span aria-current="page">{createMode ? "Create quotation" : "Edit quotation"}</span>
     </nav>
     <header className={styles.pageHeader}>
-      <div className={styles.heading}><span className={styles.pageIcon}><FileText size={30} /></span><div><h1>Edit Quotation</h1><p>Update services, prices, lead, validity and notes.</p></div></div>
+      <div className={styles.heading}><span className={styles.pageIcon}><FileText size={30} /></span><div><p className={styles.eyebrow}>{createMode ? "Commercial workspace" : "Quotation workspace"}</p><h1>{createMode ? "Build a new quotation" : "Edit quotation"}</h1><p>{createMode ? "Compose services, assign a customer, and save a ready-to-send draft." : "Update services, prices, lead, validity and notes."}</p></div></div>
       <div className={styles.toolbar}>
-        <Button variant="outline" className={styles.outlineButton} disabled={loading || !quotation} onClick={() => setPreviewing(true)}><Eye size={18} />Preview</Button>
-        <CopyQuotationButton quotationId={quotationId} showLabel className={styles.outlineButton} disabled={loading || props.loadFailed || !quotation || saving} />
-        <Button type="submit" form="quotation-edit-form" className={styles.primaryButton} disabled={disabled || !draftItems.length}><Save size={17} />{saving ? "Saving…" : "Save Changes"}</Button>
+        {!createMode && <><Button variant="outline" className={styles.outlineButton} disabled={loading || !quotation} onClick={() => setPreviewing(true)}><Eye size={18} />Preview</Button>
+        <CopyQuotationButton quotationId={quotationId} showLabel className={styles.outlineButton} disabled={loading || props.loadFailed || !quotation || saving} /></>}
+        <Button type="submit" form="quotation-edit-form" className={styles.primaryButton} disabled={disabled || !draftItems.length}><Save size={17} />{saving ? "Saving…" : createMode ? "Create Draft" : "Save Changes"}</Button>
       </div>
     </header>
 
-    <section className={`${styles.card} ${styles.metadata}`} aria-label="Quotation information" aria-busy={loading}>
+    {createMode ? <section className={`${styles.card} ${styles.createIntro}`} aria-label="New quotation guidance"><div><span className={styles.stepNumber}>01</span><strong>Add the services</strong><p>Choose the celebration services and set their pricing.</p></div><div><span className={styles.stepNumber}>02</span><strong>Set the customer details</strong><p>Optionally link one lead, validity date, and a note.</p></div><div><span className={styles.stepNumber}>03</span><strong>Save as a draft</strong><p>Review the total, then create the quotation.</p></div></section> : <section className={`${styles.card} ${styles.metadata}`} aria-label="Quotation information" aria-busy={loading}>
       <div className={styles.identity}><button type="button" className={styles.quotationNumber} onClick={() => void copyNumber()} disabled={!quotation} aria-label={copied ? "Quotation number copied" : "Copy quotation number"}><span>{quotation?.quotation_number || (loading ? "Loading quotation…" : "Quotation unavailable")}</span>{copied ? <Check size={17} /> : <Copy size={17} />}</button>{quotation && <span className={styles.badge} data-status={props.effectiveStatus || quotation.status}>{title(props.effectiveStatus || quotation.status)}</span>}</div>
       <div className={styles.timestamp}><CalendarDays size={24} /><div><span>Created on</span><p>{date(quotation?.created_at)}</p></div></div>
       <div className={styles.timestamp}><Pencil size={23} /><div><span>Last updated</span><p>{date(quotation?.updated_at)}</p></div></div>
-    </section>
+    </section>}
     {copyError && <p role="alert" className={styles.error}>{copyError}</p>}
     {error && <p role="alert" className={styles.error}>{error}</p>}
     {props.loadFailed && <Button type="button" variant="outline" onClick={props.onRetry} className="mb-5">Retry loading</Button>}
@@ -137,13 +139,13 @@ export function QuotationEditor(props: Props) {
 
       <aside className={styles.summaryColumn} aria-label="Quotation summary and actions">
         <section className={styles.card}><h2 className={styles.cardTitle}><Calculator />Quotation Summary</h2><div className={styles.summaryBody}><div className={styles.summaryLine}><span>Services</span><span>{draftItems.length} {draftItems.length === 1 ? "item" : "items"}</span></div><div className={styles.total}><strong>Quotation Total</strong><strong>{money.format(total)}</strong></div></div></section>
-        <section className={styles.card}><h2 className={styles.cardTitle}><Activity />Lifecycle</h2><div className={styles.lifecycleBody}>{props.lifecycle}{props.bookingAction}</div></section>
+        {!createMode && <><section className={styles.card}><h2 className={styles.cardTitle}><Activity />Lifecycle</h2><div className={styles.lifecycleBody}>{props.lifecycle}{props.bookingAction}</div></section>
         <QuotationActivityDialog quotationId={quotationId} quotationNumber={quotation?.quotation_number} disabled={loading || props.loadFailed || !quotation} />
-        <section className={`${styles.card} ${styles.deleteCard}`}><h2><Trash2 size={22} />Delete Quotation</h2><p>This permanently removes the quotation and its related history. Quotations linked to a booking cannot be deleted.</p><Button type="button" variant="outline" disabled={!quotation || props.deleting} onClick={props.onDelete}><Trash2 size={16} />{props.deleting ? "Deleting…" : "Delete Quotation"}</Button></section>
+        <section className={`${styles.card} ${styles.deleteCard}`}><h2><Trash2 size={22} />Delete Quotation</h2><p>This permanently removes the quotation and its related history. Quotations linked to a booking cannot be deleted.</p><Button type="button" variant="outline" disabled={!quotation || props.deleting} onClick={props.onDelete}><Trash2 size={16} />{props.deleting ? "Deleting…" : "Delete Quotation"}</Button></section></>}
       </aside>
     </div>
     <AddServiceDialog open={adding && !disabled} onOpenChange={setAdding} services={availableServices} onAdd={(item) => { if (!disabled) props.onAddService(item); setAdding(false); }} />
-    <QuotationPreview quotationId={quotationId} open={previewing} onOpenChange={setPreviewing} />
+    {!createMode && <QuotationPreview quotationId={quotationId} open={previewing} onOpenChange={setPreviewing} />}
   </div>;
 }
 

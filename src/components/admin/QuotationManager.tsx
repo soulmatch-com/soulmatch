@@ -303,9 +303,10 @@ export function QuotationManager({ quotationId, initialLeadId, returnTo }: { quo
     }
   }
   return (
-    <section className={quotationId ? undefined : "min-w-0 rounded-xl border bg-white p-4 sm:p-5"}>
-      {quotationId ? <QuotationEditor
-        quotationId={quotationId}
+    <section>
+      {true ? <QuotationEditor
+        quotationId={quotationId || "new"}
+        createMode={!quotationId}
         quotation={currentQuotation}
         services={services}
         leads={leads}
@@ -332,8 +333,8 @@ export function QuotationManager({ quotationId, initialLeadId, returnTo }: { quo
         onRemoveService={removeService}
         onMoveService={moveService}
         onDelete={() => currentQuotation && setQuotationToDelete(currentQuotation)}
-        lifecycle={!loading && !loadFailed && currentQuotation && <QuotationLifecycle quotationId={quotationId} quotation={currentQuotation} onQuotationChange={handleQuotationChange} onEffectiveStatusChange={setEffectiveStatus} workspace />}
-        bookingAction={!loading && !loadFailed && currentQuotation && <QuotationBookingAction quotationId={quotationId} status={currentQuotation.status} />}
+        lifecycle={!loading && !loadFailed && currentQuotation && <QuotationLifecycle quotationId={quotationId || ""} quotation={currentQuotation} onQuotationChange={handleQuotationChange} onEffectiveStatusChange={setEffectiveStatus} workspace />}
+        bookingAction={!loading && !loadFailed && currentQuotation && <QuotationBookingAction quotationId={quotationId || ""} status={currentQuotation.status} />}
       /> : <>
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
@@ -356,7 +357,7 @@ export function QuotationManager({ quotationId, initialLeadId, returnTo }: { quo
         <h3 className="text-sm font-semibold text-slate-800">{quotationId ? "Quotation details" : "New quotation"}</h3>
         {isReadOnly && (
           <p role="status" className="mt-3 rounded-md bg-amber-50 p-3 text-sm text-amber-900">
-            This quotation is {currentQuotation.status} and cannot be edited. Create a new quotation to make changes.
+            This quotation is {currentQuotation?.status} and cannot be edited. Create a new quotation to make changes.
           </p>
         )}
         {currentQuotation?.status === "draft" && leadIds.length === 0 && (

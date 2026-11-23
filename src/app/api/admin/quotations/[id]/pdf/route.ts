@@ -166,9 +166,9 @@ function eventDateRange(startDate: string | null, endDate: string | null, sessio
 }
 
 function eventName(value: '60th-marriage' | '70th-marriage' | '80th-marriage' | null) {
-  if (value === '60th-marriage') return '60th Marriage'
-  if (value === '70th-marriage') return '70th Marriage'
-  if (value === '80th-marriage') return '80th Marriage'
+  if (value === '60th-marriage') return 'Sashtiapthapoorthi'
+  if (value === '70th-marriage') return 'Bheemaratha Shanthi'
+  if (value === '80th-marriage') return 'Sathabhishekam'
   return 'Not provided'
 }
 
@@ -178,6 +178,16 @@ function sessionName(value: 'one_session' | 'two_sessions' | null) {
 
 function packageName(value: 'basic' | 'premium' | null) {
   return value === 'basic' ? 'Standard' : value === 'premium' ? 'Premium' : 'Not provided'
+}
+
+function fileNamePart(value: string) {
+  return value.trim().replace(/[<>:"/\\|?*\u0000-\u001F]/gu, '').replace(/\s+/gu, '-').replace(/-+/gu, '-').replace(/^-|-$/gu, '')
+}
+
+function quotationPdfFileName(lead: { contact_name: string; event_type: '60th-marriage' | '70th-marriage' | '80th-marriage' | null; event_date: string | null; event_end_date: string | null; event_session: 'one_session' | 'two_sessions' | null; package_type: 'basic' | 'premium' | null } | undefined, quotationNumber: string) {
+  if (!lead) return `${fileNamePart(quotationNumber) || 'quotation'}.pdf`
+  const sessionCount = lead.event_session === 'one_session' ? '1-session' : lead.event_session === 'two_sessions' ? '2-sessions' : 'session-not-provided'
+  return [lead.contact_name, eventName(lead.event_type), packageName(lead.package_type), sessionCount, eventDateRange(lead.event_date, lead.event_end_date, lead.event_session)].map(fileNamePart).filter(Boolean).join('-').concat('.pdf')
 }
 
 function wrap(text: string, maxCharacters: number) {
@@ -283,11 +293,12 @@ export async function GET(_: Request, { params }: { params: Promise<{ id: string
   }
   detail('Event', eventName(primaryLead?.event_type ?? null), 36, 73, 710)
   detail('Venue', 'Thirukadaiyur', 212, 249, 710)
-  detail('Date', eventDateRange(primaryLead?.event_date ?? null, primaryLead?.event_end_date ?? null, primaryLead?.event_session ?? null), 36, 73, 697)
+  detail('Event Date', eventDateRange(primaryLead?.event_date ?? null, primaryLead?.event_end_date ?? null, primaryLead?.event_session ?? null), 36, 93, 697)
   detail('Prepared On', compactDate(quotation.created_at.slice(0, 10)), 212, 267, 697)
   detail('Session', sessionName(primaryLead?.event_session ?? null), 36, 78, 684)
-  detail('Guest Count', primaryLead?.total_members ? String(primaryLead.total_members) : 'Not provided', 212, 302, 684)
+  detail('Guest Count', primaryLead?.total_members ? String(primaryLead.total_members) : 'Not provided', 212, 270, 684)
   detail('Package', packageName(primaryLead?.package_type ?? null), 36, 82, 671)
+  detail('Valid Until', compactDate(quotation.valid_until), 212, 270, 671)
   let y = 643
   page.drawRectangle({ x: tableLeft, y: y - 14, width: tableWidth, height: 14, color: brand })
   text('No.', tableLeft + (numberColumn - bold.widthOfTextAtSize('No.', 7)) / 2, y - 10, 7, bold, rgb(1, 1, 1))
@@ -340,5 +351,6 @@ export async function GET(_: Request, { params }: { params: Promise<{ id: string
 
   const bytes = await pdf.save()
   const body = new Uint8Array(bytes).buffer
-  return new NextResponse(body, { headers: { 'Content-Type': 'application/pdf', 'Content-Disposition': `attachment; filename="${quotation.quotation_number}.pdf"`, 'Cache-Control': 'private, no-store' } })
+  const fileName = quotationPdfFileName(primaryLead, quotation.quotation_number)
+  return new NextResponse(body, { headers: { 'Content-Type': 'application/pdf', 'Content-Disposition': `attachment; filename="quotation.pdf"; filename*=UTF-8''${encodeURIComponent(fileName)}`, 'Cache-Control': 'private, no-store' } })
 }

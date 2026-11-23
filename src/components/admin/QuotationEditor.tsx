@@ -143,7 +143,7 @@ export function QuotationEditor(props: Props) {
       </aside>
     </div>
     <AddServiceDialog open={adding && !disabled} onOpenChange={setAdding} services={availableServices} onAdd={(item) => { if (!disabled) props.onAddService(item); setAdding(false); }} />
-    <QuotationPreview quotationId={quotationId} quotationNumber={quotation?.quotation_number} open={previewing} onOpenChange={setPreviewing} />
+    <QuotationPreview quotationId={quotationId} open={previewing} onOpenChange={setPreviewing} />
   </div>;
 }
 
@@ -157,7 +157,7 @@ function AddServiceDialog({ open, onOpenChange, services, onAdd }: { open: boole
   </DialogContent></Dialog>;
 }
 
-function QuotationPreview({ quotationId, quotationNumber, open, onOpenChange }: { quotationId: string; quotationNumber?: string; open: boolean; onOpenChange: (open: boolean) => void }) {
+function QuotationPreview({ quotationId, open, onOpenChange }: { quotationId: string; open: boolean; onOpenChange: (open: boolean) => void }) {
   const [pdf, setPdf] = useState<{ url?: string; error?: string }>({});
   useEffect(() => {
     if (!open) return;
@@ -177,5 +177,5 @@ function QuotationPreview({ quotationId, quotationNumber, open, onOpenChange }: 
     void load();
     return () => { controller.abort(); if (objectUrl) URL.revokeObjectURL(objectUrl); };
   }, [open, quotationId]);
-  return <Dialog open={open} onOpenChange={onOpenChange}><DialogContent className={styles.previewDialog}><DialogHeader><DialogTitle>Quotation preview</DialogTitle><DialogDescription>Preview of the saved quotation. Save your changes before previewing updated details.</DialogDescription></DialogHeader>{pdf.error ? <p role="alert" className={styles.error}>{pdf.error}</p> : pdf.url ? <iframe title="Quotation PDF preview" src={pdf.url} className={styles.pdf} /> : <div className={styles.empty}><Loader2 size={24} className="animate-spin" />Preparing preview…</div>}<DialogFooter>{pdf.url && <Button asChild className={styles.primaryButton}><a href={pdf.url} download={`${quotationNumber || "quotation"}.pdf`}><Download size={16} />Download PDF</a></Button>}</DialogFooter></DialogContent></Dialog>;
+  return <Dialog open={open} onOpenChange={onOpenChange}><DialogContent className={styles.previewDialog}><DialogHeader><DialogTitle>Quotation preview</DialogTitle><DialogDescription>Preview of the saved quotation. Save your changes before previewing updated details.</DialogDescription></DialogHeader>{pdf.error ? <p role="alert" className={styles.error}>{pdf.error}</p> : pdf.url ? <iframe title="Quotation PDF preview" src={pdf.url} className={styles.pdf} /> : <div className={styles.empty}><Loader2 size={24} className="animate-spin" />Preparing preview…</div>}<DialogFooter>{pdf.url && <Button asChild className={styles.primaryButton}><a href={`/api/admin/quotations/${quotationId}/pdf`}><Download size={16} />Download PDF</a></Button>}</DialogFooter></DialogContent></Dialog>;
 }

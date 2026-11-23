@@ -2,6 +2,8 @@ import type { ReactNode } from 'react'
 
 import Link from 'next/link'
 
+import { parseMarkdownHeading } from './markdown-article'
+
 function safeHref(value: string) {
   // Older published content can still contain an absolute .in link; that host redirects to .com.
   return /^(\/|https:\/\/mythirumanam\.(?:com|in)\/)/.test(value) ? value : null
@@ -63,7 +65,7 @@ function renderTable(lines: string[], start: number) {
 }
 
 export function MarkdownArticle({ content }: { content: string }) {
-  const lines = content.replace(/<[^>]*>/g, '').split('\n')
+  const lines = content.split('\n')
   const nodes: ReactNode[] = []
 
   for (let index = 0; index < lines.length; index += 1) {
@@ -90,11 +92,17 @@ export function MarkdownArticle({ content }: { content: string }) {
       const table = renderTable(lines, index)
       nodes.push(table.node)
       index = table.next - 1
-    } else if (line.startsWith('### ')) nodes.push(<h3 key={index} className="text-xl font-bold">{inline(line.slice(4))}</h3>)
-    else if (line.startsWith('## ')) nodes.push(<h2 key={index} className="text-2xl font-bold">{inline(line.slice(3))}</h2>)
-    else if (line.startsWith('# ')) nodes.push(<h1 key={index} className="text-3xl font-bold">{inline(line.slice(2))}</h1>)
-    else if (line.startsWith('- ')) nodes.push(<li key={index} className="ml-6 list-disc">{inline(line.slice(2))}</li>)
-    else if (line) nodes.push(<p key={index} className="leading-8 text-stone-700">{inline(line)}</p>)
+    } else {
+      const heading = parseMarkdownHeading(line)
+      if (heading?.level === 4) nodes.push(<h4 key={index} id={heading.id} className="text-lg font-bold">{inline(heading.text)}</h4>)
+      else if (heading?.level === 3) nodes.push(<h3 key={index} id={heading.id} className="text-xl font-bold">{inline(heading.text)}</h3>)
+      else if (heading?.level === 2) nodes.push(<h2 key={index} id={heading.id} className="text-2xl font-bold">{inline(heading.text)}</h2>)
+      // The article page title is the document's only H1. Body H1s retain their
+      // text, ID, children, and previous body-heading styling as H2s.
+      else if (heading?.level === 1) nodes.push(<h2 key={index} id={heading.id} className="text-3xl font-bold">{inline(heading.text)}</h2>)
+      else if (line.startsWith('- ')) nodes.push(<li key={index} className="ml-6 list-disc">{inline(line.slice(2))}</li>)
+      else if (line) nodes.push(<p key={index} className="leading-8 text-stone-700">{inline(line)}</p>)
+    }
   }
 
   return <div className="space-y-5">{nodes}</div>

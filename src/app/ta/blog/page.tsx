@@ -21,13 +21,13 @@ export const metadata: Metadata = {
 }
 
 export default async function TamilBlogPage() {
-  const { items: articles } = await getPublicBlogPosts('ta')
+  const { items: articles, total } = await getPublicBlogPosts('ta')
 
   return (
     <>
       <JsonLd data={{ '@context': 'https://schema.org', '@type': 'CollectionPage', name: 'திருக்கடையூர் விழா வழிகாட்டிகள்', url, description, inLanguage: 'ta' }} />
       <div lang="ta">
-        <BlogListing locale="ta" articles={articles} />
+        <BlogListing key="ta" locale="ta" articles={articles} total={total} />
       </div>
     </>
   )

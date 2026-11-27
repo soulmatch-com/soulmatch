@@ -21,12 +21,12 @@ export const metadata: Metadata = {
 }
 
 export default async function BlogPage() {
-  const { items: articles } = await getPublicBlogPosts('en')
+  const { items: articles, total } = await getPublicBlogPosts('en')
 
   return (
     <>
       <JsonLd data={{ '@context': 'https://schema.org', '@type': 'CollectionPage', name: 'Thirukadaiyur Celebration Guides', url, description, inLanguage: 'en' }} />
-      <BlogListing locale="en" articles={articles} />
+      <BlogListing key="en" locale="en" articles={articles} total={total} />
     </>
   )
 }

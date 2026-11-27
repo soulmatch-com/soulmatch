@@ -7,6 +7,7 @@ import { blogAdminListSchema, blogDraftSchema, blogLocaleSchema, blogPublishSche
 import type { CmsBlogInput, CmsBlogLocale, CmsBlogPost, CmsBlogStatus, CmsBlogTranslation } from '@/lib/blog/cms-types'
 
 type TranslationSummary = { exists: boolean; status: CmsBlogStatus | 'missing'; title: string | null }
+type TranslationListRow = Pick<CmsBlogTranslation, 'id' | 'locale' | 'status' | 'title'>
 type CmsRows = { post: CmsBlogPost; translations: CmsBlogTranslation[] }
 export const adminBlogPreviewRobots = { index: false, follow: false } as const
 
@@ -20,7 +21,7 @@ async function authorize() {
   return result.admin
 }
 
-function translationSummary(translations: CmsBlogTranslation[], locale: CmsBlogLocale): TranslationSummary {
+function translationSummary(translations: TranslationListRow[], locale: CmsBlogLocale): TranslationSummary {
   const value = translations.find((translation) => translation.locale === locale)
   return value ? { exists: true, status: value.status, title: value.title } : { exists: false, status: 'missing', title: null }
 }
@@ -40,13 +41,13 @@ export async function getAdminBlogPosts(input: unknown = {}) {
   await authorize()
   const { page, pageSize, status, search } = blogAdminListSchema.parse(input)
   const db = createAdminClient()
-  let query = db.from('blog_posts').select('id, slug, status, featured_image_url, featured_image_alt, published_at, created_at, updated_at, created_by, updated_by, blog_post_translations(id, locale, status, title)', { count: 'exact' }).order('updated_at', { ascending: false }).range((page - 1) * pageSize, page * pageSize - 1)
+  let query = db.from('blog_posts').select('id, slug, status, featured_image_url, featured_image_alt, published_at, created_at, updated_at, created_by, updated_by, blog_post_translations(id, locale, status, title), search_translations:blog_post_translations()', { count: 'exact' }).order('updated_at', { ascending: false }).range((page - 1) * pageSize, page * pageSize - 1)
   if (status !== 'all') query = query.eq('status', status)
   const safeSearch = search.replace(/[^a-zA-Z0-9\u0B80-\u0BFF\s-]/g, '').trim()
-  if (safeSearch) query = query.or(`slug.ilike.%${safeSearch}%,blog_post_translations.title.ilike.%${safeSearch}%`)
+  if (safeSearch) query = query.ilike('search_translations.title', `%${safeSearch}%`).or(`slug.ilike.%${safeSearch}%,search_translations.not.is.null`)
   const { data, error, count } = await query
   if (error) throw new AdminBlogRepositoryError('READ_FAILED', 'Unable to load blogs.')
-  const rows = ((data ?? []) as Array<CmsBlogPost & { blog_post_translations: CmsBlogTranslation[] }>).map(({ blog_post_translations, ...post }) => ({ ...post, english: translationSummary(blog_post_translations, 'en'), tamil: translationSummary(blog_post_translations, 'ta') }))
+  const rows = ((data ?? []) as Array<CmsBlogPost & { blog_post_translations: TranslationListRow[] }>).map(({ blog_post_translations, ...post }) => ({ ...post, english: translationSummary(blog_post_translations, 'en'), tamil: translationSummary(blog_post_translations, 'ta') }))
   return { rows, total: count ?? 0, page, pageSize }
 }
 

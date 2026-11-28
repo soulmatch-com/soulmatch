@@ -43,11 +43,12 @@ function toPublicListItem(article: BlogArticle): PublicBlogListItem {
   }
 }
 
-export async function getPublicBlogPosts(locale: BlogLocale) {
-  if (isPublicBlogCmsEnabled()) return getPublishedBlogPosts(locale)
+export async function getPublicBlogPosts(locale: BlogLocale, options: { page?: number; pageSize?: number } = {}) {
+  if (isPublicBlogCmsEnabled()) return getPublishedBlogPosts(locale, options)
 
   const items = getPublishedBlogArticles(locale).map(toPublicListItem)
-  return { items, page: 1, pageSize: 20, total: items.length }
+  const { page = 1, pageSize = 20 } = options
+  return { items: items.slice((page - 1) * pageSize, page * pageSize), page, pageSize, total: items.length }
 }
 
 export async function getPublicBlogBySlug(slug: string, locale: BlogLocale): Promise<PublicBlogSourceArticle | null> {

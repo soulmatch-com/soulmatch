@@ -1,7 +1,9 @@
+'use client'
+
+import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
 import type { BlogLocale } from '@/content/blog/articles'
-import { getBlogListingPath } from '@/content/blog/articles'
 import type { PublicBlogListItem } from '@/lib/blog/public-blog-types'
 import { formatBlogDate } from '@/lib/blog/format-blog-date'
 import { BlogSubscriptionBox } from './BlogSubscriptionBox'
@@ -37,7 +39,38 @@ function getArticlePath(article: Pick<PublicBlogListItem, 'locale' | 'slug'>) {
   return article.locale === 'en' ? `/blog/${article.slug}` : `/ta/blog/${article.slug}`
 }
 
-export function BlogListing({ locale, articles }: { locale: BlogLocale; articles: readonly PublicBlogListItem[] }) {
+export function BlogListing({ locale, articles: initialArticles, total }: { locale: BlogLocale; articles: readonly PublicBlogListItem[]; total: number }) {
+  const [articles, setArticles] = useState(initialArticles)
+  const [page, setPage] = useState(1)
+  const [hasMore, setHasMore] = useState(initialArticles.length < total)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState(false)
+  const sentinel = useRef<HTMLDivElement>(null)
+  const inFlight = useRef(false)
+
+  useEffect(() => {
+    const target = sentinel.current
+    if (!target || !hasMore || error) return
+    const observer = new IntersectionObserver(([entry]) => {
+      if (!entry.isIntersecting || inFlight.current) return
+      inFlight.current = true
+      setLoading(true)
+      fetch(`/api/blog?locale=${locale}&page=${page + 1}`)
+        .then((response) => {
+          if (!response.ok) throw new Error('Unable to load blogs')
+          return response.json() as Promise<{ items: PublicBlogListItem[]; total: number; page: number; pageSize: number }>
+        })
+        .then((result) => {
+          setArticles((current) => [...current, ...result.items.filter((item) => !current.some((existing) => existing.slug === item.slug))])
+          setPage(result.page)
+          setHasMore(result.items.length > 0 && result.page * result.pageSize < result.total)
+        })
+        .catch(() => setError(true))
+        .finally(() => { inFlight.current = false; setLoading(false) })
+    }, { rootMargin: '300px' })
+    observer.observe(target)
+    return () => observer.disconnect()
+  }, [locale, page, hasMore, error])
   const copy = listingCopy[locale]
   const otherLocale = locale === 'en' ? 'ta' : 'en'
   const currentLabel = locale === 'en' ? 'English' : 'தமிழ்'
@@ -55,7 +88,7 @@ export function BlogListing({ locale, articles }: { locale: BlogLocale; articles
               {currentLabel}
             </span>
             <Link
-              href={getBlogListingPath(otherLocale)}
+              href={otherLocale === 'en' ? '/blog' : '/ta/blog'}
               hrefLang={otherLocale}
               className="rounded-full border border-white/50 px-4 py-2 text-white hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
             >
@@ -98,6 +131,9 @@ export function BlogListing({ locale, articles }: { locale: BlogLocale; articles
             ))}
           </div>
         )}
+        {hasMore && <div ref={sentinel} className="py-6 text-center text-sm text-stone-600" role="status" aria-live="polite">
+          {error ? <><span>{locale === 'ta' ? 'வழிகாட்டிகளை ஏற்ற முடியவில்லை.' : 'Could not load more guides.'} </span><button type="button" className="font-bold text-amber-800 underline" onClick={() => setError(false)}>{locale === 'ta' ? 'மீண்டும் முயற்சிக்கவும்' : 'Try again'}</button></> : loading ? (locale === 'ta' ? 'மேலும் வழிகாட்டிகள் ஏற்றப்படுகின்றன…' : 'Loading more guides…') : null}
+        </div>}
         <BlogSubscriptionBox locale={locale} source="blog_listing" />
       </section>
     </main>
